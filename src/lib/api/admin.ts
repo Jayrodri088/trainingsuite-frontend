@@ -107,6 +107,13 @@ export const adminApi = {
     return response.data;
   },
 
+  deleteUser: async (id: string) => {
+    const response = await apiClient.delete<ApiResponse<null>>(
+      `/admin/users/${id}`
+    );
+    return response.data;
+  },
+
   // Analytics
   getOverview: async () => {
     const response = await apiClient.get<ApiResponse<OverviewAnalytics>>(
