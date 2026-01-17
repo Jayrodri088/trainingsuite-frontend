@@ -216,19 +216,19 @@
 ---
 
 ## Phase 10: Instructor Dashboard
-- [ ] Instructor overview
-  - [ ] Course statistics
-  - [ ] Enrollment counts
-  - [ ] Revenue summary
-  - [ ] Recent activity
-- [ ] My courses (instructor)
-  - [ ] Courses table
-  - [ ] Status badges
-  - [ ] Quick actions (edit, view, delete)
-- [ ] Course builder
-  - [ ] Course details form
-  - [ ] Thumbnail upload
-  - [ ] Preview video upload
+- [x] Instructor overview
+  - [x] Course statistics
+  - [x] Enrollment counts
+  - [x] Revenue summary
+  - [x] Recent activity
+- [x] My courses (instructor)
+  - [x] Courses table
+  - [x] Status badges
+  - [x] Quick actions (edit, view, delete)
+- [x] Course builder
+  - [x] Course details form
+  - [x] Thumbnail upload
+  - [x] Preview video upload
   - [ ] Module management
     - [ ] Add/edit/delete modules
     - [ ] Drag-and-drop reordering
@@ -244,19 +244,19 @@
     - [ ] Set correct answers
     - [ ] Configure passing score
     - [ ] Set time limit
-  - [ ] Course settings
-    - [ ] Pricing
-    - [ ] Category selection
-    - [ ] Level selection
+  - [x] Course settings
+    - [x] Pricing
+    - [x] Category selection
+    - [x] Level selection
     - [ ] Publish/unpublish
 - [ ] Live session management
   - [ ] Create session
   - [ ] Edit session
   - [ ] Start/end session
   - [ ] View attendance
-- [ ] Student analytics
-  - [ ] Enrollment trends
-  - [ ] Completion rates
+- [x] Student analytics
+  - [x] Enrollment trends
+  - [x] Completion rates
   - [ ] Quiz performance
 
 ---
