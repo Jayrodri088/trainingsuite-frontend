@@ -1,0 +1,566 @@
+"use client";
+
+import { use } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Play,
+  Clock,
+  Users,
+  Star,
+  Award,
+  BookOpen,
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  Globe,
+  Calendar,
+  FileText,
+  Video,
+  Lock,
+  ArrowLeft,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
+import { useCourse, useCourseCurriculum, useCourseRatings } from "@/hooks";
+import { formatCurrency } from "@/lib/utils";
+import type { Module, Lesson } from "@/types";
+
+const levelColors = {
+  beginner: "bg-green-100 text-green-800",
+  intermediate: "bg-amber-100 text-amber-800",
+  advanced: "bg-red-100 text-red-800",
+};
+
+function CourseDetailSkeleton() {
+  return (
+    <div className="container max-w-6xl py-8">
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+        <div>
+          <Skeleton className="h-96 w-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean }) {
+  const getIcon = () => {
+    if (lesson.type === "video") return <Video className="h-4 w-4" />;
+    if (lesson.type === "quiz") return <FileText className="h-4 w-4" />;
+    return <FileText className="h-4 w-4" />;
+  };
+
+  return (
+    <div className="flex items-center justify-between py-2 px-3 rounded hover:bg-muted/50">
+      <div className="flex items-center gap-3">
+        <div className="text-muted-foreground">{getIcon()}</div>
+        <span className="text-sm">{lesson.title}</span>
+        {lesson.isFree && !isLocked && (
+          <Badge variant="outline" className="text-xs">
+            Preview
+          </Badge>
+        )}
+      </div>
+      <div className="flex items-center gap-2 text-muted-foreground">
+        {lesson.duration && (
+          <span className="text-xs">{lesson.duration} min</span>
+        )}
+        {isLocked && !lesson.isFree && <Lock className="h-3.5 w-3.5" />}
+      </div>
+    </div>
+  );
+}
+
+function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index: number; isEnrolled: boolean }) {
+  const lessons = (module.lessons || []) as Lesson[];
+  const totalDuration = lessons.reduce((acc, lesson) => acc + (lesson.duration || 0), 0);
+
+  return (
+    <AccordionItem value={module._id} className="border rounded-lg px-4">
+      <AccordionTrigger className="hover:no-underline py-4">
+        <div className="flex items-center gap-4 text-left">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium">
+            {index + 1}
+          </div>
+          <div>
+            <h4 className="font-medium text-sm">{module.title}</h4>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {lessons.length} lessons &bull; {totalDuration} min
+            </p>
+          </div>
+        </div>
+      </AccordionTrigger>
+      <AccordionContent className="pb-4">
+        <div className="space-y-1 ml-12">
+          {lessons.map((lesson) => (
+            <LessonItem
+              key={lesson._id}
+              lesson={lesson}
+              isLocked={!isEnrolled}
+            />
+          ))}
+        </div>
+      </AccordionContent>
+    </AccordionItem>
+  );
+}
+
+function RatingBar({ rating, percentage }: { rating: number; percentage: number }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-sm w-12">{rating} star</span>
+      <Progress value={percentage} className="h-2 flex-1" />
+      <span className="text-sm text-muted-foreground w-10">{percentage}%</span>
+    </div>
+  );
+}
+
+export default function CourseDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const resolvedParams = use(params);
+  const router = useRouter();
+  const { data: courseResponse, isLoading: courseLoading } = useCourse(resolvedParams.slug);
+  const { data: curriculumResponse, isLoading: curriculumLoading } = useCourseCurriculum(resolvedParams.slug);
+  const { data: ratingsResponse } = useCourseRatings(resolvedParams.slug);
+
+  if (courseLoading) {
+    return <CourseDetailSkeleton />;
+  }
+
+  const course = courseResponse?.data;
+
+  if (!course) {
+    return (
+      <div className="container max-w-6xl py-16 text-center">
+        <h1 className="text-2xl font-bold">Course not found</h1>
+        <p className="text-muted-foreground mt-2">
+          The course you're looking for doesn't exist or has been removed.
+        </p>
+        <Button className="mt-6" onClick={() => router.push("/courses")}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Courses
+        </Button>
+      </div>
+    );
+  }
+
+  const modules = (curriculumResponse?.data || []) as Module[];
+  const ratings = ratingsResponse?.data || [];
+  const instructor = typeof course.instructor === "object" ? course.instructor : null;
+
+  // Calculate rating distribution (mock for now if no real data)
+  const ratingDistribution = [
+    { rating: 5, percentage: 65 },
+    { rating: 4, percentage: 20 },
+    { rating: 3, percentage: 10 },
+    { rating: 2, percentage: 3 },
+    { rating: 1, percentage: 2 },
+  ];
+
+  const totalLessons = modules.reduce(
+    (acc, module) => acc + ((module.lessons as Lesson[])?.length || 0),
+    0
+  );
+  const totalDuration = modules.reduce(
+    (acc, module) =>
+      acc +
+      ((module.lessons as Lesson[])?.reduce(
+        (lessonAcc, lesson) => lessonAcc + (lesson.duration || 0),
+        0
+      ) || 0),
+    0
+  );
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+        <div className="container max-w-6xl py-12">
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mb-4 text-slate-300 hover:text-white hover:bg-white/10"
+                onClick={() => router.push("/courses")}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                All Courses
+              </Button>
+
+              <div className="flex items-center gap-2 mb-4">
+                <Badge className={levelColors[course.level as keyof typeof levelColors] || "bg-gray-100 text-gray-800"}>
+                  {course.level}
+                </Badge>
+                {course.category && typeof course.category === "object" && (
+                  <Badge variant="outline" className="border-slate-500 text-slate-300">
+                    {course.category.name}
+                  </Badge>
+                )}
+              </div>
+
+              <h1 className="text-3xl font-bold tracking-tight mb-4">
+                {course.title}
+              </h1>
+
+              <p className="text-slate-300 text-lg leading-relaxed mb-6">
+                {course.description}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm">
+                <div className="flex items-center gap-1 text-amber-400">
+                  <Star className="h-4 w-4 fill-current" />
+                  <span className="font-semibold">{course.rating?.toFixed(1) || "N/A"}</span>
+                  <span className="text-slate-400">({course.ratingCount || 0} ratings)</span>
+                </div>
+                <div className="flex items-center gap-1 text-slate-300">
+                  <Users className="h-4 w-4" />
+                  <span>{(course.enrollmentCount || 0).toLocaleString()} students</span>
+                </div>
+                {course.language && (
+                  <div className="flex items-center gap-1 text-slate-300">
+                    <Globe className="h-4 w-4" />
+                    <span>{course.language}</span>
+                  </div>
+                )}
+                {course.updatedAt && (
+                  <div className="flex items-center gap-1 text-slate-300">
+                    <Calendar className="h-4 w-4" />
+                    <span>Updated {new Date(course.updatedAt).toLocaleDateString()}</span>
+                  </div>
+                )}
+              </div>
+
+              {instructor && (
+                <div className="flex items-center gap-3 mt-6">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {instructor.name?.charAt(0) || "I"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">{instructor.name}</p>
+                    <p className="text-xs text-slate-400">{instructor.title || "Instructor"}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Enrollment Card */}
+            <div className="lg:row-span-2">
+              <Card className="sticky top-24 shadow-lg">
+                {/* Preview Image */}
+                <div className="aspect-video bg-gradient-to-br from-violet-500 to-purple-600 rounded-t-lg relative overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors">
+                      <Play className="h-8 w-8 text-white fill-white ml-1" />
+                    </div>
+                  </div>
+                </div>
+                <CardContent className="p-6">
+                  <div className="flex items-baseline gap-2 mb-4">
+                    <span className="text-3xl font-bold">
+                      {course.isFree ? "Free" : formatCurrency(course.price, course.currency)}
+                    </span>
+                    {!course.isFree && course.originalPrice && course.originalPrice > course.price && (
+                      <span className="text-lg text-muted-foreground line-through">
+                        {formatCurrency(course.originalPrice, course.currency)}
+                      </span>
+                    )}
+                  </div>
+
+                  <Button size="lg" className="w-full mb-3">
+                    {course.isFree ? "Enroll for Free" : "Enroll Now"}
+                  </Button>
+                  <Button variant="outline" size="lg" className="w-full">
+                    Add to Wishlist
+                  </Button>
+
+                  <p className="text-xs text-center text-muted-foreground mt-3">
+                    30-Day Money-Back Guarantee
+                  </p>
+
+                  <div className="mt-6 space-y-3">
+                    <h4 className="font-semibold text-sm">This course includes:</h4>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center gap-2">
+                        <Video className="h-4 w-4 text-muted-foreground" />
+                        <span>{totalDuration ? `${Math.round(totalDuration / 60)} hours` : "Video content"}</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4 text-muted-foreground" />
+                        <span>{totalLessons} lessons</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        <span>Downloadable resources</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Award className="h-4 w-4 text-muted-foreground" />
+                        <span>Certificate of completion</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span>Full lifetime access</span>
+                      </li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Course Content */}
+      <div className="container max-w-6xl py-8">
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <Tabs defaultValue="curriculum" className="w-full">
+              <TabsList className="mb-6">
+                <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="instructor">Instructor</TabsTrigger>
+                <TabsTrigger value="reviews">Reviews</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="curriculum" className="mt-0">
+                <Card>
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">Course Content</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        {modules.length} modules &bull; {totalLessons} lessons &bull; {Math.round(totalDuration / 60)}h total
+                      </p>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    {curriculumLoading ? (
+                      <div className="space-y-3">
+                        {[...Array(4)].map((_, i) => (
+                          <Skeleton key={i} className="h-16 w-full" />
+                        ))}
+                      </div>
+                    ) : modules.length > 0 ? (
+                      <Accordion type="multiple" className="space-y-3">
+                        {modules.map((module, index) => (
+                          <ModuleAccordion
+                            key={module._id}
+                            module={module}
+                            index={index}
+                            isEnrolled={false}
+                          />
+                        ))}
+                      </Accordion>
+                    ) : (
+                      <p className="text-center py-8 text-muted-foreground">
+                        Curriculum coming soon.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="overview" className="mt-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">What you'll learn</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {course.learningOutcomes && course.learningOutcomes.length > 0 ? (
+                      <ul className="grid sm:grid-cols-2 gap-3">
+                        {course.learningOutcomes.map((outcome, index) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                            <span className="text-sm">{outcome}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-muted-foreground">No learning outcomes specified.</p>
+                    )}
+
+                    {course.prerequisites && course.prerequisites.length > 0 && (
+                      <div className="mt-8">
+                        <h3 className="font-semibold mb-4">Prerequisites</h3>
+                        <ul className="space-y-2">
+                          {course.prerequisites.map((prereq, index) => (
+                            <li key={index} className="flex items-start gap-2">
+                              <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+                              <span className="text-sm">{prereq}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {course.targetAudience && course.targetAudience.length > 0 && (
+                      <div className="mt-8">
+                        <h3 className="font-semibold mb-4">Who this course is for</h3>
+                        <ul className="space-y-2">
+                          {course.targetAudience.map((audience, index) => (
+                            <li key={index} className="flex items-start gap-2">
+                              <Users className="h-5 w-5 text-muted-foreground shrink-0" />
+                              <span className="text-sm">{audience}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="instructor" className="mt-0">
+                <Card>
+                  <CardContent className="pt-6">
+                    {instructor ? (
+                      <div>
+                        <div className="flex items-start gap-4">
+                          <Avatar className="h-20 w-20">
+                            <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                              {instructor.name?.charAt(0) || "I"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h3 className="text-lg font-semibold">{instructor.name}</h3>
+                            <p className="text-muted-foreground">{instructor.title || "Instructor"}</p>
+                            <div className="flex items-center gap-4 mt-2 text-sm">
+                              <div className="flex items-center gap-1">
+                                <Star className="h-4 w-4 text-amber-500 fill-current" />
+                                <span>4.8 Instructor Rating</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Users className="h-4 w-4" />
+                                <span>50,000+ Students</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <BookOpen className="h-4 w-4" />
+                                <span>15 Courses</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        {instructor.bio && (
+                          <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+                            {instructor.bio}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">Instructor information not available.</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="reviews" className="mt-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Student Reviews</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid md:grid-cols-[200px,1fr] gap-8">
+                      {/* Rating Summary */}
+                      <div className="text-center">
+                        <div className="text-5xl font-bold text-primary">
+                          {course.rating?.toFixed(1) || "N/A"}
+                        </div>
+                        <div className="flex justify-center gap-1 my-2">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-5 w-5 ${
+                                i < Math.round(course.rating || 0)
+                                  ? "fill-amber-500 text-amber-500"
+                                  : "text-gray-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Based on {course.ratingCount || 0} reviews
+                        </p>
+                      </div>
+
+                      {/* Rating Distribution */}
+                      <div className="space-y-2">
+                        {ratingDistribution.map((item) => (
+                          <RatingBar key={item.rating} rating={item.rating} percentage={item.percentage} />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Individual Reviews */}
+                    {ratings.length > 0 ? (
+                      <div className="mt-8 space-y-6">
+                        {ratings.map((rating: any) => (
+                          <div key={rating._id} className="border-t pt-6">
+                            <div className="flex items-start gap-4">
+                              <Avatar>
+                                <AvatarFallback>
+                                  {rating.user?.name?.charAt(0) || "U"}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <h4 className="font-medium">{rating.user?.name || "Anonymous"}</h4>
+                                  <span className="text-sm text-muted-foreground">
+                                    {new Date(rating.createdAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <div className="flex gap-0.5 my-1">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={`h-4 w-4 ${
+                                        i < rating.rating
+                                          ? "fill-amber-500 text-amber-500"
+                                          : "text-gray-300"
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                                <p className="text-sm text-muted-foreground mt-2">
+                                  {rating.review}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-center py-8 text-muted-foreground mt-6">
+                        No reviews yet. Be the first to review this course!
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
