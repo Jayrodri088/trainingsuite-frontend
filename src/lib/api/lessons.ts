@@ -1,9 +1,90 @@
 import { apiClient } from "./client";
-import type { ApiResponse, PaginatedResponse, Lesson, Material, Comment } from "@/types";
+import type { ApiResponse, PaginatedResponse, Lesson, Material, Comment, Module } from "@/types";
+
+export interface CreateModuleData {
+  title: string;
+  description?: string;
+  order?: number;
+}
+
+export interface UpdateModuleData extends Partial<CreateModuleData> {}
+
+export interface CreateLessonData {
+  title: string;
+  description?: string;
+  content?: string;
+  type?: "video" | "text" | "quiz";
+  videoUrl?: string;
+  duration?: number;
+  isFree?: boolean;
+  order?: number;
+}
+
+export interface UpdateLessonData extends Partial<CreateLessonData> {}
+
+export const modulesApi = {
+  create: async (courseId: string, data: CreateModuleData) => {
+    const response = await apiClient.post<ApiResponse<Module>>(
+      `/courses/${courseId}/modules`,
+      data
+    );
+    return response.data;
+  },
+
+  update: async (moduleId: string, data: UpdateModuleData) => {
+    const response = await apiClient.put<ApiResponse<Module>>(
+      `/modules/${moduleId}`,
+      data
+    );
+    return response.data;
+  },
+
+  delete: async (moduleId: string) => {
+    const response = await apiClient.delete<ApiResponse<null>>(`/modules/${moduleId}`);
+    return response.data;
+  },
+
+  reorder: async (courseId: string, moduleIds: string[]) => {
+    const response = await apiClient.put<ApiResponse<Module[]>>(
+      `/courses/${courseId}/modules/reorder`,
+      { moduleIds }
+    );
+    return response.data;
+  },
+};
 
 export const lessonsApi = {
   getById: async (id: string) => {
     const response = await apiClient.get<ApiResponse<Lesson>>(`/lessons/${id}`);
+    return response.data;
+  },
+
+  create: async (moduleId: string, data: CreateLessonData) => {
+    const response = await apiClient.post<ApiResponse<Lesson>>(
+      `/modules/${moduleId}/lessons`,
+      data
+    );
+    return response.data;
+  },
+
+  update: async (lessonId: string, data: UpdateLessonData) => {
+    const response = await apiClient.put<ApiResponse<Lesson>>(
+      `/lessons/${lessonId}`,
+      data
+    );
+    return response.data;
+  },
+
+  delete: async (lessonId: string) => {
+    const response = await apiClient.delete<ApiResponse<null>>(`/lessons/${lessonId}`);
+    return response.data;
+  },
+
+  reorder: async (moduleId: string, lessonIds: string[]) => {
+    const response = await apiClient.put<ApiResponse<Lesson[]>>(
+      `/modules/${moduleId}/lessons/reorder`,
+      { lessonIds }
+    );
     return response.data;
   },
 
