@@ -15,7 +15,9 @@ import {
   XCircle,
   Clock,
   RefreshCw,
+  Loader2,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +47,68 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { paymentsApi } from "@/lib/api/payments";
 import type { Payment, PaymentStatus, Course, User } from "@/types";
 import { format, parseISO } from "date-fns";
+
+function ReceiptDownloadButton({ payment }: { payment: Payment }) {
+  const { toast } = useToast();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const course = payment.course as Course;
+
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    try {
+      const blob = await paymentsApi.downloadReceipt(payment._id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `receipt-${payment.transactionId || payment._id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast({ title: "Receipt downloaded!" });
+    } catch (error) {
+      // Fallback: Generate a simple receipt
+      const receiptContent = `
+PAYMENT RECEIPT
+===============
+
+Transaction ID: ${payment.transactionId || payment._id}
+Date: ${new Date(payment.createdAt).toLocaleDateString()}
+
+Course: ${course?.title || "Course Purchase"}
+Amount: ${payment.currency === "USD" ? "$" : payment.currency}${payment.amount}
+Payment Method: ${payment.provider}
+Status: ${payment.status.toUpperCase()}
+
+Thank you for your purchase!
+      `.trim();
+
+      const blob = new Blob([receiptContent], { type: "text/plain" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `receipt-${payment.transactionId || payment._id}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast({ title: "Receipt downloaded!" });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  return (
+    <Button variant="ghost" size="sm" onClick={handleDownload} disabled={isDownloading}>
+      {isDownloading ? (
+        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+      ) : (
+        <Download className="h-4 w-4 mr-1" />
+      )}
+      Receipt
+    </Button>
+  );
+}
 
 export default function PaymentHistoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -310,10 +374,7 @@ export default function PaymentHistoryPage() {
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           {payment.status === "completed" && (
-                            <Button variant="ghost" size="sm">
-                              <Download className="h-4 w-4 mr-1" />
-                              Receipt
-                            </Button>
+                            <ReceiptDownloadButton payment={payment} />
                           )}
                           {course?.slug && (
                             <Button variant="ghost" size="sm" asChild>

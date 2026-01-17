@@ -37,7 +37,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { enrollmentsApi } from "@/lib/api/enrollments";
+import { adminApi } from "@/lib/api/admin";
 import { coursesApi } from "@/lib/api/courses";
 import { getInitials } from "@/lib/utils";
 import type { EnrollmentWithCourse, Course, User } from "@/types";
@@ -55,14 +55,14 @@ export default function AdminStudentsPage() {
 
   const { data: enrollmentsData, isLoading } = useQuery({
     queryKey: ["admin-enrollments"],
-    queryFn: () => enrollmentsApi.getAll(1, 100),
+    queryFn: () => adminApi.getEnrollments(1, 100),
   });
 
   const courses = coursesData?.data || [];
-  const enrollments = enrollmentsData?.data || [];
+  const enrollments = (enrollmentsData?.data || []) as EnrollmentWithCourse[];
 
   // Filter enrollments
-  const filteredEnrollments = enrollments.filter((enrollment) => {
+  const filteredEnrollments = enrollments.filter((enrollment: EnrollmentWithCourse) => {
     const user = enrollment.user as User;
     const course = enrollment.course as Course;
 

@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
-  Save,
   Loader2,
   Plus,
   GripVertical,
@@ -18,11 +17,11 @@ import {
   Trash2,
   Edit,
   Eye,
-  EyeOff,
   MoreVertical,
   BookOpen,
   Settings,
-  Play,
+  Paperclip,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,9 +68,9 @@ import { useToast } from "@/hooks/use-toast";
 import { coursesApi, UpdateCourseData } from "@/lib/api/courses";
 import { modulesApi, lessonsApi, CreateModuleData, CreateLessonData } from "@/lib/api/lessons";
 import { categoriesApi } from "@/lib/api/categories";
-import type { Course, Module, Lesson, CourseLevel } from "@/types";
+import type { Module, Lesson, CourseLevel, Material } from "@/types";
 
-export default function CourseEditorPage({
+export default function AdminCourseEditorPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -100,7 +99,7 @@ export default function CourseEditorPage({
     content: "",
     type: "video",
     videoUrl: "",
-    duration: 0,
+    videoDuration: 0,
     isFree: false,
   });
 
@@ -184,7 +183,7 @@ export default function CourseEditorPage({
         content: "",
         type: "video",
         videoUrl: "",
-        duration: 0,
+        videoDuration: 0,
         isFree: false,
       });
       toast({ title: "Lesson created successfully" });
@@ -207,7 +206,7 @@ export default function CourseEditorPage({
         content: "",
         type: "video",
         videoUrl: "",
-        duration: 0,
+        videoDuration: 0,
         isFree: false,
       });
       toast({ title: "Lesson updated successfully" });
@@ -228,8 +227,65 @@ export default function CourseEditorPage({
     },
   });
 
+  // Materials state
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [newMaterialTitle, setNewMaterialTitle] = useState("");
+  const [newMaterialUrl, setNewMaterialUrl] = useState("");
+
+  // Fetch materials when editing a lesson
+  const { data: materialsData } = useQuery({
+    queryKey: ["lesson-materials", editingLesson?._id],
+    queryFn: () => lessonsApi.getMaterials(editingLesson!._id),
+    enabled: !!editingLesson?._id,
+  });
+
+  // Update materials when data changes
+  useState(() => {
+    if (materialsData?.data) {
+      setMaterials(materialsData.data);
+    }
+  });
+
+  const addMaterialMutation = useMutation({
+    mutationFn: (data: { title: string; fileUrl: string; fileType: string }) =>
+      lessonsApi.addMaterial(editingLesson!._id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lesson-materials", editingLesson?._id] });
+      setNewMaterialTitle("");
+      setNewMaterialUrl("");
+      toast({ title: "Material added successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to add material", variant: "destructive" });
+    },
+  });
+
+  const deleteMaterialMutation = useMutation({
+    mutationFn: (materialId: string) => lessonsApi.deleteMaterial(materialId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lesson-materials", editingLesson?._id] });
+      toast({ title: "Material deleted successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete material", variant: "destructive" });
+    },
+  });
+
+  const handleAddMaterial = () => {
+    if (!newMaterialTitle.trim() || !newMaterialUrl.trim()) {
+      toast({ title: "Title and URL are required", variant: "destructive" });
+      return;
+    }
+    const fileType = newMaterialUrl.endsWith(".pdf") ? "application/pdf" : "application/octet-stream";
+    addMaterialMutation.mutate({
+      title: newMaterialTitle.trim(),
+      fileUrl: newMaterialUrl.trim(),
+      fileType,
+    });
+  };
+
   const course = courseResponse?.data;
-  const curriculumData = curriculumResponse?.data as { curriculum?: Module[] } | undefined;
+  const curriculumData = curriculumResponse?.data as { course?: { _id: string; title: string; duration: number }; curriculum?: Module[] } | undefined;
   const modules = (curriculumData?.curriculum || []) as Module[];
   const categories = categoriesData?.data || [];
 
@@ -264,7 +320,7 @@ export default function CourseEditorPage({
         content: lesson.content || "",
         type: lesson.type || "video",
         videoUrl: lesson.videoUrl || "",
-        duration: lesson.duration || 0,
+        videoDuration: lesson.videoDuration || lesson.duration || 0,
         isFree: lesson.isFree || false,
       });
     } else {
@@ -275,7 +331,7 @@ export default function CourseEditorPage({
         content: "",
         type: "video",
         videoUrl: "",
-        duration: 0,
+        videoDuration: 0,
         isFree: false,
       });
     }
@@ -334,7 +390,7 @@ export default function CourseEditorPage({
         <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <h2 className="text-lg font-medium">Course not found</h2>
         <Button asChild className="mt-4">
-          <Link href="/instructor/courses">Back to Courses</Link>
+          <Link href="/admin/courses">Back to Courses</Link>
         </Button>
       </div>
     );
@@ -346,7 +402,7 @@ export default function CourseEditorPage({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/instructor/courses">
+            <Link href="/admin/courses">
               <ArrowLeft className="h-5 w-5" />
             </Link>
           </Button>
@@ -411,11 +467,11 @@ export default function CourseEditorPage({
                   <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="text-lg font-medium">No modules yet</h3>
                   <p className="text-muted-foreground mt-1">
-                    Start building your course by adding a module.
+                    Start building the course by adding a module.
                   </p>
                   <Button onClick={() => handleOpenModuleDialog()} className="mt-4">
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Your First Module
+                    Add First Module
                   </Button>
                 </div>
               ) : (
@@ -607,7 +663,7 @@ export default function CourseEditorPage({
             <CardHeader>
               <CardTitle>Course Settings</CardTitle>
               <CardDescription>
-                Update your course details and settings.
+                Update course details and settings.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -626,6 +682,7 @@ export default function CourseEditorPage({
                     <SelectContent>
                       <SelectItem value="draft">Draft</SelectItem>
                       <SelectItem value="published">Published</SelectItem>
+                      <SelectItem value="archived">Archived</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -710,7 +767,7 @@ export default function CourseEditorPage({
             <DialogDescription>
               {editingModule
                 ? "Update the module details."
-                : "Create a new module for your course."}
+                : "Create a new module for this course."}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleModuleSubmit}>
@@ -839,16 +896,16 @@ export default function CourseEditorPage({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="duration">Duration (minutes)</Label>
+                    <Label htmlFor="videoDuration">Duration (minutes)</Label>
                     <Input
-                      id="duration"
+                      id="videoDuration"
                       type="number"
                       min="0"
-                      value={lessonForm.duration}
+                      value={lessonForm.videoDuration}
                       onChange={(e) =>
                         setLessonForm({
                           ...lessonForm,
-                          duration: parseInt(e.target.value) || 0,
+                          videoDuration: parseInt(e.target.value) || 0,
                         })
                       }
                     />
@@ -884,6 +941,80 @@ export default function CourseEditorPage({
                   (Allow non-enrolled users to access this lesson)
                 </span>
               </div>
+
+              {/* Materials Section - Only show when editing */}
+              {editingLesson && (
+                <div className="space-y-3 border-t pt-4">
+                  <div className="flex items-center gap-2">
+                    <Paperclip className="h-4 w-4" />
+                    <Label>Materials & Downloads</Label>
+                  </div>
+
+                  {/* Existing Materials */}
+                  {(materialsData?.data || []).length > 0 && (
+                    <div className="space-y-2">
+                      {(materialsData?.data || []).map((material: Material) => (
+                        <div
+                          key={material._id}
+                          className="flex items-center justify-between p-2 border rounded-lg text-sm"
+                        >
+                          <a
+                            href={material.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline truncate flex-1"
+                          >
+                            {material.title}
+                          </a>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => deleteMaterialMutation.mutate(material._id)}
+                            disabled={deleteMaterialMutation.isPending}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Add New Material */}
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Material title (e.g., Slides PDF)"
+                      value={newMaterialTitle}
+                      onChange={(e) => setNewMaterialTitle(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Material URL (https://...)"
+                        value={newMaterialUrl}
+                        onChange={(e) => setNewMaterialUrl(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleAddMaterial}
+                        disabled={addMaterialMutation.isPending}
+                      >
+                        {addMaterialMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Add downloadable files like PDFs, slides, code samples, etc.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button

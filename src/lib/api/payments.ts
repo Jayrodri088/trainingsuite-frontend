@@ -40,4 +40,12 @@ export const paymentsApi = {
     );
     return response.data;
   },
+
+  downloadReceipt: async (id: string) => {
+    const response = await apiClient.get<Blob>(
+      `/payments/${id}/receipt`,
+      { responseType: "blob" }
+    );
+    return response.data;
+  },
 };

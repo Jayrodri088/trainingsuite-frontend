@@ -15,6 +15,7 @@ import {
   MessageCircle,
   Clock,
   Loader2,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -220,6 +221,10 @@ export default function ForumDetailPage() {
                       </p>
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span>{post.user?.name || "Anonymous"}</span>
+                        <div className="flex items-center gap-1">
+                          <Heart className="h-4 w-4" />
+                          <span>{(post as any).likes || 0}</span>
+                        </div>
                         <div className="flex items-center gap-1">
                           <Eye className="h-4 w-4" />
                           <span>{post.viewCount || 0}</span>

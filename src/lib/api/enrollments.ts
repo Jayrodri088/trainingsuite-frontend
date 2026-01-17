@@ -24,14 +24,23 @@ export const enrollmentsApi = {
 
   getByCourse: async (courseId: string) => {
     const response = await apiClient.get<ApiResponse<EnrollmentWithCourse>>(
-      `/enrollments/course/${courseId}`
+      `/enrollments/${courseId}`
     );
     return response.data;
   },
 
   getEnrollmentByCourse: async (courseId: string) => {
+    // Check if user is enrolled in a specific course
     const response = await apiClient.get<ApiResponse<EnrollmentWithCourse>>(
       `/enrollments/course/${courseId}`
+    );
+    return response.data;
+  },
+
+  checkEnrollment: async (courseId: string) => {
+    // Alternative: Check enrollment status
+    const response = await apiClient.get<ApiResponse<{ isEnrolled: boolean; enrollment?: EnrollmentWithCourse }>>(
+      `/courses/${courseId}/enrollment`
     );
     return response.data;
   },

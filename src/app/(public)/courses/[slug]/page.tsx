@@ -40,6 +40,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCourse, useCourseCurriculum, useCourseRatings, useAuth } from "@/hooks";
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi } from "@/lib/api/courses";
+import { enrollmentsApi } from "@/lib/api/enrollments";
 import { formatCurrency } from "@/lib/utils";
 import type { Course, Module, Lesson, Rating } from "@/types";
 
@@ -302,30 +303,27 @@ export default function CourseDetailPage({
   const { data: curriculumResponse, isLoading: curriculumLoading } = useCourseCurriculum(resolvedParams.slug);
   const { data: ratingsResponse } = useCourseRatings(resolvedParams.slug);
 
-  // Check enrollment status
+  // Check enrollment status - need course ID, so wait for course to load
+  const courseId = courseResponse?.data?._id;
   const { data: enrollmentResponse } = useQuery({
-    queryKey: ["enrollment-check", resolvedParams.slug],
+    queryKey: ["enrollment-check", courseId],
     queryFn: async () => {
-      if (!isAuthenticated) return null;
+      if (!isAuthenticated || !courseId) return null;
       try {
-        const response = await coursesApi.getBySlug(resolvedParams.slug);
-        // Check from user's enrollments
-        const enrollmentsResponse = await fetch("/api/enrollments/my", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-        });
-        const enrollments = await enrollmentsResponse.json();
-        const course = response?.data;
-        if (course && enrollments?.data) {
-          return enrollments.data.find((e: any) =>
-            e.course?._id === course._id || e.course === course._id
-          );
-        }
-        return null;
+        // Fetch all user enrollments and check if this course is enrolled
+        const myEnrollments = await enrollmentsApi.getMyEnrollments(1, 100);
+        const enrollment = myEnrollments?.data?.find(
+          (e) => {
+            const enrolledCourseId = typeof e.course === "object" ? e.course?._id : e.course;
+            return enrolledCourseId === courseId;
+          }
+        );
+        return enrollment || null;
       } catch {
         return null;
       }
     },
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !!courseId,
   });
 
   const isEnrolled = !!enrollmentResponse;
@@ -355,7 +353,19 @@ export default function CourseDetailPage({
     },
     onError: (error: any) => {
       const message = error?.response?.data?.message || "Failed to enroll";
-      toast({ title: message, variant: "destructive" });
+      const status = error?.response?.status;
+
+      // If 400 error with "already enrolled" message, redirect to learn page
+      if (status === 400 && message.toLowerCase().includes("already")) {
+        toast({ title: "You're already enrolled! Redirecting..." });
+        queryClient.invalidateQueries({ queryKey: ["enrollment-check"] });
+        const course = courseResponse?.data;
+        if (course) {
+          router.push(`/courses/${course.slug}/learn`);
+        }
+      } else {
+        toast({ title: message, variant: "destructive" });
+      }
     },
   });
 
@@ -366,6 +376,12 @@ export default function CourseDetailPage({
     if (!isAuthenticated) {
       toast({ title: "Please login to enroll", variant: "destructive" });
       router.push(`/login?redirect=/courses/${resolvedParams.slug}`);
+      return;
+    }
+
+    // If already enrolled, go to learn page
+    if (isEnrolled) {
+      router.push(`/courses/${course.slug}/learn`);
       return;
     }
 
@@ -424,7 +440,8 @@ export default function CourseDetailPage({
     );
   }
 
-  const modules = (curriculumResponse?.data || []) as Module[];
+  const curriculumData = curriculumResponse?.data as { curriculum?: Module[] } | undefined;
+  const modules = (curriculumData?.curriculum || []) as Module[];
   const ratings = (ratingsResponse?.data || []) as Rating[];
   const instructor = typeof course.instructor === "object" ? course.instructor : null;
 
@@ -527,7 +544,10 @@ export default function CourseDetailPage({
               </div>
 
               {instructor && (
-                <div className="flex items-center gap-3 mt-6">
+                <Link
+                  href={`/instructors/${instructor._id}`}
+                  className="flex items-center gap-3 mt-6 hover:opacity-80 transition-opacity"
+                >
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-primary text-primary-foreground">
                       {instructor.name?.charAt(0) || "I"}
@@ -537,7 +557,7 @@ export default function CourseDetailPage({
                     <p className="text-sm font-medium">{instructor.name}</p>
                     <p className="text-xs text-slate-400">{instructor.title || "Instructor"}</p>
                   </div>
-                </div>
+                </Link>
               )}
             </div>
 
@@ -755,6 +775,11 @@ export default function CourseDetailPage({
                             {instructor.bio}
                           </p>
                         )}
+                        <Button asChild variant="outline" className="mt-4">
+                          <Link href={`/instructors/${instructor._id}`}>
+                            View Full Profile
+                          </Link>
+                        </Button>
                       </div>
                     ) : (
                       <p className="text-muted-foreground">Instructor information not available.</p>

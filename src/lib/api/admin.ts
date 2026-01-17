@@ -14,12 +14,10 @@ import type {
 export interface CreateCourseData {
   title: string;
   description: string;
-  instructor: string;
-  category?: string;
+  category: string;
   price?: number;
+  isFree?: boolean;
   level?: string;
-  language?: string;
-  status?: string;
 }
 
 export const adminApi = {
@@ -211,6 +209,18 @@ export const adminApi = {
   deleteAnnouncement: async (id: string) => {
     const response = await apiClient.delete<ApiResponse<null>>(
       `/admin/announcements/${id}`
+    );
+    return response.data;
+  },
+
+  // Enrollments
+  getEnrollments: async (page = 1, limit = 100, status?: string, courseId?: string) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (status) params.append("status", status);
+    if (courseId) params.append("course", courseId);
+
+    const response = await apiClient.get<PaginatedResponse<unknown>>(
+      `/admin/enrollments?${params.toString()}`
     );
     return response.data;
   },

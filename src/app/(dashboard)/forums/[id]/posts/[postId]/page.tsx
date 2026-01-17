@@ -17,6 +17,8 @@ import {
   Edit,
   Loader2,
   Send,
+  ThumbsUp,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,6 +54,8 @@ export default function PostDetailPage() {
   const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+  const [likedComments, setLikedComments] = useState<Set<string>>(new Set());
 
   const { data: postData, isLoading: postLoading } = useQuery({
     queryKey: ["post", postId],
@@ -74,6 +78,82 @@ export default function PostDetailPage() {
     },
     onError: () => {
       toast({ title: "Failed to add comment", variant: "destructive" });
+    },
+  });
+
+  const likePostMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const isLiked = likedPosts.has(id);
+      if (isLiked) {
+        return forumsApi.unlikePost(id);
+      }
+      return forumsApi.likePost(id);
+    },
+    onMutate: async (id) => {
+      // Optimistic update
+      setLikedPosts((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(id)) {
+          newSet.delete(id);
+        } else {
+          newSet.add(id);
+        }
+        return newSet;
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["post", postId] });
+    },
+    onError: (_, id) => {
+      // Revert on error
+      setLikedPosts((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(id)) {
+          newSet.delete(id);
+        } else {
+          newSet.add(id);
+        }
+        return newSet;
+      });
+      toast({ title: "Failed to update like", variant: "destructive" });
+    },
+  });
+
+  const likeCommentMutation = useMutation({
+    mutationFn: async (commentId: string) => {
+      const isLiked = likedComments.has(commentId);
+      if (isLiked) {
+        return forumsApi.unlikeComment(commentId);
+      }
+      return forumsApi.likeComment(commentId);
+    },
+    onMutate: async (commentId) => {
+      // Optimistic update
+      setLikedComments((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(commentId)) {
+          newSet.delete(commentId);
+        } else {
+          newSet.add(commentId);
+        }
+        return newSet;
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["post-comments", postId] });
+    },
+    onError: (_, commentId) => {
+      // Revert on error
+      setLikedComments((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(commentId)) {
+          newSet.delete(commentId);
+        } else {
+          newSet.add(commentId);
+        }
+        return newSet;
+      });
+      toast({ title: "Failed to update like", variant: "destructive" });
     },
   });
 
@@ -152,6 +232,15 @@ export default function PostDetailPage() {
               </div>
               <p className="text-sm whitespace-pre-wrap">{comment.content}</p>
               <div className="flex items-center gap-2 mt-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`h-7 text-xs ${likedComments.has(comment._id) ? "text-red-500" : ""}`}
+                  onClick={() => likeCommentMutation.mutate(comment._id)}
+                >
+                  <Heart className={`h-3 w-3 mr-1 ${likedComments.has(comment._id) ? "fill-red-500" : ""}`} />
+                  {((comment as any).likes || 0) + (likedComments.has(comment._id) ? 1 : 0)}
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -234,6 +323,15 @@ export default function PostDetailPage() {
                 <p className="whitespace-pre-wrap">{post.content}</p>
               </div>
               <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`h-8 px-3 ${likedPosts.has(post._id) ? "text-red-500" : "text-muted-foreground"}`}
+                  onClick={() => likePostMutation.mutate(post._id)}
+                >
+                  <Heart className={`h-4 w-4 mr-1 ${likedPosts.has(post._id) ? "fill-red-500" : ""}`} />
+                  <span>{((post as any).likes || 0) + (likedPosts.has(post._id) ? 1 : 0)} likes</span>
+                </Button>
                 <div className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
                   <span>{post.viewCount || 0} views</span>

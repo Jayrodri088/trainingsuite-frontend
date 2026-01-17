@@ -68,4 +68,32 @@ export const forumsApi = {
     );
     return response.data;
   },
+
+  likePost: async (postId: string) => {
+    const response = await apiClient.post<ApiResponse<{ likes: number; isLiked: boolean }>>(
+      `/posts/${postId}/like`
+    );
+    return response.data;
+  },
+
+  unlikePost: async (postId: string) => {
+    const response = await apiClient.delete<ApiResponse<{ likes: number; isLiked: boolean }>>(
+      `/posts/${postId}/like`
+    );
+    return response.data;
+  },
+
+  likeComment: async (commentId: string) => {
+    const response = await apiClient.post<ApiResponse<{ likes: number; isLiked: boolean }>>(
+      `/comments/${commentId}/like`
+    );
+    return response.data;
+  },
+
+  unlikeComment: async (commentId: string) => {
+    const response = await apiClient.delete<ApiResponse<{ likes: number; isLiked: boolean }>>(
+      `/comments/${commentId}/like`
+    );
+    return response.data;
+  },
 };

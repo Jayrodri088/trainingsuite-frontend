@@ -15,7 +15,7 @@ export interface CreateLessonData {
   content?: string;
   type?: "video" | "text" | "quiz";
   videoUrl?: string;
-  duration?: number;
+  videoDuration?: number;
   isFree?: boolean;
   order?: number;
 }
@@ -98,6 +98,21 @@ export const lessonsApi = {
   getMaterials: async (id: string) => {
     const response = await apiClient.get<ApiResponse<Material[]>>(
       `/lessons/${id}/materials`
+    );
+    return response.data;
+  },
+
+  addMaterial: async (lessonId: string, data: { title: string; fileUrl: string; fileType: string; fileSize?: number }) => {
+    const response = await apiClient.post<ApiResponse<Material>>(
+      `/lessons/${lessonId}/materials`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteMaterial: async (materialId: string) => {
+    const response = await apiClient.delete<ApiResponse<null>>(
+      `/materials/${materialId}`
     );
     return response.data;
   },

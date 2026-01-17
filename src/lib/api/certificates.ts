@@ -15,4 +15,19 @@ export const certificatesApi = {
     );
     return response.data;
   },
+
+  download: async (id: string) => {
+    const response = await apiClient.get<Blob>(
+      `/certificates/${id}/download`,
+      { responseType: "blob" }
+    );
+    return response.data;
+  },
+
+  verify: async (certificateNumber: string) => {
+    const response = await apiClient.get<ApiResponse<CertificateWithDetails>>(
+      `/certificates/verify/${certificateNumber}`
+    );
+    return response.data;
+  },
 };

@@ -136,7 +136,7 @@ export default function AdminDiscussionsPage() {
     setFormData({
       title: forum.title,
       description: forum.description || "",
-      course: typeof forum.course === "object" ? forum.course._id : forum.course || "",
+      course: forum.course || "",
       isGeneral: forum.isGeneral || false,
     });
     setDialogOpen(true);
@@ -344,7 +344,7 @@ export default function AdminDiscussionsPage() {
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4 text-muted-foreground" />
-                        {forum.memberCount || 0}
+                        {(forum as unknown as { memberCount?: number }).memberCount || 0}
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">

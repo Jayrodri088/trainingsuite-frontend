@@ -1,11 +1,9 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Play,
-  Pause,
   ChevronLeft,
   ChevronRight,
   CheckCircle,
@@ -14,18 +12,10 @@ import {
   Video,
   FileText,
   Menu,
-  X,
   Clock,
   BookOpen,
   MessageSquare,
   Download,
-  ChevronDown,
-  ChevronUp,
-  Maximize,
-  Volume2,
-  Settings,
-  SkipBack,
-  SkipForward,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,11 +33,171 @@ import {
 } from "@/components/ui/accordion";
 import { useCourse, useCourseCurriculum, useEnrollment } from "@/hooks";
 import { LessonComments } from "@/components/lessons/lesson-comments";
+import { RichContentRenderer } from "@/components/lessons/rich-content-renderer";
+import { CourseCompletionDialog } from "@/components/courses/course-completion-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { lessonsApi } from "@/lib/api/lessons";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Module, Lesson, Course } from "@/types";
 
-function VideoPlayer({ lesson }: { lesson: Lesson | null }) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
+function getVideoEmbedUrl(url: string): { type: 'youtube' | 'vimeo' | 'direct' | 'unknown'; embedUrl: string } {
+  if (!url) return { type: 'unknown', embedUrl: '' };
+
+  // YouTube patterns
+  const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const youtubeMatch = url.match(youtubeRegex);
+  if (youtubeMatch) {
+    return {
+      type: 'youtube',
+      embedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}?rel=0&modestbranding=1`,
+    };
+  }
+
+  // Vimeo patterns
+  const vimeoRegex = /(?:vimeo\.com\/)(\d+)/;
+  const vimeoMatch = url.match(vimeoRegex);
+  if (vimeoMatch) {
+    return {
+      type: 'vimeo',
+      embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}`,
+    };
+  }
+
+  // Direct video files
+  if (url.match(/\.(mp4|webm|ogg|mov)(\?.*)?$/i)) {
+    return { type: 'direct', embedUrl: url };
+  }
+
+  // Google Drive
+  const driveRegex = /drive\.google\.com\/file\/d\/([^\/]+)/;
+  const driveMatch = url.match(driveRegex);
+  if (driveMatch) {
+    return {
+      type: 'direct',
+      embedUrl: `https://drive.google.com/file/d/${driveMatch[1]}/preview`,
+    };
+  }
+
+  // Loom
+  const loomRegex = /loom\.com\/share\/([a-zA-Z0-9]+)/;
+  const loomMatch = url.match(loomRegex);
+  if (loomMatch) {
+    return {
+      type: 'direct',
+      embedUrl: `https://www.loom.com/embed/${loomMatch[1]}`,
+    };
+  }
+
+  // Default: try as direct URL
+  return { type: 'direct', embedUrl: url };
+}
+
+// Declare YouTube API types
+declare global {
+  interface Window {
+    YT: {
+      Player: new (
+        elementId: string,
+        config: {
+          videoId: string;
+          events?: {
+            onStateChange?: (event: { data: number }) => void;
+            onReady?: () => void;
+          };
+          playerVars?: Record<string, number | string>;
+        }
+      ) => unknown;
+      PlayerState: {
+        ENDED: number;
+      };
+    };
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+function VideoPlayer({
+  lesson,
+  onVideoEnd,
+  lessonId,
+}: {
+  lesson: Lesson | null;
+  onVideoEnd?: () => void;
+  lessonId?: string;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const youtubePlayerRef = useRef<unknown>(null);
+  const [ytApiLoaded, setYtApiLoaded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Load YouTube API
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !window.YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+
+      window.onYouTubeIframeAPIReady = () => {
+        setYtApiLoaded(true);
+      };
+    } else if (window.YT) {
+      setYtApiLoaded(true);
+    }
+  }, []);
+
+  // Initialize YouTube player when API is ready
+  useEffect(() => {
+    if (!lesson?.videoUrl || !ytApiLoaded) return;
+
+    const { type, embedUrl } = getVideoEmbedUrl(lesson.videoUrl);
+    if (type !== 'youtube') return;
+
+    // Extract video ID from embed URL
+    const videoIdMatch = embedUrl.match(/embed\/([^?]+)/);
+    if (!videoIdMatch) return;
+    const videoId = videoIdMatch[1];
+
+    // Clean up previous player
+    if (youtubePlayerRef.current) {
+      youtubePlayerRef.current = null;
+    }
+
+    // Create unique container ID
+    const containerId = `youtube-player-${lessonId || 'default'}`;
+
+    // Wait for container to be ready
+    setTimeout(() => {
+      const container = document.getElementById(containerId);
+      if (!container || !window.YT?.Player) return;
+
+      youtubePlayerRef.current = new window.YT.Player(containerId, {
+        videoId,
+        playerVars: {
+          rel: 0,
+          modestbranding: 1,
+        },
+        events: {
+          onStateChange: (event: { data: number }) => {
+            // YT.PlayerState.ENDED = 0
+            if (event.data === 0 && onVideoEnd) {
+              onVideoEnd();
+            }
+          },
+        },
+      });
+    }, 100);
+
+    return () => {
+      youtubePlayerRef.current = null;
+    };
+  }, [lesson?.videoUrl, ytApiLoaded, onVideoEnd, lessonId]);
+
+  // Handle HTML5 video end
+  const handleVideoEnd = useCallback(() => {
+    if (onVideoEnd) {
+      onVideoEnd();
+    }
+  }, [onVideoEnd]);
 
   if (!lesson) {
     return (
@@ -57,102 +207,81 @@ function VideoPlayer({ lesson }: { lesson: Lesson | null }) {
     );
   }
 
+  if (!lesson.videoUrl) {
+    return (
+      <div className="aspect-video bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <Video className="h-16 w-16 text-slate-600 mx-auto mb-4" />
+          <p className="text-slate-400">No video for this lesson</p>
+          {lesson.type === 'text' && (
+            <p className="text-slate-500 text-sm mt-2">This is a text-based lesson. See content below.</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const { type, embedUrl } = getVideoEmbedUrl(lesson.videoUrl);
+
+  // YouTube - use YouTube IFrame API for end detection
+  if (type === 'youtube') {
+    const containerId = `youtube-player-${lessonId || 'default'}`;
+    return (
+      <div className="aspect-video bg-slate-900" ref={containerRef}>
+        <div id={containerId} className="w-full h-full" />
+      </div>
+    );
+  }
+
+  // Vimeo - use iframe with postMessage API
+  if (type === 'vimeo') {
+    return (
+      <div className="aspect-video bg-slate-900">
+        <iframe
+          src={`${embedUrl}?api=1`}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          title={lesson.title}
+        />
+        <p className="text-xs text-slate-500 text-center py-1">
+          Click "Mark as Complete" when you finish watching
+        </p>
+      </div>
+    );
+  }
+
+  // Google Drive or Loom - use iframe (can't detect end)
+  if (embedUrl.includes('drive.google.com') || embedUrl.includes('loom.com')) {
+    return (
+      <div className="aspect-video bg-slate-900">
+        <iframe
+          src={embedUrl}
+          className="w-full h-full"
+          allow="autoplay; encrypted-media"
+          allowFullScreen
+          title={lesson.title}
+        />
+      </div>
+    );
+  }
+
+  // Direct video file - use HTML5 video with onEnded
   return (
-    <div className="relative aspect-video bg-slate-900 group">
-      {/* Video placeholder */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        {lesson.videoUrl ? (
-          <video
-            className="w-full h-full object-contain"
-            poster="/video-placeholder.jpg"
-          >
-            <source src={lesson.videoUrl} type="video/mp4" />
-          </video>
-        ) : (
-          <div className="text-center">
-            <Video className="h-16 w-16 text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-400">Video content</p>
-          </div>
-        )}
-      </div>
-
-      {/* Play button overlay */}
-      {!isPlaying && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-          <button
-            onClick={() => setIsPlaying(true)}
-            className="h-20 w-20 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition-colors"
-          >
-            <Play className="h-10 w-10 text-white fill-white ml-1" />
-          </button>
-        </div>
-      )}
-
-      {/* Video controls */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-        {/* Progress bar */}
-        <div className="mb-3">
-          <Progress value={progress} className="h-1 bg-white/20" />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/20"
-              onClick={() => setIsPlaying(!isPlaying)}
-            >
-              {isPlaying ? (
-                <Pause className="h-5 w-5" />
-              ) : (
-                <Play className="h-5 w-5" />
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/20"
-            >
-              <SkipBack className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/20"
-            >
-              <SkipForward className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/20"
-            >
-              <Volume2 className="h-5 w-5" />
-            </Button>
-            <span className="text-sm text-white ml-2">
-              0:00 / {lesson.duration || 0}:00
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/20"
-            >
-              <Settings className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/20"
-            >
-              <Maximize className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="aspect-video bg-slate-900">
+      <video
+        ref={videoRef}
+        className="w-full h-full"
+        controls
+        controlsList="nodownload"
+        playsInline
+        onEnded={handleVideoEnd}
+        poster="/video-placeholder.jpg"
+      >
+        <source src={embedUrl} type="video/mp4" />
+        <source src={embedUrl} type="video/webm" />
+        Your browser does not support the video tag.
+      </video>
     </div>
   );
 }
@@ -303,10 +432,7 @@ function LessonContent({ lesson }: { lesson: Lesson | null }) {
       <h2 className="text-xl font-bold mb-4">{lesson.title}</h2>
 
       {lesson.content ? (
-        <div
-          className="prose prose-sm max-w-none"
-          dangerouslySetInnerHTML={{ __html: lesson.content }}
-        />
+        <RichContentRenderer content={lesson.content} />
       ) : (
         <p className="text-muted-foreground">
           Watch the video above to complete this lesson.
@@ -372,12 +498,68 @@ export default function CourseLearnPage({
 }) {
   const resolvedParams = use(params);
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [completionDialogOpen, setCompletionDialogOpen] = useState(false);
+  const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
 
   const { data: courseResponse, isLoading: courseLoading } = useCourse(resolvedParams.slug);
   const { data: curriculumResponse, isLoading: curriculumLoading } = useCourseCurriculum(resolvedParams.slug);
   const { data: enrollmentResponse } = useEnrollment(resolvedParams.slug);
+
+  // Initialize completed lessons from enrollment data
+  useEffect(() => {
+    if (enrollmentResponse?.data?.completedLessons) {
+      const completed = enrollmentResponse.data.completedLessons as string[];
+      setCompletedLessonIds(new Set(completed));
+    }
+  }, [enrollmentResponse?.data?.completedLessons]);
+
+  // Mark lesson complete mutation
+  const markCompleteMutation = useMutation({
+    mutationFn: async (lessonId: string) => {
+      return lessonsApi.markComplete(lessonId);
+    },
+    onSuccess: (response, lessonId) => {
+      setCompletedLessonIds((prev) => new Set([...prev, lessonId]));
+      queryClient.invalidateQueries({ queryKey: ["enrollment", resolvedParams.slug] });
+      toast({ title: "Lesson completed!" });
+
+      // Check if course is completed
+      if (response?.data?.isCompleted) {
+        setCompletionDialogOpen(true);
+      }
+    },
+    onError: (error: Error & { response?: { data?: { message?: string }; status?: number } }) => {
+      const message = error.response?.data?.message || "Failed to mark lesson as complete";
+      const status = error.response?.status;
+
+      if (status === 403) {
+        toast({
+          title: "Not enrolled",
+          description: "You must be enrolled in this course to track progress.",
+          variant: "destructive"
+        });
+      } else {
+        toast({ title: message, variant: "destructive" });
+      }
+    },
+  });
+
+  // Get active lesson (needs to be before handleVideoEnd)
+  const curriculumData = curriculumResponse?.data as { curriculum?: Module[] } | undefined;
+  const modules = (curriculumData?.curriculum || []) as Module[];
+  const firstLesson = modules[0]?.lessons?.[0] as Lesson | undefined;
+  const activeLesson = currentLesson || firstLesson || null;
+
+  // Handle video end - auto mark as complete
+  const handleVideoEnd = useCallback(() => {
+    if (activeLesson && !completedLessonIds.has(activeLesson._id) && !markCompleteMutation.isPending) {
+      markCompleteMutation.mutate(activeLesson._id);
+    }
+  }, [activeLesson, completedLessonIds, markCompleteMutation]);
 
   const isLoading = courseLoading || curriculumLoading;
 
@@ -386,7 +568,6 @@ export default function CourseLearnPage({
   }
 
   const course = courseResponse?.data as Course | undefined;
-  const modules = (curriculumResponse?.data || []) as Module[];
   const enrollment = enrollmentResponse?.data;
   const courseProgress = enrollment?.progress || 0;
 
@@ -405,10 +586,6 @@ export default function CourseLearnPage({
       </div>
     );
   }
-
-  // Get first lesson if none selected
-  const firstLesson = modules[0]?.lessons?.[0] as Lesson | undefined;
-  const activeLesson = currentLesson || firstLesson || null;
 
   // Get all lessons flat
   const allLessons = modules.flatMap((m) => (m.lessons || []) as Lesson[]);
@@ -467,7 +644,11 @@ export default function CourseLearnPage({
         {/* Video & Content Area */}
         <div className="flex-1 flex flex-col">
           {/* Video Player */}
-          <VideoPlayer lesson={activeLesson} />
+          <VideoPlayer
+            lesson={activeLesson}
+            onVideoEnd={handleVideoEnd}
+            lessonId={activeLesson?._id}
+          />
 
           {/* Lesson Navigation */}
           <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
@@ -481,9 +662,25 @@ export default function CourseLearnPage({
               Previous
             </Button>
 
-            <Button variant="default" size="sm">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Mark as Complete
+            <Button
+              variant="default"
+              size="sm"
+              disabled={!activeLesson || completedLessonIds.has(activeLesson._id) || markCompleteMutation.isPending}
+              onClick={() => activeLesson && markCompleteMutation.mutate(activeLesson._id)}
+            >
+              {completedLessonIds.has(activeLesson?._id || "") ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2 text-green-400" />
+                  Completed
+                </>
+              ) : markCompleteMutation.isPending ? (
+                "Marking..."
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Mark as Complete
+                </>
+              )}
             </Button>
 
             <Button
@@ -547,6 +744,16 @@ export default function CourseLearnPage({
           />
         </aside>
       </div>
+
+      {/* Course Completion Dialog */}
+      <CourseCompletionDialog
+        open={completionDialogOpen}
+        onOpenChange={setCompletionDialogOpen}
+        course={course}
+        onCertificateGenerated={(cert) => {
+          queryClient.invalidateQueries({ queryKey: ["certificates"] });
+        }}
+      />
     </div>
   );
 }

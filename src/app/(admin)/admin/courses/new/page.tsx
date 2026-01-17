@@ -84,12 +84,12 @@ export default function AdminCreateCoursePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title.trim()) {
-      toast({ title: "Title is required", variant: "destructive" });
+    if (!formData.title.trim() || formData.title.trim().length < 3) {
+      toast({ title: "Title must be at least 3 characters", variant: "destructive" });
       return;
     }
-    if (!formData.description.trim()) {
-      toast({ title: "Description is required", variant: "destructive" });
+    if (!formData.description.trim() || formData.description.trim().length < 20) {
+      toast({ title: "Description must be at least 20 characters", variant: "destructive" });
       return;
     }
     if (!formData.category) {
@@ -98,8 +98,8 @@ export default function AdminCreateCoursePage() {
     }
 
     createMutation.mutate({
-      title: formData.title,
-      description: formData.description,
+      title: formData.title.trim(),
+      description: formData.description.trim(),
       category: formData.category,
       price: formData.isFree ? 0 : formData.price,
       isFree: formData.isFree,
@@ -200,6 +200,9 @@ export default function AdminCreateCoursePage() {
                     placeholder="Enter course title"
                     required
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Minimum 3 characters ({formData.title.length}/3)
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="description">Description *</Label>
@@ -207,10 +210,13 @@ export default function AdminCreateCoursePage() {
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Describe the course..."
+                    placeholder="Describe what students will learn in this course..."
                     rows={5}
                     required
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Minimum 20 characters ({formData.description.length}/20)
+                  </p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
