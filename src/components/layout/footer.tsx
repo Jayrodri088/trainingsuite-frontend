@@ -6,7 +6,6 @@ const footerLinks = {
     { label: "Browse Courses", href: "/courses" },
     { label: "Categories", href: "/categories" },
     { label: "Become an Instructor", href: "/teach" },
-    { label: "Pricing", href: "/pricing" },
   ],
   company: [
     { label: "About Us", href: "/about" },

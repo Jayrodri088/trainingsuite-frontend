@@ -5,6 +5,23 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
   ArrowLeft,
   Save,
   Loader2,
@@ -70,6 +87,68 @@ import { coursesApi, UpdateCourseData } from "@/lib/api/courses";
 import { modulesApi, lessonsApi, CreateModuleData, CreateLessonData } from "@/lib/api/lessons";
 import { categoriesApi } from "@/lib/api/categories";
 import type { Course, Module, Lesson, CourseLevel } from "@/types";
+
+// Sortable Module Item Component
+function SortableModuleItem({
+  module,
+  moduleIndex,
+  children,
+}: {
+  module: Module;
+  moduleIndex: number;
+  children: React.ReactNode;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: module._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      {children}
+    </div>
+  );
+}
+
+// Sortable Lesson Item Component
+function SortableLessonItem({
+  lesson,
+  children,
+}: {
+  lesson: Lesson;
+  children: React.ReactNode;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: lesson._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      {children}
+    </div>
+  );
+}
 
 export default function CourseEditorPage({
   params,
@@ -228,6 +307,41 @@ export default function CourseEditorPage({
     },
   });
 
+  const reorderModulesMutation = useMutation({
+    mutationFn: (moduleIds: string[]) => modulesApi.reorder(courseId, moduleIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["course-curriculum", courseId] });
+      toast({ title: "Modules reordered" });
+    },
+    onError: () => {
+      toast({ title: "Failed to reorder modules", variant: "destructive" });
+    },
+  });
+
+  const reorderLessonsMutation = useMutation({
+    mutationFn: ({ moduleId, lessonIds }: { moduleId: string; lessonIds: string[] }) =>
+      lessonsApi.reorder(moduleId, lessonIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["course-curriculum", courseId] });
+      toast({ title: "Lessons reordered" });
+    },
+    onError: () => {
+      toast({ title: "Failed to reorder lessons", variant: "destructive" });
+    },
+  });
+
+  // DnD Sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   const course = courseResponse?.data;
   const curriculumData = curriculumResponse?.data as { curriculum?: Module[] } | undefined;
   const modules = (curriculumData?.curriculum || []) as Module[];
@@ -316,6 +430,29 @@ export default function CourseEditorPage({
         return <HelpCircle className="h-4 w-4" />;
       default:
         return <FileText className="h-4 w-4" />;
+    }
+  };
+
+  const handleModuleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = modules.findIndex((m) => m._id === active.id);
+      const newIndex = modules.findIndex((m) => m._id === over.id);
+      const newOrder = arrayMove(modules, oldIndex, newIndex);
+      reorderModulesMutation.mutate(newOrder.map((m) => m._id));
+    }
+  };
+
+  const handleLessonDragEnd = (moduleId: string, lessons: Lesson[]) => (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = lessons.findIndex((l) => l._id === active.id);
+      const newIndex = lessons.findIndex((l) => l._id === over.id);
+      const newOrder = arrayMove(lessons, oldIndex, newIndex);
+      reorderLessonsMutation.mutate({
+        moduleId,
+        lessonIds: newOrder.map((l) => l._id),
+      });
     }
   };
 
@@ -419,22 +556,35 @@ export default function CourseEditorPage({
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {modules.map((module, moduleIndex) => {
-                    const lessons = (module.lessons || []) as Lesson[];
-                    const isExpanded = expandedModules.includes(module._id);
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleModuleDragEnd}
+                >
+                  <SortableContext
+                    items={modules.map((m) => m._id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-4">
+                      {modules.map((module, moduleIndex) => {
+                        const lessons = (module.lessons || []) as Lesson[];
+                        const isExpanded = expandedModules.includes(module._id);
 
-                    return (
-                      <Collapsible
-                        key={module._id}
-                        open={isExpanded}
-                        onOpenChange={() => toggleModule(module._id)}
-                      >
-                        <div className="border rounded-lg">
-                          <CollapsibleTrigger asChild>
-                            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50">
-                              <div className="flex items-center gap-3">
-                                <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+                        return (
+                          <SortableModuleItem
+                            key={module._id}
+                            module={module}
+                            moduleIndex={moduleIndex}
+                          >
+                            <Collapsible
+                              open={isExpanded}
+                              onOpenChange={() => toggleModule(module._id)}
+                            >
+                              <div className="border rounded-lg">
+                                <CollapsibleTrigger asChild>
+                                  <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50">
+                                    <div className="flex items-center gap-3">
+                                      <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab active:cursor-grabbing" />
                                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium">
                                   {moduleIndex + 1}
                                 </div>
@@ -514,14 +664,21 @@ export default function CourseEditorPage({
                                   </Button>
                                 </div>
                               ) : (
-                                <div className="space-y-2 mt-4">
-                                  {lessons.map((lesson, lessonIndex) => (
-                                    <div
-                                      key={lesson._id}
-                                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
-                                    >
-                                      <div className="flex items-center gap-3">
-                                        <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+                                <DndContext
+                                  sensors={sensors}
+                                  collisionDetection={closestCenter}
+                                  onDragEnd={handleLessonDragEnd(module._id, lessons)}
+                                >
+                                  <SortableContext
+                                    items={lessons.map((l) => l._id)}
+                                    strategy={verticalListSortingStrategy}
+                                  >
+                                    <div className="space-y-2 mt-4">
+                                      {lessons.map((lesson, lessonIndex) => (
+                                        <SortableLessonItem key={lesson._id} lesson={lesson}>
+                                          <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
+                                            <div className="flex items-center gap-3">
+                                              <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab active:cursor-grabbing" />
                                         <div className="text-muted-foreground">
                                           {getLessonIcon(lesson.type || "text")}
                                         </div>
@@ -575,27 +732,33 @@ export default function CourseEditorPage({
                                             Delete Lesson
                                           </DropdownMenuItem>
                                         </DropdownMenuContent>
-                                      </DropdownMenu>
+                                          </DropdownMenu>
+                                          </div>
+                                        </SortableLessonItem>
+                                      ))}
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="w-full mt-2"
+                                        onClick={() => handleOpenLessonDialog(module._id)}
+                                      >
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Add Lesson
+                                      </Button>
                                     </div>
-                                  ))}
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full mt-2"
-                                    onClick={() => handleOpenLessonDialog(module._id)}
-                                  >
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add Lesson
-                                  </Button>
-                                </div>
+                                  </SortableContext>
+                                </DndContext>
                               )}
                             </div>
                           </CollapsibleContent>
-                        </div>
-                      </Collapsible>
-                    );
-                  })}
-                </div>
+                              </div>
+                            </Collapsible>
+                          </SortableModuleItem>
+                        );
+                      })}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               )}
             </CardContent>
           </Card>

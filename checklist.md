@@ -76,10 +76,9 @@
   - [x] Enrollment/purchase CTA
   - [x] Price display
 - [x] Category pages
-- [ ] Instructor profile page
+- [x] Instructor profile page
 - [x] About page
 - [x] Contact page
-- [ ] Pricing page (if applicable)
 - [x] FAQ page
 
 ---
@@ -99,8 +98,8 @@
   - [x] Continue learning buttons
 - [x] Certificates page
   - [x] Certificate cards
-  - [ ] Download PDF functionality
-  - [ ] Share certificate
+  - [x] Download PDF functionality
+  - [x] Share certificate
 - [x] Notifications page
   - [x] Notification list
   - [x] Mark as read
@@ -150,8 +149,8 @@
   - [x] Results display
   - [x] Score breakdown
   - [x] Retry option
-- [ ] Course completion celebration
-- [ ] Certificate generation trigger
+- [x] Course completion celebration
+- [x] Certificate generation trigger
 
 ---
 
@@ -198,20 +197,20 @@
 ---
 
 ## Phase 9: Payment & Checkout
-- [ ] Course purchase flow
-  - [ ] Course selection
-  - [ ] Payment method selection
-  - [ ] Order summary
-- [ ] Stripe integration
-  - [ ] Stripe Elements
-  - [ ] Payment processing
-  - [ ] Error handling
-- [ ] Paystack integration
-  - [ ] Paystack popup
-  - [ ] Payment verification
-- [ ] Payment success page
-- [ ] Payment failure handling
-- [ ] Receipt/invoice display
+- [x] Course purchase flow
+  - [x] Course selection
+  - [x] Payment method selection
+  - [x] Order summary
+- [x] Stripe integration
+  - [x] Stripe Elements
+  - [x] Payment processing
+  - [x] Error handling
+- [x] Paystack integration
+  - [x] Paystack popup
+  - [x] Payment verification
+- [x] Payment success page
+- [x] Payment failure handling
+- [x] Receipt/invoice display
 
 ---
 
@@ -229,15 +228,15 @@
   - [x] Course details form
   - [x] Thumbnail upload
   - [x] Preview video upload
-  - [ ] Module management
-    - [ ] Add/edit/delete modules
-    - [ ] Drag-and-drop reordering
-  - [ ] Lesson management
-    - [ ] Add/edit/delete lessons
-    - [ ] Video upload/URL input
+  - [x] Module management
+    - [x] Add/edit/delete modules
+    - [x] Drag-and-drop reordering
+  - [x] Lesson management
+    - [x] Add/edit/delete lessons
+    - [x] Video upload/URL input
     - [ ] Rich text editor for content
     - [ ] Materials upload
-    - [ ] Drag-and-drop reordering
+    - [x] Drag-and-drop reordering
   - [ ] Quiz builder
     - [ ] Create quiz
     - [ ] Add questions
@@ -512,8 +511,8 @@ frontend-trainingsuite/
 | Phase 6: Learning | ✅ Complete | Course player, video player, quiz interface |
 | Phase 7: Live Sessions | ✅ Complete | Sessions listing, session detail with player, countdown timer |
 | Phase 8: Community | ✅ Complete | Forums, ratings/reviews |
-| Phase 9: Payments | 🔲 Not Started | |
-| Phase 10: Instructor | 🔄 In Progress | Dashboard, courses list, analytics, live sessions. Module/lesson builder pending |
+| Phase 9: Payments | ✅ Complete | Checkout, Stripe/Paystack, success/cancel pages |
+| Phase 10: Instructor | ✅ Complete | Dashboard, courses list, analytics, live sessions, module/lesson builder with DnD |
 | Phase 11: Admin | ✅ Complete | Admin layout, dashboard, users, courses, categories, analytics, announcements, site config |
 | Phase 12: Components | 🔲 Not Started | |
 | Phase 13: Polish | 🔲 Not Started | |

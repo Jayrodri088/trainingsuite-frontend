@@ -14,9 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCourses, useAuth } from "@/hooks";
+import { useCourses, useAuth, useEnrollments } from "@/hooks";
 import { formatCurrency } from "@/lib/utils";
-import type { Course } from "@/types";
+import type { Course, Enrollment } from "@/types";
 
 const features = [
   {
@@ -50,20 +50,25 @@ const cardGradients = [
   "bg-gradient-to-br from-blue-500 to-indigo-600",
 ];
 
-function CourseCard({ course, index }: { course: Course; index: number }) {
+function CourseCard({ course, index, enrollment }: { course: Course; index: number; enrollment?: Enrollment }) {
   const gradient = cardGradients[index % cardGradients.length];
+  const isEnrolled = !!enrollment;
+  const progress = enrollment?.progress || 0;
 
   return (
-    <Link href={`/courses/${course.slug || course._id}`}>
+    <Link href={isEnrolled ? `/learn/${course.slug || course._id}` : `/courses/${course.slug || course._id}`}>
       <Card className="overflow-hidden group cursor-pointer h-full hover:shadow-lg transition-shadow">
         <div className={`h-36 ${gradient} relative`}>
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-          <div className="absolute top-3 left-3">
+          <div className="absolute top-3 left-3 flex gap-2">
             <Badge variant="secondary" className="text-xs capitalize">
               {course.level}
             </Badge>
+            {isEnrolled && (
+              <Badge className="bg-blue-600 hover:bg-blue-600 text-xs">Enrolled</Badge>
+            )}
           </div>
-          {course.isFree && (
+          {course.isFree && !isEnrolled && (
             <div className="absolute top-3 right-3">
               <Badge className="bg-green-600 hover:bg-green-600 text-xs">Free</Badge>
             </div>
@@ -90,12 +95,29 @@ function CourseCard({ course, index }: { course: Course; index: number }) {
               ({(course.enrollmentCount || 0).toLocaleString()} students)
             </span>
           </div>
-          <div className="mt-3 flex items-center justify-between">
-            <span className="font-bold">
-              {course.isFree ? "Free" : formatCurrency(course.price, course.currency)}
-            </span>
-            <Button size="sm" className="h-7 text-xs">Enroll Now</Button>
-          </div>
+          {isEnrolled ? (
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-muted-foreground">{progress}% complete</span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-1.5">
+                <div
+                  className="bg-primary h-1.5 rounded-full transition-all"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <Button size="sm" className="h-7 text-xs w-full mt-2">
+                {progress >= 100 ? "Review" : "Continue"}
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-3 flex items-center justify-between">
+              <span className="font-bold">
+                {course.isFree ? "Free" : formatCurrency(course.price, course.currency)}
+              </span>
+              <Button size="sm" className="h-7 text-xs">Enroll Now</Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </Link>
@@ -127,8 +149,17 @@ export default function HomePage() {
     sort: "enrollmentCount",
     order: "desc",
   });
+  const { data: enrollmentsResponse } = useEnrollments();
 
   const courses = coursesResponse?.data || [];
+  const enrollments = enrollmentsResponse?.data || [];
+
+  // Create a map of course ID to enrollment for quick lookup
+  const enrollmentMap = new Map<string, Enrollment>();
+  enrollments.forEach((enrollment) => {
+    const courseId = typeof enrollment.course === "object" ? enrollment.course._id : enrollment.course;
+    enrollmentMap.set(courseId, enrollment);
+  });
 
   return (
     <div className="flex flex-col">
@@ -244,7 +275,12 @@ export default function HomePage() {
               </>
             ) : courses.length > 0 ? (
               courses.map((course, index) => (
-                <CourseCard key={course._id} course={course} index={index} />
+                <CourseCard
+                  key={course._id}
+                  course={course}
+                  index={index}
+                  enrollment={enrollmentMap.get(course._id)}
+                />
               ))
             ) : (
               <div className="col-span-full text-center py-12">
