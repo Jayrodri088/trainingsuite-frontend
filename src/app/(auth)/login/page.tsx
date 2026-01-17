@@ -24,7 +24,7 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setUser } = useAuthStore();
+  const { setAuth } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,7 +43,7 @@ export default function LoginPage() {
       // In production, this would integrate with NextAuth
       const response = await authApi.login(data);
       if (response.success && response.data) {
-        setUser(response.data.user);
+        setAuth(response.data.user, response.data.token);
         toast.success("Welcome back!");
         router.push("/dashboard");
       }
