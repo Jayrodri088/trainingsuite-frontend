@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   User,
   Lock,
@@ -9,6 +10,7 @@ import {
   Camera,
   Save,
   Loader2,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,11 +29,79 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks";
+import { useToast } from "@/hooks/use-toast";
 import { getInitials } from "@/lib/utils";
+import { apiClient } from "@/lib/api/client";
+import { authApi } from "@/lib/api/auth";
 
 export default function SettingsPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  // Upload avatar mutation
+  const uploadAvatarMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "avatars");
+
+      const uploadResponse = await apiClient.post<{
+        success: boolean;
+        data: { fileUrl: string };
+      }>("/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (!uploadResponse.data.success) {
+        throw new Error("Upload failed");
+      }
+
+      // Update user profile with new avatar URL
+      await authApi.updateProfile({ avatar: uploadResponse.data.data.fileUrl });
+
+      return uploadResponse.data.data.fileUrl;
+    },
+    onSuccess: (fileUrl) => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      setAvatarPreview(null);
+      toast({ title: "Avatar updated successfully!" });
+    },
+    onError: () => {
+      toast({ title: "Failed to upload avatar", variant: "destructive" });
+      setAvatarPreview(null);
+    },
+  });
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please select an image file", variant: "destructive" });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "File size must be less than 2MB", variant: "destructive" });
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setAvatarPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload file
+    uploadAvatarMutation.mutate(file);
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -83,16 +153,35 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-6">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src={user?.avatar} />
-                    <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                      {getInitials(user?.name || "User")}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="relative">
+                    <Avatar className="h-24 w-24">
+                      <AvatarImage src={avatarPreview || user?.avatar} />
+                      <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
+                        {getInitials(user?.name || "User")}
+                      </AvatarFallback>
+                    </Avatar>
+                    {uploadAvatarMutation.isPending && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                        <Loader2 className="h-6 w-6 animate-spin text-white" />
+                      </div>
+                    )}
+                  </div>
                   <div className="space-y-2">
-                    <Button variant="outline" size="sm">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadAvatarMutation.isPending}
+                    >
                       <Camera className="h-4 w-4 mr-2" />
-                      Change Photo
+                      {uploadAvatarMutation.isPending ? "Uploading..." : "Change Photo"}
                     </Button>
                     <p className="text-xs text-muted-foreground">
                       JPG, PNG or GIF. Max size 2MB.

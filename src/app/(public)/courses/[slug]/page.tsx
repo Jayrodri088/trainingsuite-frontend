@@ -3,7 +3,7 @@
 import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Play,
   Clock,
@@ -41,7 +41,7 @@ import { useCourse, useCourseCurriculum, useCourseRatings, useAuth } from "@/hoo
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi } from "@/lib/api/courses";
 import { formatCurrency } from "@/lib/utils";
-import type { Module, Lesson, Rating } from "@/types";
+import type { Course, Module, Lesson, Rating } from "@/types";
 
 const levelColors = {
   beginner: "bg-green-100 text-green-800",
@@ -166,11 +166,10 @@ function StarRatingInput({
           onClick={() => onChange(star)}
         >
           <Star
-            className={`${sizeClasses[size]} cursor-pointer transition-colors ${
-              star <= (hoverValue || value)
-                ? "fill-amber-500 text-amber-500"
-                : "text-gray-300 hover:text-amber-300"
-            }`}
+            className={`${sizeClasses[size]} cursor-pointer transition-colors ${star <= (hoverValue || value)
+              ? "fill-amber-500 text-amber-500"
+              : "text-gray-300 hover:text-amber-300"
+              }`}
           />
         </button>
       ))}
@@ -232,11 +231,10 @@ function ReviewForm({
           {[...Array(5)].map((_, i) => (
             <Star
               key={i}
-              className={`h-5 w-5 ${
-                i < existingReview.rating
-                  ? "fill-amber-500 text-amber-500"
-                  : "text-gray-300"
-              }`}
+              className={`h-5 w-5 ${i < existingReview.rating
+                ? "fill-amber-500 text-amber-500"
+                : "text-gray-300"
+                }`}
             />
           ))}
         </div>
@@ -665,11 +663,10 @@ export default function CourseDetailPage({
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-5 w-5 ${
-                                i < Math.round(course.rating || 0)
-                                  ? "fill-amber-500 text-amber-500"
-                                  : "text-gray-300"
-                              }`}
+                              className={`h-5 w-5 ${i < Math.round(course.rating || 0)
+                                ? "fill-amber-500 text-amber-500"
+                                : "text-gray-300"
+                                }`}
                             />
                           ))}
                         </div>
@@ -712,41 +709,40 @@ export default function CourseDetailPage({
                         {ratings
                           .filter((r) => r._id !== userReview?._id)
                           .map((rating) => (
-                          <div key={rating._id} className="border-t pt-6">
-                            <div className="flex items-start gap-4">
-                              <Avatar>
-                                <AvatarFallback>
-                                  {rating.user?.name?.charAt(0) || "U"}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <h4 className="font-medium">{rating.user?.name || "Anonymous"}</h4>
-                                  <span className="text-sm text-muted-foreground">
-                                    {new Date(rating.createdAt).toLocaleDateString()}
-                                  </span>
-                                </div>
-                                <div className="flex gap-0.5 my-1">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      className={`h-4 w-4 ${
-                                        i < rating.rating
+                            <div key={rating._id} className="border-t pt-6">
+                              <div className="flex items-start gap-4">
+                                <Avatar>
+                                  <AvatarFallback>
+                                    {rating.user?.name?.charAt(0) || "U"}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <h4 className="font-medium">{rating.user?.name || "Anonymous"}</h4>
+                                    <span className="text-sm text-muted-foreground">
+                                      {new Date(rating.createdAt).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  <div className="flex gap-0.5 my-1">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        className={`h-4 w-4 ${i < rating.rating
                                           ? "fill-amber-500 text-amber-500"
                                           : "text-gray-300"
-                                      }`}
-                                    />
-                                  ))}
+                                          }`}
+                                      />
+                                    ))}
+                                  </div>
+                                  {rating.review && (
+                                    <p className="text-sm text-muted-foreground mt-2">
+                                      {rating.review}
+                                    </p>
+                                  )}
                                 </div>
-                                {rating.review && (
-                                  <p className="text-sm text-muted-foreground mt-2">
-                                    {rating.review}
-                                  </p>
-                                )}
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     ) : !userReview ? (
                       <p className="text-center py-8 text-muted-foreground mt-6">
@@ -759,6 +755,97 @@ export default function CourseDetailPage({
             </Tabs>
           </div>
         </div>
+      </div>
+
+      {/* Related Courses Section */}
+      <RelatedCourses
+        categoryId={typeof course.category === "object" ? course.category._id : course.category}
+        currentCourseId={course._id}
+      />
+    </div>
+  );
+}
+
+// Related Courses Component
+function RelatedCourses({
+  categoryId,
+  currentCourseId
+}: {
+  categoryId?: string;
+  currentCourseId: string;
+}) {
+  const { data: relatedResponse, isLoading } = useQuery({
+    queryKey: ["related-courses", categoryId],
+    queryFn: () => coursesApi.getAll({
+      category: categoryId,
+      limit: 4,
+      status: "published" as const
+    }),
+    enabled: !!categoryId,
+  });
+
+  const relatedCourses = (relatedResponse?.data || [])
+    .filter((course: Course) => course._id !== currentCourseId)
+    .slice(0, 4);
+
+  if (!categoryId || (relatedCourses.length === 0 && !isLoading)) {
+    return null;
+  }
+
+  return (
+    <div className="border-t bg-muted/30">
+      <div className="container max-w-6xl py-12">
+        <h2 className="text-2xl font-bold mb-6">Related Courses</h2>
+        {isLoading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="overflow-hidden">
+                <Skeleton className="aspect-video" />
+                <CardContent className="p-4 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-4 w-1/4" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {relatedCourses.map((course: Course) => (
+              <Link key={course._id} href={`/courses/${course.slug}`}>
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
+                  <div className="aspect-video bg-gradient-to-br from-violet-500 to-purple-600 relative">
+                    {course.thumbnail ? (
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <BookOpen className="h-10 w-10 text-white/60" />
+                      </div>
+                    )}
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold line-clamp-2 mb-2">{course.title}</h3>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <div className="flex items-center gap-1">
+                        <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                        <span>{course.rating?.toFixed(1) || "N/A"}</span>
+                      </div>
+                      <span>•</span>
+                      <span>{course.enrollmentCount || 0} students</span>
+                    </div>
+                    <p className="font-semibold text-primary">
+                      {course.isFree ? "Free" : formatCurrency(course.price, course.currency)}
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

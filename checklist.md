@@ -72,7 +72,7 @@
   - [x] Curriculum accordion (modules/lessons)
   - [x] Instructor profile section
   - [x] Ratings & reviews section
-  - [ ] Related courses
+  - [x] Related courses
   - [x] Enrollment/purchase CTA
   - [x] Price display
 - [x] Category pages
@@ -107,7 +107,7 @@
   - [x] Mark all as read
   - [x] Notification preferences
 - [x] Profile settings page
-  - [ ] Avatar upload
+  - [x] Avatar upload
   - [x] Personal information form
   - [x] Password change
   - [x] Email preferences
@@ -137,10 +137,10 @@
   - [x] Download links
   - [x] File type icons
 - [x] Lesson comments/discussion
-  - [ ] Comment form
-  - [ ] Comment list
-  - [ ] Reply functionality
-  - [ ] Edit/delete own comments
+  - [x] Comment form
+  - [x] Comment list
+  - [x] Reply functionality
+  - [x] Edit/delete own comments
 - [x] Mark complete functionality
 - [x] Quiz interface
   - [x] Question display

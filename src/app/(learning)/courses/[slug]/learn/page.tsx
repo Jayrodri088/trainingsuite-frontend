@@ -42,6 +42,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useCourse, useCourseCurriculum, useEnrollment } from "@/hooks";
+import { LessonComments } from "@/components/lessons/lesson-comments";
 import type { Module, Lesson, Course } from "@/types";
 
 function VideoPlayer({ lesson }: { lesson: Lesson | null }) {
@@ -181,13 +182,12 @@ function LessonItem({
     <button
       onClick={onClick}
       disabled={isLocked}
-      className={`w-full text-left p-3 rounded-lg transition-colors ${
-        isActive
-          ? "bg-primary/10 border border-primary/30"
-          : isLocked
+      className={`w-full text-left p-3 rounded-lg transition-colors ${isActive
+        ? "bg-primary/10 border border-primary/30"
+        : isLocked
           ? "opacity-50 cursor-not-allowed"
           : "hover:bg-muted"
-      }`}
+        }`}
     >
       <div className="flex items-start gap-3">
         <div className="mt-0.5">{getIcon()}</div>
@@ -520,15 +520,8 @@ export default function CourseLearnPage({
               </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="discussion" className="mt-0 p-6">
-              <div className="text-center py-12">
-                <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="font-semibold">Discussion</h3>
-                <p className="text-muted-foreground mt-2">
-                  Ask questions and discuss this lesson with other learners.
-                </p>
-                <Button className="mt-4">Start a Discussion</Button>
-              </div>
+            <TabsContent value="discussion" className="mt-0">
+              <LessonComments lessonId={activeLesson?._id || ""} />
             </TabsContent>
 
             <TabsContent value="notes" className="mt-0 p-6">
