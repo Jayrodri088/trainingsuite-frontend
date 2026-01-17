@@ -44,6 +44,13 @@ export const liveSessionsApi = {
     return response.data;
   },
 
+  delete: async (id: string) => {
+    const response = await apiClient.delete<ApiResponse<null>>(
+      `/live-sessions/${id}`
+    );
+    return response.data;
+  },
+
   start: async (id: string) => {
     const response = await apiClient.post<ApiResponse<LiveSession>>(
       `/live-sessions/${id}/start`

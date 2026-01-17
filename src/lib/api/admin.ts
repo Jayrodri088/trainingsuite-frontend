@@ -26,7 +26,7 @@ export const adminApi = {
   // Courses
   createCourse: async (data: CreateCourseData) => {
     const response = await apiClient.post<ApiResponse<Course>>(
-      "/admin/courses",
+      "/courses",
       data
     );
     return response.data;

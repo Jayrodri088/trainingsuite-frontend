@@ -18,10 +18,9 @@ import {
   MessageSquare,
   Megaphone,
   LogOut,
-  GraduationCap,
-  Award,
+  PlusCircle,
   Video,
-  HelpCircle,
+  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,7 +38,7 @@ import { getInitials, cn } from "@/lib/utils";
 
 const adminNavSections = [
   {
-    title: "Admin",
+    title: "Overview",
     items: [
       {
         label: "Dashboard",
@@ -47,14 +46,24 @@ const adminNavSections = [
         icon: LayoutDashboard,
       },
       {
-        label: "Users",
-        href: "/admin/users",
-        icon: Users,
+        label: "Analytics",
+        href: "/admin/analytics",
+        icon: BarChart3,
       },
+    ],
+  },
+  {
+    title: "Content",
+    items: [
       {
         label: "Courses",
         href: "/admin/courses",
         icon: BookOpen,
+      },
+      {
+        label: "Create Course",
+        href: "/admin/courses/new",
+        icon: PlusCircle,
       },
       {
         label: "Categories",
@@ -62,10 +71,35 @@ const adminNavSections = [
         icon: FolderTree,
       },
       {
-        label: "Analytics",
-        href: "/admin/analytics",
-        icon: BarChart3,
+        label: "Live Sessions",
+        href: "/admin/live-sessions",
+        icon: Video,
       },
+      {
+        label: "Discussions",
+        href: "/admin/discussions",
+        icon: MessageSquare,
+      },
+    ],
+  },
+  {
+    title: "Users",
+    items: [
+      {
+        label: "All Users",
+        href: "/admin/users",
+        icon: Users,
+      },
+      {
+        label: "Students",
+        href: "/admin/students",
+        icon: GraduationCap,
+      },
+    ],
+  },
+  {
+    title: "Platform",
+    items: [
       {
         label: "Announcements",
         href: "/admin/announcements",
@@ -80,41 +114,6 @@ const adminNavSections = [
         label: "Settings",
         href: "/admin/settings",
         icon: Settings,
-      },
-    ],
-  },
-  {
-    title: "Learning",
-    items: [
-      {
-        label: "My Courses",
-        href: "/admin/my-courses",
-        icon: GraduationCap,
-      },
-      {
-        label: "Certificates",
-        href: "/admin/certificates",
-        icon: Award,
-      },
-      {
-        label: "Live Sessions",
-        href: "/admin/live-sessions",
-        icon: Video,
-      },
-      {
-        label: "Forums",
-        href: "/admin/forums",
-        icon: MessageSquare,
-      },
-      {
-        label: "Notifications",
-        href: "/admin/notifications",
-        icon: Bell,
-      },
-      {
-        label: "Help",
-        href: "/admin/help",
-        icon: HelpCircle,
       },
     ],
   },
