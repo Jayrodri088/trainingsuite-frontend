@@ -1,8 +1,9 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Play,
   Clock,
@@ -19,6 +20,8 @@ import {
   Video,
   Lock,
   ArrowLeft,
+  Loader2,
+  Edit,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,9 +36,12 @@ import {
 } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { useCourse, useCourseCurriculum, useCourseRatings } from "@/hooks";
+import { Textarea } from "@/components/ui/textarea";
+import { useCourse, useCourseCurriculum, useCourseRatings, useAuth } from "@/hooks";
+import { useToast } from "@/hooks/use-toast";
+import { coursesApi } from "@/lib/api/courses";
 import { formatCurrency } from "@/lib/utils";
-import type { Module, Lesson } from "@/types";
+import type { Module, Lesson, Rating } from "@/types";
 
 const levelColors = {
   beginner: "bg-green-100 text-green-800",
@@ -132,6 +138,158 @@ function RatingBar({ rating, percentage }: { rating: number; percentage: number 
   );
 }
 
+function StarRatingInput({
+  value,
+  onChange,
+  size = "md",
+}: {
+  value: number;
+  onChange: (rating: number) => void;
+  size?: "sm" | "md" | "lg";
+}) {
+  const [hoverValue, setHoverValue] = useState(0);
+
+  const sizeClasses = {
+    sm: "h-5 w-5",
+    md: "h-7 w-7",
+    lg: "h-9 w-9",
+  };
+
+  return (
+    <div className="flex gap-1" onMouseLeave={() => setHoverValue(0)}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          className="focus:outline-none transition-transform hover:scale-110"
+          onMouseEnter={() => setHoverValue(star)}
+          onClick={() => onChange(star)}
+        >
+          <Star
+            className={`${sizeClasses[size]} cursor-pointer transition-colors ${
+              star <= (hoverValue || value)
+                ? "fill-amber-500 text-amber-500"
+                : "text-gray-300 hover:text-amber-300"
+            }`}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ReviewForm({
+  courseId,
+  existingReview,
+  onSuccess,
+}: {
+  courseId: string;
+  existingReview?: Rating;
+  onSuccess: () => void;
+}) {
+  const { toast } = useToast();
+  const [rating, setRating] = useState(existingReview?.rating || 0);
+  const [review, setReview] = useState(existingReview?.review || "");
+  const [isEditing, setIsEditing] = useState(!existingReview);
+
+  const submitMutation = useMutation({
+    mutationFn: (data: { rating: number; review?: string }) =>
+      coursesApi.createRating(courseId, data),
+    onSuccess: () => {
+      toast({ title: existingReview ? "Review updated!" : "Review submitted!" });
+      setIsEditing(false);
+      onSuccess();
+    },
+    onError: () => {
+      toast({ title: "Failed to submit review", variant: "destructive" });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (rating === 0) {
+      toast({ title: "Please select a rating", variant: "destructive" });
+      return;
+    }
+    submitMutation.mutate({ rating, review: review.trim() || undefined });
+  };
+
+  if (existingReview && !isEditing) {
+    return (
+      <div className="bg-muted/50 rounded-lg p-4">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="font-medium">Your Review</h4>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsEditing(true)}
+          >
+            <Edit className="h-4 w-4 mr-1" />
+            Edit
+          </Button>
+        </div>
+        <div className="flex gap-0.5 mb-2">
+          {[...Array(5)].map((_, i) => (
+            <Star
+              key={i}
+              className={`h-5 w-5 ${
+                i < existingReview.rating
+                  ? "fill-amber-500 text-amber-500"
+                  : "text-gray-300"
+              }`}
+            />
+          ))}
+        </div>
+        {existingReview.review && (
+          <p className="text-sm text-muted-foreground">{existingReview.review}</p>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-muted/50 rounded-lg p-4">
+      <h4 className="font-medium mb-4">
+        {existingReview ? "Update your review" : "Leave a review"}
+      </h4>
+      <div className="mb-4">
+        <p className="text-sm text-muted-foreground mb-2">Your rating</p>
+        <StarRatingInput value={rating} onChange={setRating} />
+      </div>
+      <div className="mb-4">
+        <p className="text-sm text-muted-foreground mb-2">Your review (optional)</p>
+        <Textarea
+          value={review}
+          onChange={(e) => setReview(e.target.value)}
+          placeholder="Share your experience with this course..."
+          rows={4}
+        />
+      </div>
+      <div className="flex gap-2">
+        <Button type="submit" disabled={submitMutation.isPending}>
+          {submitMutation.isPending && (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          )}
+          {existingReview ? "Update Review" : "Submit Review"}
+        </Button>
+        {existingReview && isEditing && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setIsEditing(false);
+              setRating(existingReview.rating);
+              setReview(existingReview.review || "");
+            }}
+          >
+            Cancel
+          </Button>
+        )}
+      </div>
+    </form>
+  );
+}
+
 export default function CourseDetailPage({
   params,
 }: {
@@ -139,6 +297,8 @@ export default function CourseDetailPage({
 }) {
   const resolvedParams = use(params);
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { user, isAuthenticated } = useAuth();
   const { data: courseResponse, isLoading: courseLoading } = useCourse(resolvedParams.slug);
   const { data: curriculumResponse, isLoading: curriculumLoading } = useCourseCurriculum(resolvedParams.slug);
   const { data: ratingsResponse } = useCourseRatings(resolvedParams.slug);
@@ -165,17 +325,32 @@ export default function CourseDetailPage({
   }
 
   const modules = (curriculumResponse?.data || []) as Module[];
-  const ratings = ratingsResponse?.data || [];
+  const ratings = (ratingsResponse?.data || []) as Rating[];
   const instructor = typeof course.instructor === "object" ? course.instructor : null;
 
-  // Calculate rating distribution (mock for now if no real data)
-  const ratingDistribution = [
-    { rating: 5, percentage: 65 },
-    { rating: 4, percentage: 20 },
-    { rating: 3, percentage: 10 },
-    { rating: 2, percentage: 3 },
-    { rating: 1, percentage: 2 },
-  ];
+  // Find user's existing review
+  const userReview = user
+    ? ratings.find((r) => r.user?._id === user._id)
+    : undefined;
+
+  // Calculate rating distribution from actual data
+  const ratingCounts = ratings.reduce(
+    (acc, r) => {
+      acc[r.rating] = (acc[r.rating] || 0) + 1;
+      return acc;
+    },
+    {} as Record<number, number>
+  );
+  const totalRatings = ratings.length || 1;
+  const ratingDistribution = [5, 4, 3, 2, 1].map((rating) => ({
+    rating,
+    percentage: Math.round(((ratingCounts[rating] || 0) / totalRatings) * 100),
+  }));
+
+  const handleReviewSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["course-ratings", resolvedParams.slug] });
+    queryClient.invalidateQueries({ queryKey: ["course", resolvedParams.slug] });
+  };
 
   const totalLessons = modules.reduce(
     (acc, module) => acc + ((module.lessons as Lesson[])?.length || 0),

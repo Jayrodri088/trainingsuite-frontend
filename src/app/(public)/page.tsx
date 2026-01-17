@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCourses } from "@/hooks";
+import { useCourses, useAuth } from "@/hooks";
 import { formatCurrency } from "@/lib/utils";
 import type { Course } from "@/types";
 
@@ -140,6 +140,7 @@ function CourseCardSkeleton() {
 }
 
 export default function HomePage() {
+  const { isAuthenticated } = useAuth();
   const { data: coursesResponse, isLoading } = useCourses({
     status: "published",
     limit: 4,
@@ -167,30 +168,41 @@ export default function HomePage() {
               online courses. Learn from industry experts and earn certificates that matter.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Button size="lg" asChild>
-                <Link href="/register">
-                  Get Started Free
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              {isAuthenticated ? (
+                <Button size="lg" asChild>
+                  <Link href="/dashboard">
+                    Go to Dashboard
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              ) : (
+                <Button size="lg" asChild>
+                  <Link href="/register">
+                    Get Started Free
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
               <Button size="lg" variant="outline" asChild>
                 <Link href="/courses">Browse Courses</Link>
               </Button>
             </div>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <span>Free to start</span>
+            {!isAuthenticated && (
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span>Free to start</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span>No credit card required</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span>Cancel anytime</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <span>No credit card required</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <span>Cancel anytime</span>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
@@ -316,19 +328,29 @@ export default function HomePage() {
         <div className="container max-w-6xl">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-bold tracking-tight">
-              Ready to Start Learning?
+              {isAuthenticated ? "Continue Your Learning Journey" : "Ready to Start Learning?"}
             </h2>
             <p className="mt-3 text-primary-foreground/80">
-              Join over 50,000 learners and start your journey today.
-              Get access to hundreds of courses for free.
+              {isAuthenticated
+                ? "Pick up where you left off or explore new courses to expand your skills."
+                : "Join over 50,000 learners and start your journey today. Get access to hundreds of courses for free."}
             </p>
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Button size="lg" variant="secondary" asChild>
-                <Link href="/register">
-                  Create Free Account
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              {isAuthenticated ? (
+                <Button size="lg" variant="secondary" asChild>
+                  <Link href="/my-courses">
+                    My Courses
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              ) : (
+                <Button size="lg" variant="secondary" asChild>
+                  <Link href="/register">
+                    Create Free Account
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
               <Button
                 size="lg"
                 variant="outline"

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Users,
   Target,
@@ -11,6 +13,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useAuth } from "@/hooks";
 
 const stats = [
   { label: "Students", value: "50,000+", icon: Users },
@@ -70,6 +73,8 @@ const team = [
 ];
 
 export default function AboutPage() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -186,18 +191,23 @@ export default function AboutPage() {
       {/* CTA Section */}
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Start Learning?</h2>
+          <h2 className="text-3xl font-bold mb-4">
+            {isAuthenticated ? "Continue Your Learning Journey" : "Ready to Start Learning?"}
+          </h2>
           <p className="text-primary-foreground/80 max-w-2xl mx-auto mb-8">
-            Join thousands of learners who are already transforming their careers
-            with Training Suite. Browse our courses and start your journey today.
+            {isAuthenticated
+              ? "Explore our courses and continue building your skills with Training Suite."
+              : "Join thousands of learners who are already transforming their careers with Training Suite. Browse our courses and start your journey today."}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" variant="secondary" asChild>
               <Link href="/courses">Browse Courses</Link>
             </Button>
-            <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10" asChild>
-              <Link href="/register">Create Free Account</Link>
-            </Button>
+            {!isAuthenticated && (
+              <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10" asChild>
+                <Link href="/register">Create Free Account</Link>
+              </Button>
+            )}
           </div>
         </div>
       </section>

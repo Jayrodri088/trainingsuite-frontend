@@ -77,10 +77,10 @@
   - [x] Price display
 - [x] Category pages
 - [ ] Instructor profile page
-- [ ] About page
-- [ ] Contact page
+- [x] About page
+- [x] Contact page
 - [ ] Pricing page (if applicable)
-- [ ] FAQ page
+- [x] FAQ page
 
 ---
 
@@ -111,10 +111,10 @@
   - [x] Personal information form
   - [x] Password change
   - [x] Email preferences
-- [ ] Payment history page
-  - [ ] Transaction table
+- [x] Payment history page
+  - [x] Transaction table
   - [ ] Receipt download
-  - [ ] Payment status badges
+  - [x] Payment status badges
 
 ---
 
@@ -156,38 +156,38 @@
 ---
 
 ## Phase 7: Live Sessions
-- [ ] Live sessions listing page
-  - [ ] Upcoming sessions
-  - [ ] Past sessions (recordings)
-  - [ ] Session cards with details
-- [ ] Live session detail page
-  - [ ] Session info
-  - [ ] Instructor details
-  - [ ] Join button (when live)
-  - [ ] Countdown timer (when scheduled)
-- [ ] Live session player
-  - [ ] Video embed (YouTube/Vimeo/Custom)
+- [x] Live sessions listing page
+  - [x] Upcoming sessions
+  - [x] Past sessions (recordings)
+  - [x] Session cards with details
+- [x] Live session detail page
+  - [x] Session info
+  - [x] Instructor details
+  - [x] Join button (when live)
+  - [x] Countdown timer (when scheduled)
+- [x] Live session player
+  - [x] Video embed (YouTube/Vimeo/Custom)
   - [ ] Attendance tracking
-  - [ ] Session info sidebar
+  - [x] Session info sidebar
 
 ---
 
 ## Phase 8: Community Features
-- [ ] Forums listing page
-  - [ ] General forums
-  - [ ] Course-specific forums
-  - [ ] Forum cards
-- [ ] Forum detail page
-  - [ ] Posts list
-  - [ ] Create post button
-  - [ ] Search posts
-  - [ ] Sort options
-- [ ] Post detail page
-  - [ ] Post content
-  - [ ] Comments thread
-  - [ ] Reply to comments
+- [x] Forums listing page
+  - [x] General forums
+  - [x] Course-specific forums
+  - [x] Forum cards
+- [x] Forum detail page
+  - [x] Posts list
+  - [x] Create post button
+  - [x] Search posts
+  - [x] Sort options
+- [x] Post detail page
+  - [x] Post content
+  - [x] Comments thread
+  - [x] Reply to comments
   - [ ] Like/react to posts
-- [ ] Create/edit post form
+- [x] Create/edit post form
 - [ ] Course ratings & reviews
   - [ ] Star rating input
   - [ ] Review text area
@@ -507,13 +507,13 @@ frontend-trainingsuite/
 | Phase 1: Setup | ✅ Complete | Next.js 16, shadcn/ui, purple theme, API client, types |
 | Phase 2: Auth | ✅ Complete | Login, register, forgot/reset password, protected routes |
 | Phase 3: Layouts | ✅ Complete | Public layout, dashboard sidebar, header, footer, breadcrumb |
-| Phase 4: Public | ✅ Complete | Landing, courses catalog, course detail, categories pages |
-| Phase 5: User Dashboard | ✅ Complete | Dashboard, my courses, certificates, notifications, settings |
+| Phase 4: Public | ✅ Complete | Landing, courses catalog, course detail, categories, about, contact, FAQ pages |
+| Phase 5: User Dashboard | ✅ Complete | Dashboard, my courses, certificates, notifications, settings, payment history |
 | Phase 6: Learning | ✅ Complete | Course player, video player, quiz interface |
-| Phase 7: Live Sessions | 🔲 Not Started | |
-| Phase 8: Community | 🔲 Not Started | |
+| Phase 7: Live Sessions | ✅ Complete | Sessions listing, session detail with player, countdown timer |
+| Phase 8: Community | 🔄 In Progress | Forums (complete), ratings/reviews (pending) |
 | Phase 9: Payments | 🔲 Not Started | |
-| Phase 10: Instructor | 🔄 In Progress | Instructor layout, dashboard overview |
+| Phase 10: Instructor | 🔄 In Progress | Dashboard, courses list, analytics, live sessions. Module/lesson builder pending |
 | Phase 11: Admin | ✅ Complete | Admin layout, dashboard, users, courses, categories, analytics, announcements, site config |
 | Phase 12: Components | 🔲 Not Started | |
 | Phase 13: Polish | 🔲 Not Started | |
