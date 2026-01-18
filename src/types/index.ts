@@ -86,7 +86,7 @@ export interface Lesson {
   videoUrl?: string;
   videoDuration?: number;
   duration?: number;
-  type?: "video" | "text" | "quiz";
+  type?: "video" | "text";
   materials?: unknown[];
   module: string;
   isFree: boolean;
@@ -117,43 +117,6 @@ export interface EnrollmentWithCourse extends Omit<Enrollment, "course"> {
   course: Course;
 }
 
-// Quiz Types
-export interface Quiz {
-  _id: string;
-  title: string;
-  description?: string;
-  lesson: string;
-  questions?: Question[];
-  passingScore: number;
-  timeLimit?: number;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Question {
-  _id: string;
-  question: string;
-  options: string[];
-  correctAnswer: number | string;
-  points: number;
-  explanation?: string;
-  order: number;
-  quiz: string;
-}
-
-export interface QuizAttempt {
-  _id: string;
-  user: string | User;
-  quiz: string | Quiz;
-  answers: { question: string; selectedAnswer: number }[];
-  score: number;
-  totalPoints: number;
-  passed: boolean;
-  timeTaken: number;
-  createdAt: string;
-}
-
 // Certificate Types
 export interface Certificate {
   _id: string;
@@ -161,7 +124,7 @@ export interface Certificate {
   course: string | Course;
   certificateNumber: string;
   certificateId?: string;
-  certificateUrl: string;
+  certificateUrl?: string;
   issuedAt: string;
   createdAt: string;
 }
@@ -291,6 +254,7 @@ export type NotificationType =
   | "live_session_reminder"
   | "live_session_started"
   | "new_announcement"
+  | "new_course_content"
   | "payment_success"
   | "forum_reply"
   | "comment_reply";
@@ -303,7 +267,6 @@ export interface Notification {
   message: string;
   link?: string;
   isRead: boolean;
-  read?: boolean;
   metadata?: Record<string, unknown>;
   createdAt: string;
 }

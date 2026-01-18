@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -14,7 +14,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
-  CreditCard,
   MessageSquare,
   Megaphone,
   LogOut,
@@ -33,8 +32,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/hooks";
+import { useAuth, useNotifications, useMarkAsRead } from "@/hooks";
 import { getInitials, cn } from "@/lib/utils";
+import { formatDistanceToNow } from "date-fns";
 
 const adminNavSections = [
   {
@@ -106,11 +106,6 @@ const adminNavSections = [
         icon: Megaphone,
       },
       {
-        label: "Payments",
-        href: "/admin/payments",
-        icon: CreditCard,
-      },
-      {
         label: "Settings",
         href: "/admin/settings",
         icon: Settings,
@@ -125,8 +120,23 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
+  const { data: notificationsResponse } = useNotifications();
+  const markAsRead = useMarkAsRead();
   const [collapsed, setCollapsed] = useState(false);
+
+  const notifications = notificationsResponse?.data || [];
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  const handleNotificationClick = (notification: typeof notifications[0]) => {
+    if (!notification.isRead) {
+      markAsRead.mutate(notification._id);
+    }
+    if (notification.link) {
+      router.push(notification.link);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -240,12 +250,61 @@ export default function AdminLayout({
 
           <div className="flex items-center gap-3">
             {/* Notifications */}
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
-                3
-              </span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80">
+                <DropdownMenuLabel className="flex items-center justify-between">
+                  <span>Notifications</span>
+                  {unreadCount > 0 && (
+                    <span className="text-xs text-muted-foreground">{unreadCount} unread</span>
+                  )}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <div className="max-h-[300px] overflow-y-auto">
+                  {notifications.length > 0 ? (
+                    notifications.slice(0, 5).map((notification) => (
+                      <DropdownMenuItem
+                        key={notification._id}
+                        className={`flex flex-col items-start gap-1 p-3 cursor-pointer ${!notification.isRead ? "bg-primary/5" : ""}`}
+                        onClick={() => handleNotificationClick(notification)}
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          <p className="text-sm font-medium flex-1">{notification.title}</p>
+                          {!notification.isRead && (
+                            <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {notification.message}
+                        </p>
+                        <p className="text-xs text-muted-foreground/70">
+                          {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                        </p>
+                      </DropdownMenuItem>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      No notifications yet
+                    </div>
+                  )}
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/notifications" className="w-full justify-center">
+                    View all notifications
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* User Menu */}
             <DropdownMenu>

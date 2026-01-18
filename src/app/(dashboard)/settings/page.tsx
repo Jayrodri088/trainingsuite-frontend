@@ -66,7 +66,7 @@ export default function SettingsPage() {
       return uploadResponse.data.data.fileUrl;
     },
     onSuccess: (fileUrl) => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
       setAvatarPreview(null);
       toast({ title: "Avatar updated successfully!" });
     },

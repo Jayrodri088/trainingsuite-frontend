@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Training Suite - Learn & Grow",
-  description: "A modern learning management system for professional development",
+  title: "Rhapsody Global Missionaries Portal",
+  description: "Preparatory training portal for ministers - Video training and live sessions",
 };
 
 export default function RootLayout({

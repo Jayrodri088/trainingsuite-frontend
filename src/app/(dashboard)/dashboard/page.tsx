@@ -290,7 +290,7 @@ export default function DashboardPage() {
                       time={formatDistanceToNow(new Date(notification.createdAt), {
                         addSuffix: true,
                       })}
-                      isUnread={!notification.read}
+                      isUnread={!notification.isRead}
                     />
                   ))}
                 </div>

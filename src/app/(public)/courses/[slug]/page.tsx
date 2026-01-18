@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -41,7 +41,6 @@ import { useCourse, useCourseCurriculum, useCourseRatings, useAuth } from "@/hoo
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi } from "@/lib/api/courses";
 import { enrollmentsApi } from "@/lib/api/enrollments";
-import { formatCurrency } from "@/lib/utils";
 import type { Course, Module, Lesson, Rating } from "@/types";
 
 const levelColors = {
@@ -70,7 +69,6 @@ function CourseDetailSkeleton() {
 function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean }) {
   const getIcon = () => {
     if (lesson.type === "video") return <Video className="h-4 w-4" />;
-    if (lesson.type === "quiz") return <FileText className="h-4 w-4" />;
     return <FileText className="h-4 w-4" />;
   };
 
@@ -327,17 +325,9 @@ export default function CourseDetailPage({
   });
 
   const isEnrolled = !!enrollmentResponse;
+  const enrollmentProgress = enrollmentResponse?.progress || 0;
+  const isCompleted = enrollmentResponse?.status === "completed" || enrollmentProgress >= 100;
 
-  // Wishlist state (using localStorage)
-  const [isWishlisted, setIsWishlisted] = useState(false);
-
-  // Check wishlist on mount
-  useEffect(() => {
-    if (typeof window !== "undefined" && courseResponse?.data) {
-      const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
-      setIsWishlisted(wishlist.includes(courseResponse.data._id));
-    }
-  }, [courseResponse?.data?._id]);
 
   // Enrollment mutation
   const enrollMutation = useMutation({
@@ -385,31 +375,8 @@ export default function CourseDetailPage({
       return;
     }
 
-    if (course.isFree) {
-      enrollMutation.mutate(course._id);
-    } else {
-      // For paid courses, redirect to checkout
-      router.push(`/courses/${course.slug}/checkout`);
-    }
-  };
-
-  const handleWishlist = () => {
-    const course = courseResponse?.data;
-    if (!course) return;
-
-    const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
-
-    if (isWishlisted) {
-      const newWishlist = wishlist.filter((id: string) => id !== course._id);
-      localStorage.setItem("wishlist", JSON.stringify(newWishlist));
-      setIsWishlisted(false);
-      toast({ title: "Removed from wishlist" });
-    } else {
-      wishlist.push(course._id);
-      localStorage.setItem("wishlist", JSON.stringify(wishlist));
-      setIsWishlisted(true);
-      toast({ title: "Added to wishlist!" });
-    }
+    // Direct enrollment for all training materials
+    enrollMutation.mutate(course._id);
   };
 
   const handleGoToLearning = () => {
@@ -443,7 +410,6 @@ export default function CourseDetailPage({
   const curriculumData = curriculumResponse?.data as { curriculum?: Module[] } | undefined;
   const modules = (curriculumData?.curriculum || []) as Module[];
   const ratings = (ratingsResponse?.data || []) as Rating[];
-  const instructor = typeof course.instructor === "object" ? course.instructor : null;
 
   // Find user's existing review
   const userReview = user
@@ -509,6 +475,11 @@ export default function CourseDetailPage({
                     {course.category.name}
                   </Badge>
                 )}
+                {isEnrolled && (
+                  <Badge className={isCompleted ? "bg-green-600 hover:bg-green-600" : "bg-blue-600 hover:bg-blue-600"}>
+                    {isCompleted ? "Completed" : `${enrollmentProgress}% Complete`}
+                  </Badge>
+                )}
               </div>
 
               <h1 className="text-3xl font-bold tracking-tight mb-4">
@@ -543,22 +514,6 @@ export default function CourseDetailPage({
                 )}
               </div>
 
-              {instructor && (
-                <Link
-                  href={`/instructors/${instructor._id}`}
-                  className="flex items-center gap-3 mt-6 hover:opacity-80 transition-opacity"
-                >
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {instructor.name?.charAt(0) || "I"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium">{instructor.name}</p>
-                    <p className="text-xs text-slate-400">{instructor.title || "Instructor"}</p>
-                  </div>
-                </Link>
-              )}
             </div>
 
             {/* Enrollment Card */}
@@ -573,22 +528,31 @@ export default function CourseDetailPage({
                   </div>
                 </div>
                 <CardContent className="p-6">
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="text-3xl font-bold">
-                      {course.isFree ? "Free" : formatCurrency(course.price, course.currency)}
-                    </span>
-                    {!course.isFree && course.originalPrice && course.originalPrice > course.price && (
-                      <span className="text-lg text-muted-foreground line-through">
-                        {formatCurrency(course.originalPrice, course.currency)}
-                      </span>
-                    )}
-                  </div>
-
                   {isEnrolled ? (
-                    <Button size="lg" className="w-full mb-3" onClick={handleGoToLearning}>
-                      <Play className="h-4 w-4 mr-2" />
-                      Continue Learning
-                    </Button>
+                    <div className="space-y-3">
+                      {/* Enrollment Status Badge */}
+                      <div className="flex items-center justify-between">
+                        <Badge className={isCompleted ? "bg-green-600" : "bg-blue-600"}>
+                          {isCompleted ? "Completed" : "In Progress"}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          {enrollmentProgress}% complete
+                        </span>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all ${isCompleted ? "bg-green-500" : "bg-primary"}`}
+                          style={{ width: `${Math.min(enrollmentProgress, 100)}%` }}
+                        />
+                      </div>
+
+                      <Button size="lg" className={`w-full ${isCompleted ? "bg-green-600 hover:bg-green-700" : ""}`} onClick={handleGoToLearning}>
+                        <Play className="h-4 w-4 mr-2" />
+                        {isCompleted ? "Review Course" : "Continue Learning"}
+                      </Button>
+                    </div>
                   ) : (
                     <Button
                       size="lg"
@@ -597,31 +561,9 @@ export default function CourseDetailPage({
                       disabled={enrollMutation.isPending}
                     >
                       {enrollMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                      {course.isFree ? "Enroll for Free" : "Enroll Now"}
+                      Start Training
                     </Button>
                   )}
-
-                  {!isEnrolled && (
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="w-full"
-                      onClick={handleWishlist}
-                    >
-                      {isWishlisted ? (
-                        <>
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          In Wishlist
-                        </>
-                      ) : (
-                        "Add to Wishlist"
-                      )}
-                    </Button>
-                  )}
-
-                  <p className="text-xs text-center text-muted-foreground mt-3">
-                    30-Day Money-Back Guarantee
-                  </p>
 
                   <div className="mt-6 space-y-3">
                     <h4 className="font-semibold text-sm">This course includes:</h4>
@@ -663,7 +605,6 @@ export default function CourseDetailPage({
               <TabsList className="mb-6">
                 <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="instructor">Instructor</TabsTrigger>
                 <TabsTrigger value="reviews">Reviews</TabsTrigger>
               </TabsList>
 
@@ -707,12 +648,12 @@ export default function CourseDetailPage({
               <TabsContent value="overview" className="mt-0">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">What you'll learn</CardTitle>
+                    <CardTitle className="text-lg">Course Outcomes</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {course.learningOutcomes && course.learningOutcomes.length > 0 ? (
+                    {course.objectives && course.objectives.length > 0 ? (
                       <ul className="grid sm:grid-cols-2 gap-3">
-                        {course.learningOutcomes.map((outcome, index) => (
+                        {course.objectives.map((outcome: string, index: number) => (
                           <li key={index} className="flex items-start gap-2">
                             <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
                             <span className="text-sm">{outcome}</span>
@@ -720,69 +661,21 @@ export default function CourseDetailPage({
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-muted-foreground">No learning outcomes specified.</p>
+                      <p className="text-muted-foreground">No course outcomes specified.</p>
                     )}
 
-                    {course.prerequisites && course.prerequisites.length > 0 && (
+                    {course.requirements && course.requirements.length > 0 && (
                       <div className="mt-8">
-                        <h3 className="font-semibold mb-4">Prerequisites</h3>
+                        <h3 className="font-semibold mb-4">Requirements</h3>
                         <ul className="space-y-2">
-                          {course.prerequisites.map((prereq, index) => (
+                          {course.requirements.map((req: string, index: number) => (
                             <li key={index} className="flex items-start gap-2">
                               <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
-                              <span className="text-sm">{prereq}</span>
+                              <span className="text-sm">{req}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
-                    )}
-
-                    {course.targetAudience && course.targetAudience.length > 0 && (
-                      <div className="mt-8">
-                        <h3 className="font-semibold mb-4">Who this course is for</h3>
-                        <ul className="space-y-2">
-                          {course.targetAudience.map((audience, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <Users className="h-5 w-5 text-muted-foreground shrink-0" />
-                              <span className="text-sm">{audience}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="instructor" className="mt-0">
-                <Card>
-                  <CardContent className="pt-6">
-                    {instructor ? (
-                      <div>
-                        <div className="flex items-start gap-4">
-                          <Avatar className="h-20 w-20">
-                            <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-                              {instructor.name?.charAt(0) || "I"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <h3 className="text-lg font-semibold">{instructor.name}</h3>
-                            <p className="text-muted-foreground">{instructor.title || "Instructor"}</p>
-                          </div>
-                        </div>
-                        {instructor.bio && (
-                          <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-                            {instructor.bio}
-                          </p>
-                        )}
-                        <Button asChild variant="outline" className="mt-4">
-                          <Link href={`/instructors/${instructor._id}`}>
-                            View Full Profile
-                          </Link>
-                        </Button>
-                      </div>
-                    ) : (
-                      <p className="text-muted-foreground">Instructor information not available.</p>
                     )}
                   </CardContent>
                 </Card>
@@ -978,9 +871,9 @@ function RelatedCourses({
                       <span>•</span>
                       <span>{course.enrollmentCount || 0} students</span>
                     </div>
-                    <p className="font-semibold text-primary">
-                      {course.isFree ? "Free" : formatCurrency(course.price, course.currency)}
-                    </p>
+                    <Badge variant="secondary" className="text-xs">
+                      Training Material
+                    </Badge>
                   </CardContent>
                 </Card>
               </Link>

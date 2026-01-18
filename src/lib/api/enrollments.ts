@@ -30,15 +30,15 @@ export const enrollmentsApi = {
   },
 
   getEnrollmentByCourse: async (courseId: string) => {
-    // Check if user is enrolled in a specific course
+    // Check if user is enrolled in a specific course - same as getByCourse
     const response = await apiClient.get<ApiResponse<EnrollmentWithCourse>>(
-      `/enrollments/course/${courseId}`
+      `/enrollments/${courseId}`
     );
     return response.data;
   },
 
   checkEnrollment: async (courseId: string) => {
-    // Alternative: Check enrollment status
+    // Check enrollment status for a course
     const response = await apiClient.get<ApiResponse<{ isEnrolled: boolean; enrollment?: EnrollmentWithCourse }>>(
       `/courses/${courseId}/enrollment`
     );
@@ -46,9 +46,9 @@ export const enrollmentsApi = {
   },
 
   enroll: async (courseId: string) => {
+    // Enroll in a course (for free courses or after payment)
     const response = await apiClient.post<ApiResponse<EnrollmentWithCourse>>(
-      `/enrollments`,
-      { courseId }
+      `/courses/${courseId}/enroll`
     );
     return response.data;
   },

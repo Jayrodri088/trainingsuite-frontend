@@ -530,7 +530,6 @@ export default function AdminLiveSessionsPage() {
                     <SelectValue placeholder="Select a course" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No course</SelectItem>
                     {courses.map((course) => (
                       <SelectItem key={course._id} value={course._id}>
                         {course.title}

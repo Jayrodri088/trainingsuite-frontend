@@ -5,14 +5,10 @@ import Link from "next/link";
 import {
   Users,
   BookOpen,
-  DollarSign,
   TrendingUp,
-  ArrowUpRight,
-  MoreHorizontal,
   Eye,
-  UserPlus,
-  ShoppingCart,
-  Loader2,
+  Award,
+  Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,7 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { adminApi } from "@/lib/api/admin";
 import { coursesApi } from "@/lib/api/courses";
-import { formatCurrency, getInitials, formatDate } from "@/lib/utils";
+import { getInitials, formatDate } from "@/lib/utils";
 import type { OverviewAnalytics, Course } from "@/types";
 
 interface StatCardProps {
@@ -98,15 +94,15 @@ export default function AdminDashboardPage() {
       color: "bg-violet-500",
     },
     {
-      title: "Revenue",
-      value: formatCurrency(analytics?.revenue?.total || 0, "USD"),
-      icon: DollarSign,
-      color: "bg-green-500",
-    },
-    {
       title: "Enrollments",
       value: analytics?.enrollments?.total?.toLocaleString() || "0",
       icon: TrendingUp,
+      color: "bg-green-500",
+    },
+    {
+      title: "Completed",
+      value: analytics?.enrollments?.completed?.toLocaleString() || "0",
+      icon: Award,
       color: "bg-amber-500",
     },
   ];
@@ -163,15 +159,15 @@ export default function AdminDashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Monthly Revenue</CardTitle>
-            <CardDescription>This month</CardDescription>
+            <CardTitle className="text-lg">Certificates Issued</CardTitle>
+            <CardDescription>Total certificates</CardDescription>
           </CardHeader>
           <CardContent>
             {analyticsLoading ? (
               <Skeleton className="h-10 w-20" />
             ) : (
               <div className="text-3xl font-bold text-amber-600">
-                {formatCurrency(analytics?.revenue?.thisMonth || 0, "USD")}
+                {analytics?.enrollments?.completed || 0}
               </div>
             )}
           </CardContent>
@@ -247,9 +243,9 @@ export default function AdminDashboardPage() {
                 </Link>
               </Button>
               <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
-                <Link href="/admin/analytics">
-                  <DollarSign className="h-6 w-6" />
-                  <span className="text-sm">Analytics</span>
+                <Link href="/admin/announcements">
+                  <Megaphone className="h-6 w-6" />
+                  <span className="text-sm">Announcements</span>
                 </Link>
               </Button>
             </div>
@@ -292,7 +288,7 @@ export default function AdminDashboardPage() {
                 <TableRow>
                   <TableHead>Course</TableHead>
                   <TableHead className="text-right">Enrollments</TableHead>
-                  <TableHead className="text-right">Price</TableHead>
+                  <TableHead className="text-right">Level</TableHead>
                   <TableHead className="text-right">Rating</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
@@ -325,11 +321,7 @@ export default function AdminDashboardPage() {
                       {(course.enrollmentCount || 0).toLocaleString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      {course.isFree ? (
-                        <Badge variant="secondary">Free</Badge>
-                      ) : (
-                        formatCurrency(course.price, course.currency || "USD")
-                      )}
+                      <Badge variant="secondary">{course.level || "All Levels"}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <Badge variant="secondary">

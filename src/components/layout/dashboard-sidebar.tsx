@@ -8,23 +8,24 @@ import {
   Award,
   Bell,
   Settings,
-  CreditCard,
   Calendar,
   MessageSquare,
   HelpCircle,
   ChevronLeft,
+  Megaphone,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "./logo";
 import { useAuth } from "@/hooks/use-auth";
 
 const sidebarItems = [
   {
-    title: "Main",
+    title: "Training",
     items: [
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { label: "My Courses", href: "/my-courses", icon: BookOpen },
+      { label: "My Training", href: "/my-courses", icon: BookOpen },
       { label: "Certificates", href: "/certificates", icon: Award },
       { label: "Live Sessions", href: "/live-sessions", icon: Calendar },
     ],
@@ -33,6 +34,7 @@ const sidebarItems = [
     title: "Community",
     items: [
       { label: "Forums", href: "/forums", icon: MessageSquare },
+      { label: "Announcements", href: "/announcements", icon: Megaphone },
       { label: "Notifications", href: "/notifications", icon: Bell },
     ],
   },
@@ -40,7 +42,6 @@ const sidebarItems = [
     title: "Account",
     items: [
       { label: "Settings", href: "/settings", icon: Settings },
-      { label: "Payments", href: "/payments", icon: CreditCard },
       { label: "Help", href: "/help", icon: HelpCircle },
     ],
   },
@@ -127,9 +128,12 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
         {user && !collapsed && (
           <div className="border-t p-4">
             <div className="flex items-center gap-3 rounded-lg bg-muted/50 p-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold">
-                {user.name.charAt(0).toUpperCase()}
-              </div>
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                  {getInitials(user.name)}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{user.name}</p>
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>

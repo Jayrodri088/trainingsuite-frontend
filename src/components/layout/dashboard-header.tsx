@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Search,
   Bell,
@@ -25,14 +27,40 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications, useMarkAsRead } from "@/hooks";
 import { getInitials } from "@/lib/utils";
+import { formatDistanceToNow } from "date-fns";
 
 interface DashboardHeaderProps {
   onMenuClick?: () => void;
 }
 
 export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
+  const router = useRouter();
   const { user, logout, isLoggingOut } = useAuth();
+  const { data: notificationsResponse } = useNotifications();
+  const markAsRead = useMarkAsRead();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const notifications = notificationsResponse?.data || [];
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/courses?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
+  };
+
+  const handleNotificationClick = (notification: typeof notifications[0]) => {
+    if (!notification.isRead) {
+      markAsRead.mutate(notification._id);
+    }
+    if (notification.link) {
+      router.push(notification.link);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
@@ -47,15 +75,17 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
       </Button>
 
       {/* Search */}
-      <div className="flex-1 max-w-xl">
+      <form onSubmit={handleSearch} className="flex-1 max-w-xl">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search courses, lessons..."
+            placeholder="Search training..."
             className="w-full pl-9 bg-muted/50"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-      </div>
+      </form>
 
       {/* Right side */}
       <div className="flex items-center gap-3">
@@ -64,27 +94,48 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                3
-              </Badge>
+              {unreadCount > 0 && (
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </Badge>
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+            <DropdownMenuLabel className="flex items-center justify-between">
+              <span>Notifications</span>
+              {unreadCount > 0 && (
+                <span className="text-xs text-muted-foreground">{unreadCount} unread</span>
+              )}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="max-h-[300px] overflow-y-auto">
-              <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                <p className="text-sm font-medium">Course completed!</p>
-                <p className="text-xs text-muted-foreground">
-                  You&apos;ve completed UI Design Fundamentals
-                </p>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                <p className="text-sm font-medium">New certificate available</p>
-                <p className="text-xs text-muted-foreground">
-                  Download your certificate now
-                </p>
-              </DropdownMenuItem>
+              {notifications.length > 0 ? (
+                notifications.slice(0, 5).map((notification) => (
+                  <DropdownMenuItem
+                    key={notification._id}
+                    className={`flex flex-col items-start gap-1 p-3 cursor-pointer ${!notification.isRead ? "bg-primary/5" : ""}`}
+                    onClick={() => handleNotificationClick(notification)}
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <p className="text-sm font-medium flex-1">{notification.title}</p>
+                      {!notification.isRead && (
+                        <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {notification.message}
+                    </p>
+                    <p className="text-xs text-muted-foreground/70">
+                      {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                    </p>
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <div className="p-4 text-center text-sm text-muted-foreground">
+                  No notifications yet
+                </div>
+              )}
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>

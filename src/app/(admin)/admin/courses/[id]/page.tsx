@@ -188,8 +188,9 @@ export default function AdminCourseEditorPage({
       });
       toast({ title: "Lesson created successfully" });
     },
-    onError: () => {
-      toast({ title: "Failed to create lesson", variant: "destructive" });
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || error?.message || "Failed to create lesson";
+      toast({ title: message, variant: "destructive" });
     },
   });
 
@@ -211,8 +212,9 @@ export default function AdminCourseEditorPage({
       });
       toast({ title: "Lesson updated successfully" });
     },
-    onError: () => {
-      toast({ title: "Failed to update lesson", variant: "destructive" });
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || error?.message || "Failed to update lesson";
+      toast({ title: message, variant: "destructive" });
     },
   });
 
@@ -357,10 +359,35 @@ export default function AdminCourseEditorPage({
       toast({ title: "Lesson title is required", variant: "destructive" });
       return;
     }
+
+    // Clean up the form data - remove empty optional fields
+    const cleanedData: CreateLessonData = {
+      title: lessonForm.title,
+      type: lessonForm.type,
+      isFree: lessonForm.isFree,
+    };
+
+    if (lessonForm.description?.trim()) {
+      cleanedData.description = lessonForm.description;
+    }
+
+    if (lessonForm.type === "video") {
+      if (lessonForm.videoUrl?.trim()) {
+        cleanedData.videoUrl = lessonForm.videoUrl;
+      }
+      if (lessonForm.videoDuration && lessonForm.videoDuration > 0) {
+        cleanedData.videoDuration = lessonForm.videoDuration;
+      }
+    } else if (lessonForm.type === "text") {
+      if (lessonForm.content?.trim()) {
+        cleanedData.content = lessonForm.content;
+      }
+    }
+
     if (editingLesson) {
-      updateLessonMutation.mutate({ id: editingLesson._id, data: lessonForm });
+      updateLessonMutation.mutate({ id: editingLesson._id, data: cleanedData });
     } else if (selectedModuleId) {
-      createLessonMutation.mutate({ moduleId: selectedModuleId, data: lessonForm });
+      createLessonMutation.mutate({ moduleId: selectedModuleId, data: cleanedData });
     }
   };
 
@@ -368,8 +395,6 @@ export default function AdminCourseEditorPage({
     switch (type) {
       case "video":
         return <Video className="h-4 w-4" />;
-      case "quiz":
-        return <HelpCircle className="h-4 w-4" />;
       default:
         return <FileText className="h-4 w-4" />;
     }
@@ -853,7 +878,7 @@ export default function AdminCourseEditorPage({
                   <Label htmlFor="lessonType">Type</Label>
                   <Select
                     value={lessonForm.type}
-                    onValueChange={(value: "video" | "text" | "quiz") =>
+                    onValueChange={(value: "video" | "text") =>
                       setLessonForm({ ...lessonForm, type: value })
                     }
                   >
@@ -863,7 +888,6 @@ export default function AdminCourseEditorPage({
                     <SelectContent>
                       <SelectItem value="video">Video</SelectItem>
                       <SelectItem value="text">Text/Article</SelectItem>
-                      <SelectItem value="quiz">Quiz</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

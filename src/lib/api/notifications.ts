@@ -24,14 +24,14 @@ export const notificationsApi = {
   },
 
   markAsRead: async (id: string) => {
-    const response = await apiClient.post<ApiResponse<Notification>>(
+    const response = await apiClient.put<ApiResponse<Notification>>(
       `/notifications/${id}/read`
     );
     return response.data;
   },
 
   markAllAsRead: async () => {
-    const response = await apiClient.post<ApiResponse<null>>(
+    const response = await apiClient.put<ApiResponse<null>>(
       "/notifications/read-all"
     );
     return response.data;

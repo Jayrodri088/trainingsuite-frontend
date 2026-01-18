@@ -106,7 +106,7 @@ const faqs = [
   {
     category: "certificates",
     question: "How do I earn a certificate?",
-    answer: "To earn a certificate, you must complete all lessons in a course and pass any required quizzes or assessments with the minimum passing score. Once completed, your certificate will be automatically generated.",
+    answer: "To earn a certificate, you must complete all lessons in a course. Once completed, your certificate will be automatically generated.",
   },
   {
     category: "certificates",

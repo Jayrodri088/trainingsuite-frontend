@@ -8,7 +8,6 @@ import {
   Filter,
   Grid3X3,
   List,
-  ChevronDown,
   Star,
   Play,
   X,
@@ -34,7 +33,6 @@ import {
 } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCourses, useCategories, useEnrollments } from "@/hooks";
-import { formatCurrency } from "@/lib/utils";
 import type { Course, CourseFilters, Enrollment } from "@/types";
 
 const cardGradients = [
@@ -56,7 +54,6 @@ const sortOptions = [
   { value: "enrollmentCount", label: "Most Popular" },
   { value: "rating", label: "Highest Rated" },
   { value: "createdAt", label: "Newest" },
-  { value: "price", label: "Price" },
   { value: "title", label: "Title" },
 ];
 
@@ -64,9 +61,24 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
   const gradient = cardGradients[index % cardGradients.length];
   const isEnrolled = !!enrollment;
   const progress = enrollment?.progress || 0;
+  const isCompleted = enrollment?.status === "completed" || progress >= 100;
+  const isInProgress = isEnrolled && progress > 0 && !isCompleted;
+
+  const getEnrollmentBadge = () => {
+    if (isCompleted) {
+      return <Badge className="bg-green-600 hover:bg-green-600 text-xs">Completed</Badge>;
+    }
+    if (isInProgress) {
+      return <Badge className="bg-blue-600 hover:bg-blue-600 text-xs">In Progress</Badge>;
+    }
+    if (isEnrolled) {
+      return <Badge className="bg-slate-600 hover:bg-slate-600 text-xs">Enrolled</Badge>;
+    }
+    return null;
+  };
 
   return (
-    <Link href={isEnrolled ? `/learn/${course.slug || course._id}` : `/courses/${course.slug || course._id}`}>
+    <Link href={`/courses/${course.slug || course._id}`}>
       <Card className="overflow-hidden group cursor-pointer h-full hover:shadow-lg transition-shadow">
         <div className={`h-36 ${gradient} relative`}>
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
@@ -74,15 +86,8 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
             <Badge variant="secondary" className="text-xs capitalize">
               {course.level}
             </Badge>
-            {isEnrolled && (
-              <Badge className="bg-blue-600 hover:bg-blue-600 text-xs">Enrolled</Badge>
-            )}
+            {getEnrollmentBadge()}
           </div>
-          {course.isFree && !isEnrolled && (
-            <div className="absolute top-3 right-3">
-              <Badge className="bg-green-600 hover:bg-green-600 text-xs">Free</Badge>
-            </div>
-          )}
           <div className="absolute bottom-3 left-3">
             <div className="h-8 w-8 rounded-full bg-black/30 flex items-center justify-center">
               <Play className="h-4 w-4 text-white fill-white" />
@@ -93,39 +98,35 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
           <h3 className="font-semibold text-sm line-clamp-2 min-h-[40px] group-hover:text-primary transition-colors">
             {course.title}
           </h3>
-          <p className="text-xs text-muted-foreground mt-1">
-            {typeof course.instructor === "object" ? course.instructor.name : "Instructor"}
-          </p>
           <div className="flex items-center gap-2 mt-2">
             <div className="flex items-center gap-1 text-amber-500">
               <Star className="h-3.5 w-3.5 fill-current" />
               <span className="text-xs font-medium">{course.rating?.toFixed(1) || "N/A"}</span>
             </div>
             <span className="text-xs text-muted-foreground">
-              ({(course.enrollmentCount || 0).toLocaleString()} students)
+              ({(course.enrollmentCount || 0).toLocaleString()} enrolled)
             </span>
           </div>
           {isEnrolled ? (
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-muted-foreground">{progress}% complete</span>
+                <span className="text-xs text-muted-foreground">
+                  {isCompleted ? "Completed" : `${progress}% complete`}
+                </span>
               </div>
               <div className="w-full bg-muted rounded-full h-1.5">
                 <div
-                  className="bg-primary h-1.5 rounded-full transition-all"
-                  style={{ width: `${progress}%` }}
+                  className={`h-1.5 rounded-full transition-all ${isCompleted ? "bg-green-500" : "bg-primary"}`}
+                  style={{ width: `${Math.min(progress, 100)}%` }}
                 />
               </div>
-              <Button size="sm" className="h-7 text-xs w-full mt-2">
-                {progress >= 100 ? "Review" : "Continue"}
+              <Button size="sm" className={`h-7 text-xs w-full mt-2 ${isCompleted ? "bg-green-600 hover:bg-green-700" : ""}`}>
+                {isCompleted ? "Review Course" : "Continue"}
               </Button>
             </div>
           ) : (
-            <div className="mt-3 flex items-center justify-between">
-              <span className="font-bold">
-                {course.isFree ? "Free" : formatCurrency(course.price, course.currency)}
-              </span>
-              <Button size="sm" className="h-7 text-xs">Enroll Now</Button>
+            <div className="mt-3">
+              <Button size="sm" className="h-7 text-xs w-full">Start Training</Button>
             </div>
           )}
         </CardContent>
@@ -210,37 +211,6 @@ function FilterSidebar({
         </div>
       </div>
 
-      {/* Price */}
-      <div>
-        <h4 className="font-semibold text-sm mb-3">Price</h4>
-        <div className="space-y-2">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <Checkbox
-              checked={filters.isFree === true}
-              onCheckedChange={(checked) => {
-                setFilters({
-                  ...filters,
-                  isFree: checked ? true : undefined,
-                });
-              }}
-            />
-            <span className="text-sm">Free</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <Checkbox
-              checked={filters.isFree === false}
-              onCheckedChange={(checked) => {
-                setFilters({
-                  ...filters,
-                  isFree: checked ? false : undefined,
-                });
-              }}
-            />
-            <span className="text-sm">Paid</span>
-          </label>
-        </div>
-      </div>
-
       {/* Clear Filters */}
       <Button
         variant="outline"
@@ -306,23 +276,22 @@ function CoursesContent() {
   // Create a map of course ID to enrollment for quick lookup
   const enrollmentMap = new Map<string, Enrollment>();
   enrollments.forEach((enrollment) => {
-    const courseId = typeof enrollment.course === "object" ? enrollment.course._id : enrollment.course;
+    const courseId = typeof enrollment.course === "object" && enrollment.course ? enrollment.course._id : enrollment.course;
     enrollmentMap.set(courseId, enrollment);
   });
 
   const activeFiltersCount = [
     filters.category,
     filters.level,
-    filters.isFree !== undefined,
   ].filter(Boolean).length;
 
   return (
     <div className="container max-w-6xl py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">All Courses</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Training Materials</h1>
         <p className="text-muted-foreground mt-1">
-          Browse our collection of courses and start learning today
+          Browse our training resources and start your preparation
         </p>
       </div>
 
@@ -332,7 +301,7 @@ function CoursesContent() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search courses..."
+            placeholder="Search training materials..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -449,7 +418,7 @@ function CoursesContent() {
                 {coursesResponse?.pagination?.total
                   ? `of ${coursesResponse.pagination.total}`
                   : ""}{" "}
-                courses
+                training materials
               </>
             )}
           </p>
@@ -479,7 +448,7 @@ function CoursesContent() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No courses found.</p>
+              <p className="text-muted-foreground">No training materials found.</p>
               <p className="text-sm text-muted-foreground mt-1">
                 Try adjusting your search or filters.
               </p>

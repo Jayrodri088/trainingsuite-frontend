@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Bell,
   BellOff,
@@ -13,6 +13,7 @@ import {
   Calendar,
   Info,
   AlertCircle,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,16 +45,25 @@ const notificationColors: Record<string, string> = {
 function NotificationCard({
   notification,
   onMarkAsRead,
+  onNavigate,
 }: {
   notification: Notification;
   onMarkAsRead: (id: string) => void;
+  onNavigate: (notification: Notification) => void;
 }) {
   const type = notification.type || "info";
   const Icon = notificationIcons[type] || Info;
   const colorClass = notificationColors[type] || notificationColors.info;
 
+  const handleClick = () => {
+    onNavigate(notification);
+  };
+
   return (
-    <Card className={`transition-colors ${!notification.read ? "border-primary/30 bg-primary/5" : ""}`}>
+    <Card
+      className={`transition-colors cursor-pointer hover:shadow-md ${!notification.isRead ? "border-primary/30 bg-primary/5" : ""}`}
+      onClick={handleClick}
+    >
       <CardContent className="p-4">
         <div className="flex gap-4">
           <div className={`h-10 w-10 rounded-full ${colorClass} flex items-center justify-center shrink-0`}>
@@ -64,27 +74,41 @@ function NotificationCard({
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <h4 className="font-semibold text-sm">{notification.title}</h4>
-                  {!notification.read && (
+                  {!notification.isRead && (
                     <Badge className="h-5 px-1.5 text-xs bg-primary">New</Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
                   {notification.message}
                 </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                  </p>
+                  {notification.link && (
+                    <span className="text-xs text-primary flex items-center gap-1">
+                      <ExternalLink className="h-3 w-3" />
+                      View
+                    </span>
+                  )}
+                </div>
               </div>
-              {!notification.read && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onMarkAsRead(notification._id)}
-                  className="shrink-0"
-                >
-                  <Check className="h-4 w-4" />
-                </Button>
-              )}
+              <div className="flex items-center gap-1">
+                {!notification.isRead && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMarkAsRead(notification._id);
+                    }}
+                    className="shrink-0"
+                    title="Mark as read"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -111,13 +135,14 @@ function NotificationSkeleton() {
 }
 
 export default function NotificationsPage() {
+  const router = useRouter();
   const { data: notificationsResponse, isLoading } = useNotifications();
   const markAsRead = useMarkAsRead();
   const markAllAsRead = useMarkAllAsRead();
 
   const notifications = notificationsResponse?.data || [];
-  const unreadNotifications = notifications.filter((n) => !n.read);
-  const readNotifications = notifications.filter((n) => n.read);
+  const unreadNotifications = notifications.filter((n) => !n.isRead);
+  const readNotifications = notifications.filter((n) => n.isRead);
 
   const handleMarkAsRead = (id: string) => {
     markAsRead.mutate(id);
@@ -125,6 +150,17 @@ export default function NotificationsPage() {
 
   const handleMarkAllAsRead = () => {
     markAllAsRead.mutate();
+  };
+
+  const handleNavigate = (notification: Notification) => {
+    // Mark as read when clicking
+    if (!notification.isRead) {
+      markAsRead.mutate(notification._id);
+    }
+    // Navigate to the link if it exists
+    if (notification.link) {
+      router.push(notification.link);
+    }
   };
 
   return (
@@ -211,6 +247,7 @@ export default function NotificationsPage() {
                   key={notification._id}
                   notification={notification}
                   onMarkAsRead={handleMarkAsRead}
+                  onNavigate={handleNavigate}
                 />
               ))}
             </div>
@@ -241,6 +278,7 @@ export default function NotificationsPage() {
                   key={notification._id}
                   notification={notification}
                   onMarkAsRead={handleMarkAsRead}
+                  onNavigate={handleNavigate}
                 />
               ))}
             </div>
@@ -271,6 +309,7 @@ export default function NotificationsPage() {
                   key={notification._id}
                   notification={notification}
                   onMarkAsRead={handleMarkAsRead}
+                  onNavigate={handleNavigate}
                 />
               ))}
             </div>

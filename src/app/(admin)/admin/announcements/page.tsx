@@ -94,10 +94,11 @@ export default function AnnouncementsPage() {
       queryClient.invalidateQueries({ queryKey: ["admin-announcements"] });
       setDialogOpen(false);
       resetForm();
-      toast({ title: "Announcement created successfully" });
+      toast({ title: "Announcement created and sent to all users!" });
     },
-    onError: () => {
-      toast({ title: "Failed to create announcement", variant: "destructive" });
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || error?.response?.data?.error || "Failed to create announcement";
+      toast({ title: message, variant: "destructive" });
     },
   });
 

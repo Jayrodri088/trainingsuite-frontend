@@ -297,12 +297,12 @@ export default function AdminCreateCoursePage() {
               </CardContent>
             </Card>
 
-            {/* Learning Objectives */}
+            {/* Course Outcomes */}
             <Card>
               <CardHeader>
-                <CardTitle>Learning Objectives</CardTitle>
+                <CardTitle>Course Outcomes</CardTitle>
                 <CardDescription>
-                  What will students learn from this course?
+                  What will students be able to do after completing this course?
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -310,7 +310,7 @@ export default function AdminCreateCoursePage() {
                   <Input
                     value={newObjective}
                     onChange={(e) => setNewObjective(e.target.value)}
-                    placeholder="Add a learning objective..."
+                    placeholder="Add an outcome (e.g., 'Understand the basics of...')"
                     onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addObjective())}
                   />
                   <Button type="button" onClick={addObjective}>

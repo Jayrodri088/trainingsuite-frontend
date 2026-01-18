@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Search,
   Bell,
@@ -29,20 +29,46 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "./logo";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications, useMarkAsRead } from "@/hooks";
 import { getInitials } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { formatDistanceToNow } from "date-fns";
 
 const publicNavItems = [
   { label: "Home", href: "/" },
-  { label: "Courses", href: "/courses" },
-  { label: "Categories", href: "/categories" },
+  { label: "Training", href: "/courses" },
+  { label: "Live Sessions", href: "/live-sessions" },
   { label: "About", href: "/about" },
 ];
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, isAuthenticated, logout, isLoggingOut } = useAuth();
+  const { data: notificationsResponse } = useNotifications();
+  const markAsRead = useMarkAsRead();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const notifications = notificationsResponse?.data || [];
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/courses?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
+  };
+
+  const handleNotificationClick = (notification: typeof notifications[0]) => {
+    if (!notification.isRead) {
+      markAsRead.mutate(notification._id);
+    }
+    if (notification.link) {
+      router.push(notification.link);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
@@ -79,13 +105,15 @@ export function Header() {
         {/* Search & Actions */}
         <div className="flex items-center gap-2">
           {/* Search */}
-          <div className="hidden md:flex relative">
+          <form onSubmit={handleSearch} className="hidden md:flex relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search courses..."
+              placeholder="Search training..."
               className="w-[200px] lg:w-[260px] pl-9 h-9 bg-muted/50 border-0"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
+          </form>
 
           {isAuthenticated && user ? (
             <>
@@ -94,21 +122,48 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative h-9 w-9">
                     <Bell className="h-4 w-4" />
-                    <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
-                      3
-                    </span>
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-80">
-                  <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                  <DropdownMenuLabel className="flex items-center justify-between">
+                    <span>Notifications</span>
+                    {unreadCount > 0 && (
+                      <span className="text-xs text-muted-foreground">{unreadCount} unread</span>
+                    )}
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <div className="max-h-[300px] overflow-y-auto">
-                    <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                      <p className="text-sm font-medium">New course available</p>
-                      <p className="text-xs text-muted-foreground">
-                        Check out the new UI Design course
-                      </p>
-                    </DropdownMenuItem>
+                    {notifications.length > 0 ? (
+                      notifications.slice(0, 5).map((notification) => (
+                        <DropdownMenuItem
+                          key={notification._id}
+                          className={`flex flex-col items-start gap-1 p-3 cursor-pointer ${!notification.isRead ? "bg-primary/5" : ""}`}
+                          onClick={() => handleNotificationClick(notification)}
+                        >
+                          <div className="flex items-center gap-2 w-full">
+                            <p className="text-sm font-medium flex-1">{notification.title}</p>
+                            {!notification.isRead && (
+                              <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-muted-foreground/70">
+                            {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                          </p>
+                        </DropdownMenuItem>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-sm text-muted-foreground">
+                        No notifications yet
+                      </div>
+                    )}
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
@@ -199,10 +254,18 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="w-72">
               <div className="flex flex-col gap-6 mt-6">
-                <div className="relative">
+                <form onSubmit={(e) => {
+                  handleSearch(e);
+                  setMobileMenuOpen(false);
+                }} className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search courses..." className="pl-9" />
-                </div>
+                  <Input
+                    placeholder="Search training..."
+                    className="pl-9"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </form>
                 <nav className="flex flex-col gap-1">
                   {publicNavItems.map((item) => (
                     <Link

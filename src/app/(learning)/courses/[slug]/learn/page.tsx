@@ -303,7 +303,7 @@ function LessonItem({
     if (isCompleted) return <CheckCircle className="h-4 w-4 text-green-500" />;
     if (isLocked) return <Lock className="h-4 w-4 text-muted-foreground" />;
     if (lesson.type === "video") return <Video className="h-4 w-4" />;
-    if (lesson.type === "quiz") return <FileText className="h-4 w-4" />;
+    if (lesson.type === "text") return <FileText className="h-4 w-4" />;
     return <Circle className="h-4 w-4" />;
   };
 
@@ -348,11 +348,13 @@ function CurriculumSidebar({
   currentLessonId,
   onSelectLesson,
   courseProgress,
+  completedLessonIds,
 }: {
   modules: Module[];
   currentLessonId: string | null;
   onSelectLesson: (lesson: Lesson) => void;
   courseProgress: number;
+  completedLessonIds: Set<string>;
 }) {
   const defaultOpenModules = modules.map((m) => m._id);
 
@@ -373,7 +375,7 @@ function CurriculumSidebar({
           <Accordion type="multiple" defaultValue={defaultOpenModules} className="space-y-2">
             {modules.map((module, moduleIndex) => {
               const lessons = (module.lessons || []) as Lesson[];
-              const completedLessons = 0; // TODO: Get from enrollment data
+              const completedLessonsCount = lessons.filter(l => completedLessonIds.has(l._id)).length;
 
               return (
                 <AccordionItem
@@ -389,7 +391,7 @@ function CurriculumSidebar({
                       <div>
                         <p className="font-medium text-sm">{module.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          {completedLessons}/{lessons.length} lessons
+                          {completedLessonsCount}/{lessons.length} lessons
                         </p>
                       </div>
                     </div>
@@ -401,7 +403,7 @@ function CurriculumSidebar({
                           key={lesson._id}
                           lesson={lesson}
                           isActive={currentLessonId === lesson._id}
-                          isCompleted={false}
+                          isCompleted={completedLessonIds.has(lesson._id)}
                           isLocked={false}
                           onClick={() => onSelectLesson(lesson)}
                         />
@@ -633,6 +635,7 @@ export default function CourseLearnPage({
                   setSidebarOpen(false);
                 }}
                 courseProgress={courseProgress}
+                completedLessonIds={completedLessonIds}
               />
             </SheetContent>
           </Sheet>
@@ -741,6 +744,7 @@ export default function CourseLearnPage({
             currentLessonId={activeLesson?._id || null}
             onSelectLesson={setCurrentLesson}
             courseProgress={courseProgress}
+            completedLessonIds={completedLessonIds}
           />
         </aside>
       </div>

@@ -2,28 +2,23 @@ import Link from "next/link";
 import { Logo } from "./logo";
 
 const footerLinks = {
-  platform: [
-    { label: "Browse Courses", href: "/courses" },
-    { label: "Categories", href: "/categories" },
-    { label: "Become an Instructor", href: "/teach" },
+  training: [
+    { label: "Training Materials", href: "/courses" },
+    { label: "Live Sessions", href: "/live-sessions" },
+    { label: "My Progress", href: "/dashboard" },
   ],
-  company: [
-    { label: "About Us", href: "/about" },
-    { label: "Careers", href: "/careers" },
-    { label: "Blog", href: "/blog" },
+  resources: [
+    { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
+    { label: "FAQ", href: "/faq" },
   ],
   support: [
     { label: "Help Center", href: "/help" },
-    { label: "FAQ", href: "/faq" },
     { label: "Community", href: "/community" },
-    { label: "Feedback", href: "/feedback" },
   ],
   legal: [
     { label: "Terms of Service", href: "/terms" },
     { label: "Privacy Policy", href: "/privacy" },
-    { label: "Cookie Policy", href: "/cookies" },
-    { label: "Accessibility", href: "/accessibility" },
   ],
 };
 
@@ -36,7 +31,7 @@ export function Footer() {
           <div className="col-span-2">
             <Logo className="mb-3" />
             <p className="text-sm text-muted-foreground max-w-[240px] leading-relaxed">
-              Empowering learners worldwide with high-quality courses and professional development opportunities.
+              Equipping ministers worldwide with training materials and resources for effective ministry.
             </p>
             {/* Social Links */}
             <div className="flex items-center gap-3 mt-4">
@@ -75,11 +70,11 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Platform */}
+          {/* Training */}
           <div>
-            <h4 className="font-semibold text-sm mb-3">Platform</h4>
+            <h4 className="font-semibold text-sm mb-3">Training</h4>
             <ul className="space-y-2">
-              {footerLinks.platform.map((link) => (
+              {footerLinks.training.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -92,11 +87,11 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Resources */}
           <div>
-            <h4 className="font-semibold text-sm mb-3">Company</h4>
+            <h4 className="font-semibold text-sm mb-3">Resources</h4>
             <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
+              {footerLinks.resources.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -147,7 +142,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Training Suite. All rights reserved.
+            &copy; {new Date().getFullYear()} Rhapsody Global Missionaries. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link
