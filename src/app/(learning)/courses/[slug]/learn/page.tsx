@@ -699,16 +699,16 @@ export default function CourseLearnPage({
 
           {/* Tabs: Content, Discussion, Notes */}
           <Tabs defaultValue="content" className="flex-1">
-            <TabsList className="w-full justify-start rounded-none border-b bg-transparent h-12 px-4">
-              <TabsTrigger value="content" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">
+            <TabsList className="w-full justify-start rounded-none border-b bg-transparent h-12 px-4 overflow-x-auto flex-nowrap gap-2">
+              <TabsTrigger value="content" className="shrink-0 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">
                 <BookOpen className="h-4 w-4 mr-2" />
                 Content
               </TabsTrigger>
-              <TabsTrigger value="discussion" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">
+              <TabsTrigger value="discussion" className="shrink-0 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Discussion
               </TabsTrigger>
-              <TabsTrigger value="notes" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">
+              <TabsTrigger value="notes" className="shrink-0 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">
                 <FileText className="h-4 w-4 mr-2" />
                 Notes
               </TabsTrigger>

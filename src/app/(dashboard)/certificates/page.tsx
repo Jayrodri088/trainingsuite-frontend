@@ -199,7 +199,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
                 )}
               </Button>
             </div>
-            <div className="flex justify-center gap-3">
+            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
               <Button
                 variant="outline"
                 className="flex-1 rounded-none border-border uppercase text-xs font-bold tracking-wider"

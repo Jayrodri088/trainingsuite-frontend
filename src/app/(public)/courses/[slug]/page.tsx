@@ -602,10 +602,10 @@ export default function CourseDetailPage({
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <Tabs defaultValue="curriculum" className="w-full">
-              <TabsList className="mb-6">
-                <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="reviews">Reviews</TabsTrigger>
+              <TabsList className="mb-6 w-full justify-start overflow-x-auto flex-nowrap gap-2">
+                <TabsTrigger value="curriculum" className="shrink-0">Curriculum</TabsTrigger>
+                <TabsTrigger value="overview" className="shrink-0">Overview</TabsTrigger>
+                <TabsTrigger value="reviews" className="shrink-0">Reviews</TabsTrigger>
               </TabsList>
 
               <TabsContent value="curriculum" className="mt-0">

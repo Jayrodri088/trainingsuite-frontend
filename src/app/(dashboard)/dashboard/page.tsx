@@ -60,8 +60,8 @@ function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
   if (!course) return null;
 
   return (
-    <div className="group flex items-center gap-4 p-4 border border-border bg-card hover:bg-muted/30 transition-colors">
-      <div className="relative h-20 w-32 bg-muted flex items-center justify-center overflow-hidden shrink-0 group-hover:opacity-90 transition-opacity">
+    <div className="group flex flex-col sm:flex-row sm:items-center gap-4 p-4 border border-border bg-card hover:bg-muted/30 transition-colors">
+      <div className="relative h-20 w-full sm:w-32 bg-muted flex items-center justify-center overflow-hidden shrink-0 group-hover:opacity-90 transition-opacity">
         <div className="absolute inset-0 bg-primary/10" />
         <PlayCircle className="h-8 w-8 text-primary relative z-10 group-hover:scale-110 transition-transform" />
         <Badge className="absolute top-2 left-2 rounded-none text-[10px] font-bold uppercase tracking-wider border-0 bg-background/80 text-foreground backdrop-blur-sm" variant="secondary">
@@ -78,7 +78,7 @@ function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
           </span>
         </div>
       </div>
-      <Button asChild className="rounded-none uppercase text-xs font-bold tracking-wider h-9">
+      <Button asChild className="rounded-none uppercase text-xs font-bold tracking-wider h-9 w-full sm:w-auto">
         <Link href={`/courses/${course.slug || course._id}/learn`}>Continue</Link>
       </Button>
     </div>

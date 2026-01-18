@@ -230,22 +230,22 @@ export default function AnalyticsPage() {
 
       {/* Charts */}
       <Tabs defaultValue="revenue" className="space-y-8">
-        <TabsList className="w-full justify-start rounded-none bg-transparent p-0 h-auto border-b border-border space-x-6">
+        <TabsList className="w-full justify-start rounded-none bg-transparent p-0 h-auto border-b border-border gap-4 sm:gap-6 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="revenue"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-bold uppercase tracking-wide text-xs text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
+            className="shrink-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-bold uppercase tracking-wide text-xs text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
           >
             Revenue
           </TabsTrigger>
           <TabsTrigger
             value="enrollments"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-bold uppercase tracking-wide text-xs text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
+            className="shrink-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-bold uppercase tracking-wide text-xs text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
           >
             Enrollments
           </TabsTrigger>
           <TabsTrigger
             value="courses"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-bold uppercase tracking-wide text-xs text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
+            className="shrink-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-bold uppercase tracking-wide text-xs text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
           >
             Course Performance
           </TabsTrigger>

@@ -458,12 +458,12 @@ export default function AdminCourseEditorPage({
       </div>
 
       <Tabs defaultValue="curriculum" className="w-full">
-        <TabsList>
-          <TabsTrigger value="curriculum">
+        <TabsList className="w-full sm:w-auto justify-start overflow-x-auto flex-nowrap gap-2">
+          <TabsTrigger value="curriculum" className="shrink-0">
             <BookOpen className="h-4 w-4 mr-2" />
             Curriculum
           </TabsTrigger>
-          <TabsTrigger value="settings">
+          <TabsTrigger value="settings" className="shrink-0">
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </TabsTrigger>

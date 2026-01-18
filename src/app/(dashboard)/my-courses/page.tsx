@@ -98,8 +98,8 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
     <Link href={`/courses/${course.slug || course._id}/learn`}>
       <Card className="rounded-none border-border group hover:border-primary/50 transition-colors">
         <CardContent className="p-4">
-          <div className="flex gap-5">
-            <div className={`h-24 w-36 ${colorClass} border border-border/50 relative shrink-0 flex items-center justify-center`}>
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
+            <div className={`h-32 sm:h-24 w-full sm:w-36 ${colorClass} border border-border/50 relative shrink-0 flex items-center justify-center`}>
               <PlayCircle className="h-8 w-8 opacity-50 group-hover:scale-110 group-hover:opacity-100 transition-all" />
               {isCompleted && (
                 <div className="absolute top-1 right-1">
@@ -108,7 +108,7 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
               )}
             </div>
             <div className="flex-1 min-w-0 flex flex-col justify-center">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline" className="rounded-none text-[10px] font-bold uppercase tracking-wider border-border">
@@ -120,7 +120,7 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
                   </div>
                   <h3 className="font-heading font-bold uppercase text-base line-clamp-1 group-hover:text-primary transition-colors">{course.title}</h3>
                 </div>
-                <Button size="sm" className="rounded-none uppercase text-xs font-bold tracking-wider h-8">
+                <Button size="sm" className="rounded-none uppercase text-xs font-bold tracking-wider h-8 w-full sm:w-auto">
                   {isCompleted ? "Review" : "Continue"}
                 </Button>
               </div>
@@ -221,22 +221,22 @@ export default function MyCoursesPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="bg-transparent border-b border-border w-full justify-start rounded-none h-auto p-0 gap-6">
+        <TabsList className="bg-transparent border-b border-border w-full justify-start rounded-none h-auto p-0 gap-4 sm:gap-6 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="all"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider shrink-0"
           >
             All <Badge variant="secondary" className="ml-2 rounded-none text-[10px] bg-muted text-muted-foreground">{filteredEnrollments.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="in-progress"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider shrink-0"
           >
             In Progress <Badge variant="secondary" className="ml-2 rounded-none text-[10px] bg-muted text-muted-foreground">{activeEnrollments.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="completed"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider shrink-0"
           >
             Completed <Badge variant="secondary" className="ml-2 rounded-none text-[10px] bg-muted text-muted-foreground">{completedEnrollments.length}</Badge>
           </TabsTrigger>
