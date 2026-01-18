@@ -69,8 +69,9 @@ export default function PostDetailPage() {
 
   // Initialize liked state from server response
   useEffect(() => {
-    if (postData?.data?.isLiked) {
-      setLikedPosts((prev) => new Set([...prev, postData.data._id]));
+    const post = postData?.data;
+    if (post?.isLiked) {
+      setLikedPosts((prev) => new Set([...prev, post._id]));
     }
   }, [postData]);
 
