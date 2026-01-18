@@ -158,6 +158,9 @@ export interface ForumPost {
   isLocked: boolean;
   viewCount: number;
   commentCount: number;
+  likes?: number;
+  likedBy?: string[];
+  isLiked?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -170,6 +173,9 @@ export interface Comment {
   lesson?: string;
   parent?: string;
   isEdited: boolean;
+  likes?: number;
+  likedBy?: string[];
+  isLiked?: boolean;
   createdAt: string;
   updatedAt: string;
 }

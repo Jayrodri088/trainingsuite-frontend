@@ -261,7 +261,7 @@ export default function PostDetailPage() {
                   onClick={() => likeCommentMutation.mutate(comment._id)}
                 >
                   <Heart className={`h-3 w-3 mr-1 ${likedComments.has(comment._id) ? "fill-red-500" : ""}`} />
-                  {(comment as any).likes || 0}
+                  {comment.likes || 0}
                 </Button>
                 <Button
                   variant="ghost"
@@ -352,7 +352,7 @@ export default function PostDetailPage() {
                   onClick={() => likePostMutation.mutate(post._id)}
                 >
                   <Heart className={`h-4 w-4 mr-1 ${likedPosts.has(post._id) ? "fill-red-500" : ""}`} />
-                  <span>{(post as any).likes || 0} likes</span>
+                  <span>{post.likes || 0} likes</span>
                 </Button>
                 <div className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
