@@ -26,11 +26,13 @@ function AvatarImage({
   src,
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+  // Only transform string URLs, pass through Blob/undefined as-is
+  const transformedSrc = typeof src === "string" ? getMediaUrl(src) : src;
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
       className={cn("aspect-square size-full", className)}
-      src={getMediaUrl(src)}
+      src={transformedSrc}
       {...props}
     />
   )
