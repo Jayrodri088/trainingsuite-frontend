@@ -108,3 +108,31 @@ export function getStatusBadgeColor(status: string): string {
       return "bg-gray-100 text-gray-800";
   }
 }
+
+/**
+ * Transform media URLs (avatars, uploads) to use the correct backend URL.
+ * Handles URLs that may contain localhost:3001 or relative paths.
+ */
+export function getMediaUrl(url: string | undefined | null): string | undefined {
+  if (!url) return undefined;
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+
+  // If it's already using the correct API URL, return as-is
+  if (apiUrl && url.startsWith(apiUrl)) {
+    return url;
+  }
+
+  // Replace localhost:3001 or localhost:3000 with the API URL
+  if (url.includes("localhost:3001") || url.includes("localhost:3000")) {
+    const path = url.replace(/https?:\/\/localhost:\d+/, "");
+    return apiUrl ? `${apiUrl.replace(/\/$/, "")}${path}` : url;
+  }
+
+  // If it's a relative path starting with /uploads, prepend API URL
+  if (url.startsWith("/uploads")) {
+    return apiUrl ? `${apiUrl.replace(/\/$/, "")}${url}` : url;
+  }
+
+  return url;
+}

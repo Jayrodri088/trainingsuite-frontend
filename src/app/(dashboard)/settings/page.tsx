@@ -53,7 +53,7 @@ export default function SettingsPage() {
         success: boolean;
         data: { fileUrl: string };
       }>("/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": undefined },
       });
 
       if (!uploadResponse.data.success) {
