@@ -65,13 +65,16 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
     >
       <div className="flex h-full flex-col">
         {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-border px-6">
+        <div className={cn(
+          "flex items-center justify-between border-b border-border",
+          collapsed ? "h-16 px-4" : "h-[72px] px-5"
+        )}>
           <Logo iconOnly={collapsed} />
           {onCollapse && (
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-none hidden lg:flex"
+              className="h-7 w-7 rounded-none hidden lg:flex shrink-0 ml-2"
               onClick={() => onCollapse(!collapsed)}
             >
               <ChevronLeft

@@ -727,12 +727,21 @@ export default function CourseDetailPage({
 
                     {/* Review Form */}
                     <div className="mt-8 border-t pt-6">
-                      {isAuthenticated ? (
+                      {isEnrolled ? (
                         <ReviewForm
                           courseId={course._id}
                           existingReview={userReview}
                           onSuccess={handleReviewSuccess}
                         />
+                      ) : isAuthenticated ? (
+                        <div className="bg-muted/50 rounded-lg p-4 text-center">
+                          <p className="text-muted-foreground mb-3">
+                            Enroll in this course to leave a review
+                          </p>
+                          <Button onClick={handleEnroll}>
+                            Start Training
+                          </Button>
+                        </div>
                       ) : (
                         <div className="bg-muted/50 rounded-lg p-4 text-center">
                           <p className="text-muted-foreground mb-3">

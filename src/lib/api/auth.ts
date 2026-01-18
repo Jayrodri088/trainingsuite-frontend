@@ -10,6 +10,7 @@ export interface RegisterData {
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 export interface ResetPasswordData {
@@ -34,7 +35,7 @@ export const authApi = {
   },
 
   register: async (data: RegisterData) => {
-    const response = await apiClient.post<ApiResponse<{ user: User }>>(
+    const response = await apiClient.post<ApiResponse<{ user: User; token: string }>>(
       "/auth/register",
       data
     );

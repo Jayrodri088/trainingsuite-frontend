@@ -5,10 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Loader2, Check, X } from "lucide-react";
+import { Eye, EyeOff, Loader2, Check, X, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Form,
   FormControl,
@@ -19,8 +20,20 @@ import {
 } from "@/components/ui/form";
 import { registerSchema, type RegisterFormData } from "@/lib/validations/auth";
 import { authApi } from "@/lib/api";
+import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "sonner";
-import { cn, getErrorMessage } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { AxiosError } from "axios";
+
+interface ValidationErrors {
+  [key: string]: string[];
+}
+
+interface ApiErrorResponse {
+  success: false;
+  error: string;
+  errors?: ValidationErrors;
+}
 
 const passwordRequirements = [
   { id: "length", label: "At least 8 characters", test: (p: string) => p.length >= 8 },
@@ -31,10 +44,12 @@ const passwordRequirements = [
 
 export default function RegisterPage() {
   const router = useRouter();
+  const setAuth = useAuthStore((state) => state.setAuth);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -49,6 +64,9 @@ export default function RegisterPage() {
   const password = form.watch("password");
 
   async function onSubmit(data: RegisterFormData) {
+    // Clear previous server errors
+    setServerError(null);
+
     if (!acceptTerms) {
       toast.error("Please accept the terms and conditions");
       return;
@@ -60,13 +78,43 @@ export default function RegisterPage() {
         name: data.name,
         email: data.email,
         password: data.password,
+        confirmPassword: data.confirmPassword,
       });
-      if (response.success) {
-        toast.success("Account created! Please check your email to verify your account.");
-        router.push("/login");
+      if (response.success && response.data) {
+        // Store auth state (auto login)
+        setAuth(response.data.user, response.data.token);
+        toast.success("Welcome! Your account has been created. Check your email to verify your account.");
+        router.push("/dashboard");
       }
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error));
+      if (error instanceof AxiosError && error.response?.data) {
+        const errorData = error.response.data as ApiErrorResponse;
+
+        // If we have field-specific errors, set them on the form
+        if (errorData.errors) {
+          const fieldErrors = errorData.errors;
+
+          // Set errors for each field
+          Object.entries(fieldErrors).forEach(([field, messages]) => {
+            if (field === "name" || field === "email" || field === "password" || field === "confirmPassword") {
+              form.setError(field as keyof RegisterFormData, {
+                type: "server",
+                message: messages.join(". "),
+              });
+            }
+          });
+
+          // Show general error message
+          setServerError(errorData.error || "Please fix the errors below");
+        } else {
+          // No field-specific errors, show the general error
+          setServerError(errorData.error || "Registration failed. Please try again.");
+        }
+      } else if (error instanceof Error) {
+        setServerError(error.message);
+      } else {
+        setServerError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -83,6 +131,13 @@ export default function RegisterPage() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {serverError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{serverError}</AlertDescription>
+            </Alert>
+          )}
+
           <FormField
             control={form.control}
             name="name"

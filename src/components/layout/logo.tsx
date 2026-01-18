@@ -10,24 +10,28 @@ interface LogoProps {
 
 export function Logo({ className, iconOnly = false, variant = "default" }: LogoProps) {
   return (
-    <Link href="/" className={cn("flex items-center gap-2", className)}>
+    <Link href="/" className={cn("flex items-center gap-3", className)}>
       <Image
         src="/logo.webp"
         alt="Rhapsody Global Missionaries"
-        width={40}
-        height={40}
-        className="h-10 w-auto"
+        width={36}
+        height={36}
+        className="h-9 w-auto shrink-0"
       />
       {!iconOnly && (
-        <span
-          className={cn(
-            "text-lg font-heading font-bold leading-tight tracking-tight",
-            variant === "light" ? "text-white" : "text-foreground"
-          )}
-        >
-          Rhapsody Global<br />
-          <span className="text-sm font-medium text-muted-foreground">Missionaries Portal</span>
-        </span>
+        <div className="flex flex-col min-w-0">
+          <span
+            className={cn(
+              "text-base font-heading font-bold leading-tight tracking-tight",
+              variant === "light" ? "text-white" : "text-foreground"
+            )}
+          >
+            Rhapsody Global
+          </span>
+          <span className="text-xs font-medium text-muted-foreground">
+            Missionaries Portal
+          </span>
+        </div>
       )}
     </Link>
   );
