@@ -59,19 +59,19 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 z-40 h-screen border-r bg-background transition-all duration-300",
+        "fixed left-0 top-0 z-40 h-screen border-r border-border bg-background transition-all duration-300",
         collapsed ? "w-[70px]" : "w-[260px]"
       )}
     >
       <div className="flex h-full flex-col">
         {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b px-4">
+        <div className="flex h-16 items-center justify-between border-b border-border px-6">
           <Logo iconOnly={collapsed} />
           {onCollapse && (
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 rounded-none hidden lg:flex"
               onClick={() => onCollapse(!collapsed)}
             >
               <ChevronLeft
@@ -85,12 +85,12 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-6">
+        <nav className="flex-1 overflow-y-auto py-6 px-4">
+          <div className="space-y-8">
             {sidebarItems.map((section) => (
               <div key={section.title}>
                 {!collapsed && (
-                  <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <p className="mb-4 px-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
                     {section.title}
                   </p>
                 )}
@@ -104,15 +104,15 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
                         <Link
                           href={item.href}
                           className={cn(
-                            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                            "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors border-l-2 border-transparent hover:bg-muted/50",
                             isActive
-                              ? "bg-primary text-primary-foreground"
-                              : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                            collapsed && "justify-center px-2"
+                              ? "border-primary text-foreground font-semibold bg-muted/30"
+                              : "text-muted-foreground hover:text-foreground",
+                            collapsed && "justify-center px-2 border-l-0"
                           )}
                           title={collapsed ? item.label : undefined}
                         >
-                          <Icon className="h-5 w-5 shrink-0" />
+                          <Icon className={cn("h-4 w-4 shrink-0", isActive && "text-primary")} />
                           {!collapsed && <span>{item.label}</span>}
                         </Link>
                       </li>
@@ -126,16 +126,16 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
 
         {/* User Info */}
         {user && !collapsed && (
-          <div className="border-t p-4">
-            <div className="flex items-center gap-3 rounded-lg bg-muted/50 p-3">
-              <Avatar className="h-10 w-10">
+          <div className="border-t border-border p-4">
+            <div className="flex items-center gap-3 p-2">
+              <Avatar className="h-9 w-9 rounded-full border border-border">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                <AvatarFallback className="bg-muted text-foreground font-medium text-xs">
                   {getInitials(user.name)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user.name}</p>
+                <p className="text-sm font-semibold truncate">{user.name}</p>
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
               </div>
             </div>

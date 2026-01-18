@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/layout/logo";
 
 export default function AuthLayout({
   children,
@@ -7,81 +8,47 @@ export default function AuthLayout({
 }) {
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      {/* Left side - Branding/Illustration */}
-      <div className="hidden lg:flex flex-col justify-between bg-primary p-10 text-primary-foreground">
+      {/* Left side - Branding/Mission */}
+      <div className="hidden lg:flex flex-col justify-between bg-primary p-12 text-primary-foreground">
         <div>
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-6 w-6"
-              >
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                <path d="M6 12v5c3 3 9 3 12 0v-5" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold">Training Suite</span>
-          </Link>
+          <Logo variant="light" />
         </div>
 
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">
-              Start your learning journey today
+        <div className="space-y-6 max-w-lg">
+          <div className="space-y-4">
+            <h1 className="font-heading text-4xl font-bold tracking-tight leading-[1.1]">
+              Equipping Ministers for Global Impact.
             </h1>
-            <p className="text-primary-foreground/80 text-lg">
-              Access world-class courses, learn from industry experts, and advance your career with our comprehensive learning platform.
+            <p className="text-primary-foreground/80 text-lg font-light leading-relaxed">
+              "To prepare God's people for works of service, so that the body of Christ may be built up."
+              <br /><span className="text-sm opacity-70 mt-2 block">— Ephesians 4:12</span>
             </p>
           </div>
-
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-primary-foreground/70">
-          <span>&copy; {new Date().getFullYear()} Training Suite</span>
-          <span>&middot;</span>
+        <div className="flex items-center gap-6 text-xs uppercase tracking-widest text-primary-foreground/60 font-medium">
+          <span>&copy; {new Date().getFullYear()} Rhapsody of Realities</span>
           <Link href="/privacy" className="hover:text-primary-foreground transition-colors">
-            Privacy Policy
+            Privacy
           </Link>
-          <span>&middot;</span>
           <Link href="/terms" className="hover:text-primary-foreground transition-colors">
-            Terms of Service
+            Terms
           </Link>
         </div>
       </div>
 
       {/* Right side - Form */}
-      <div className="flex flex-col">
+      <div className="flex flex-col bg-background">
         {/* Mobile header */}
-        <div className="lg:hidden flex items-center justify-between p-4 border-b">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5"
-              >
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                <path d="M6 12v5c3 3 9 3 12 0v-5" />
-              </svg>
-            </div>
-            <span className="font-semibold">Training Suite</span>
-          </Link>
+        <div className="lg:hidden flex items-center justify-between p-6 border-b border-border">
+          <Logo />
         </div>
 
         {/* Form content */}
-        <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
-          <div className="w-full max-w-[400px]">{children}</div>
+        <div className="flex-1 flex items-center justify-center p-6 sm:p-12">
+          <div className="w-full max-w-[400px] space-y-8 animate-in fade-in duration-500">
+            {children}
+          </div>
         </div>
       </div>
     </div>

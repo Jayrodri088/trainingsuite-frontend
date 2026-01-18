@@ -9,6 +9,7 @@ import {
   Menu,
   ChevronDown,
   User,
+  Users,
   Settings,
   LogOut,
   BookOpen,
@@ -58,6 +59,7 @@ export function Header() {
     if (searchQuery.trim()) {
       router.push(`/courses?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
+      setMobileMenuOpen(false);
     }
   };
 
@@ -70,46 +72,47 @@ export function Header() {
     }
   };
 
+  const navItems = [
+    { label: "Curriculum", href: "/courses", icon: BookOpen },
+    { label: "Mentorship", href: "/live-sessions", icon: Users },
+  ];
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background">
-      <div className="container max-w-6xl flex h-14 items-center justify-between gap-4">
-        {/* Logo & Nav */}
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
+      <div className="container max-w-7xl flex h-16 items-center justify-between gap-4 px-4 md:px-8">
+
+        {/* Left: Logo */}
         <div className="flex items-center gap-8">
           <Logo />
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            {publicNavItems.map((item) => {
+          {/* Desktop Nav - Minimal */}
+          <nav className="hidden md:flex items-center gap-6">
+            {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "relative px-3 py-2 text-sm font-medium transition-colors",
-                    isActive
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                    "text-sm font-medium transition-colors hover:text-foreground",
+                    isActive ? "text-foreground font-semibold" : "text-muted-foreground"
                   )}
                 >
                   {item.label}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-primary rounded-full" />
-                  )}
                 </Link>
               );
             })}
           </nav>
         </div>
 
-        {/* Search & Actions */}
-        <div className="flex items-center gap-2">
-          {/* Search */}
+        {/* Right: Actions */}
+        <div className="flex items-center gap-3">
+          {/* Desktop Search */}
           <form onSubmit={handleSearch} className="hidden md:flex relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search training..."
-              className="w-[200px] lg:w-[260px] pl-9 h-9 bg-muted/50 border-0"
+              placeholder="Search..."
+              className="w-[200px] pl-9 h-9 bg-muted/30 border-transparent focus:bg-background focus:border-border transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -120,18 +123,16 @@ export function Header() {
               {/* Notifications */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative h-9 w-9">
+                  <Button variant="ghost" size="icon" className="relative h-9 w-9 text-muted-foreground hover:text-foreground">
                     <Bell className="h-4 w-4" />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
-                        {unreadCount > 9 ? "9+" : unreadCount}
-                      </span>
+                      <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-600 ring-2 ring-background" />
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80">
-                  <DropdownMenuLabel className="flex items-center justify-between">
-                    <span>Notifications</span>
+                <DropdownMenuContent align="end" className="w-80 rounded-none border-border">
+                  <DropdownMenuLabel className="flex items-center justify-between p-4 pb-2">
+                    <span className="font-heading font-bold">Notifications</span>
                     {unreadCount > 0 && (
                       <span className="text-xs text-muted-foreground">{unreadCount} unread</span>
                     )}
@@ -142,161 +143,173 @@ export function Header() {
                       notifications.slice(0, 5).map((notification) => (
                         <DropdownMenuItem
                           key={notification._id}
-                          className={`flex flex-col items-start gap-1 p-3 cursor-pointer ${!notification.isRead ? "bg-primary/5" : ""}`}
+                          className="flex flex-col items-start gap-1 p-3 cursor-pointer rounded-none focus:bg-muted"
                           onClick={() => handleNotificationClick(notification)}
                         >
                           <div className="flex items-center gap-2 w-full">
-                            <p className="text-sm font-medium flex-1">{notification.title}</p>
+                            <p className="text-sm font-medium flex-1 line-clamp-1">{notification.title}</p>
                             {!notification.isRead && (
-                              <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                              <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                             )}
                           </div>
                           <p className="text-xs text-muted-foreground line-clamp-2">
                             {notification.message}
                           </p>
-                          <p className="text-xs text-muted-foreground/70">
+                          <p className="text-xs text-muted-foreground/50 mt-1">
                             {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                           </p>
                         </DropdownMenuItem>
                       ))
                     ) : (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        No notifications yet
+                      <div className="p-8 text-center text-sm text-muted-foreground">
+                        No new notifications
                       </div>
                     )}
                   </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/notifications" className="w-full justify-center">
-                      View all notifications
-                    </Link>
-                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 h-9 px-2">
-                    <Avatar className="h-7 w-7">
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9 border border-border">
                       <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                      <AvatarFallback className="bg-muted text-muted-foreground text-xs font-medium">
                         {getInitials(user.name)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden sm:inline-block text-sm font-medium">
-                      {user.name.split(" ")[0]}
-                    </span>
-                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel className="font-normal">
+                <DropdownMenuContent align="end" className="w-56 rounded-none border-border">
+                  <DropdownMenuLabel className="font-normal p-4 pb-2">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      <p className="text-sm font-semibold leading-none">{user.name}</p>
+                      <p className="text-xs text-muted-foreground leading-none">{user.email}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">
-                      <User className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Link>
+                  <DropdownMenuItem asChild className="rounded-none cursor-pointer">
+                    <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/my-courses">
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      My Courses
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/certificates">
-                      <Award className="mr-2 h-4 w-4" />
-                      Certificates
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </Link>
+                  <DropdownMenuItem asChild className="rounded-none cursor-pointer">
+                    <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={logout}
                     disabled={isLoggingOut}
-                    className="text-destructive focus:text-destructive"
+                    className="text-destructive focus:text-destructive rounded-none cursor-pointer"
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    {isLoggingOut ? "Signing out..." : "Sign out"}
+                    Sign out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
           ) : (
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
-                <Link href="/login">Sign in</Link>
-              </Button>
-              <Button size="sm" asChild>
+            <div className="hidden md:flex items-center gap-3">
+              <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Sign in
+              </Link>
+              <Button asChild className="rounded-none h-9 px-6 text-sm uppercase tracking-wide font-bold">
                 <Link href="/register">Get Started</Link>
               </Button>
             </div>
           )}
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu Trigger */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden h-9 w-9">
-                <Menu className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 -mr-2 text-foreground">
+                <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72">
-              <div className="flex flex-col gap-6 mt-6">
-                <form onSubmit={(e) => {
-                  handleSearch(e);
-                  setMobileMenuOpen(false);
-                }} className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search training..."
-                    className="pl-9"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </form>
-                <nav className="flex flex-col gap-1">
-                  {publicNavItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={cn(
-                        "px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
-                        pathname === item.href
-                          ? "text-primary bg-primary/5"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                      )}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </nav>
-                {!isAuthenticated && (
-                  <div className="flex flex-col gap-2 pt-4 border-t">
-                    <Button asChild variant="outline">
-                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                        Sign in
-                      </Link>
-                    </Button>
-                    <Button asChild>
-                      <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                        Get Started
-                      </Link>
-                    </Button>
+            <SheetContent side="right" className="w-full sm:w-[350px] p-0 border-l border-border bg-background">
+              <div className="flex flex-col h-full">
+                <div className="p-6 border-b border-border">
+                  <Logo />
+                </div>
+
+                <div className="p-6 flex-1 overflow-y-auto">
+                  <form onSubmit={handleSearch} className="mb-8 relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search curriculum..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 h-12 rounded-none bg-muted/40 border-border text-base"
+                    />
+                  </form>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Menu</div>
+                      <nav className="flex flex-col space-y-2">
+                        {navItems.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={cn(
+                              "flex items-center gap-4 p-3 -mx-3 rounded-none transition-colors border-l-2 border-transparent hover:bg-muted/50",
+                              pathname === item.href
+                                ? "border-primary font-semibold bg-muted/30"
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                          >
+                            <item.icon className="h-5 w-5" />
+                            <span className="text-lg">{item.label}</span>
+                          </Link>
+                        ))}
+                      </nav>
+                    </div>
+
+                    {!isAuthenticated && (
+                      <div className="space-y-3 pt-6 border-t border-border">
+                        <Button asChild size="lg" className="w-full rounded-none h-12 text-base uppercase tracking-wider font-bold">
+                          <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                            Start Training
+                          </Link>
+                        </Button>
+                        <Button asChild variant="outline" size="lg" className="w-full rounded-none h-12 text-base uppercase tracking-wider font-bold border-border">
+                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                            Sign In
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+
+                    {isAuthenticated && (
+                      <div className="space-y-4 pt-6 border-t border-border">
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-4 p-3 -mx-3 rounded-none hover:bg-muted/50 transition-colors"
+                        >
+                          <Avatar className="h-10 w-10 border border-border">
+                            <AvatarImage src={user?.avatar} />
+                            <AvatarFallback>{getInitials(user?.name || "")}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-semibold">{user?.name}</div>
+                            <div className="text-xs text-muted-foreground">My Dashboard</div>
+                          </div>
+                        </Link>
+                        <Button
+                          variant="destructive"
+                          className="w-full rounded-none justify-start"
+                          onClick={() => {
+                            logout();
+                            setMobileMenuOpen(false);
+                          }}
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Sign Out
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             </SheetContent>
           </Sheet>

@@ -21,7 +21,7 @@ export function Logo({ className, iconOnly = false, variant = "default" }: LogoP
       {!iconOnly && (
         <span
           className={cn(
-            "text-lg font-bold leading-tight",
+            "text-lg font-heading font-bold leading-tight tracking-tight",
             variant === "light" ? "text-white" : "text-foreground"
           )}
         >
