@@ -477,11 +477,6 @@ export default function CoursesPage() {
                             <p className="font-medium text-sm line-clamp-1">
                               {course.title}
                             </p>
-                            <p className="text-xs text-muted-foreground line-clamp-1">
-                              {typeof course.instructor === "object"
-                                ? course.instructor.name
-                                : "Unknown Instructor"}
-                            </p>
                           </div>
                           {course.isFeatured && (
                             <Sparkles className="h-4 w-4 text-amber-500 shrink-0" />

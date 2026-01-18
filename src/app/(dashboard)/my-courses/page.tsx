@@ -68,9 +68,6 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
           <h3 className="font-semibold text-sm line-clamp-2 min-h-[40px] group-hover:text-primary transition-colors">
             {course.title}
           </h3>
-          <p className="text-xs text-muted-foreground mt-1">
-            {typeof course.instructor === "object" ? course.instructor.name : "Instructor"}
-          </p>
 
           <div className="mt-3">
             <div className="flex items-center justify-between text-xs mb-1.5">
@@ -128,9 +125,6 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
                     )}
                   </div>
                   <h3 className="font-semibold line-clamp-1">{course.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {typeof course.instructor === "object" ? course.instructor.name : "Instructor"}
-                  </p>
                 </div>
                 <Button size="sm">
                   {isCompleted ? "Review" : "Continue"}
