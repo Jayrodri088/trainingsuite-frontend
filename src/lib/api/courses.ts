@@ -12,13 +12,12 @@ export interface CreateCourseData {
   title: string;
   description: string;
   category: string;
-  price?: number;
-  isFree?: boolean;
   level?: string;
   duration?: number;
   requirements?: string[];
   objectives?: string[];
   tags?: string[];
+  thumbnail?: string;
 }
 
 export interface UpdateCourseData extends Partial<CreateCourseData> {

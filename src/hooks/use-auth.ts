@@ -19,7 +19,13 @@ export function useAuth() {
       const response = await authApi.getMe();
       return response.data;
     },
-    retry: false,
+    retry: (failureCount, error: any) => {
+      // Don't retry on 401 (unauthorized) - that's a real auth failure
+      if (error?.response?.status === 401) return false;
+      // Retry up to 3 times for network errors (e.g., backend restart)
+      return failureCount < 3;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -28,7 +34,13 @@ export function useAuth() {
     if (data) {
       setUser(data);
     } else if (error) {
-      setUser(null);
+      // Only clear user on 401 Unauthorized errors
+      // Don't clear on network errors (e.g., during backend restart)
+      const isUnauthorized = (error as any)?.response?.status === 401;
+      if (isUnauthorized) {
+        setUser(null);
+      }
+      // For other errors, keep the existing user state (if any)
     }
     setLoading(isLoading);
   }, [data, error, isLoading, setUser, setLoading]);

@@ -41,6 +41,11 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
+    // Don't do anything for network errors (no response) - let the app handle retries
+    if (!error.response) {
+      return Promise.reject(error);
+    }
+
     const requestPath = error.config?.url || "";
 
     // Only redirect to login for 401 errors on protected routes

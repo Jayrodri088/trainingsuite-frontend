@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCourses, useCategories, useEnrollments } from "@/hooks";
+import { normalizeUploadUrl } from "@/lib/utils";
 import type { Course, CourseFilters, Enrollment } from "@/types";
 
 const cardGradients = [
@@ -81,9 +82,9 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
     <Link href={`/courses/${course.slug || course._id}`}>
       <Card className="overflow-hidden group cursor-pointer h-full hover:shadow-lg transition-shadow">
         <div className={`h-36 ${gradient} relative overflow-hidden`}>
-          {course.thumbnail && (
+          {normalizeUploadUrl(course.thumbnail) && (
             <img
-              src={course.thumbnail}
+              src={normalizeUploadUrl(course.thumbnail)}
               alt={course.title}
               className="absolute inset-0 w-full h-full object-cover"
             />

@@ -59,7 +59,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { formatCurrency } from "@/lib/utils";
 import { useCourses } from "@/hooks";
 import { useToast } from "@/hooks/use-toast";
 import { adminApi } from "@/lib/api/admin";
@@ -374,7 +373,6 @@ export default function CoursesPage() {
                     <TableHead className="font-bold uppercase text-xs tracking-wider">Course</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider">Status</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider">Level</TableHead>
-                    <TableHead className="font-bold uppercase text-xs tracking-wider">Price</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider text-right">Enrollments</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider text-right">Rating</TableHead>
                     <TableHead className="w-[50px] pr-6"></TableHead>
@@ -383,7 +381,7 @@ export default function CoursesPage() {
                 <TableBody>
                   {filteredCourses.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-12">
+                      <TableCell colSpan={7} className="text-center py-12">
                         <div className="flex flex-col items-center">
                           <BookOpen className="h-12 w-12 text-muted-foreground/30 mb-4" />
                           <p className="text-muted-foreground font-medium">No courses found matching your criteria</p>
@@ -445,11 +443,6 @@ export default function CoursesPage() {
                           >
                             {course.level || "beginner"}
                           </Badge>
-                        </TableCell>
-                        <TableCell className="font-mono text-sm font-medium">
-                          {course.price === 0
-                            ? <span className="text-green-600 font-bold uppercase text-xs">Free</span>
-                            : formatCurrency(course.price || 0, course.currency || "USD")}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1.5">

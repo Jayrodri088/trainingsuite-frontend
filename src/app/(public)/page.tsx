@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCourses, useAuth, useEnrollments } from "@/hooks";
 import type { Course, Enrollment } from "@/types";
-import { cn } from "@/lib/utils";
+import { cn, normalizeUploadUrl } from "@/lib/utils";
 
 function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrollment }) {
   const isEnrolled = !!enrollment;
@@ -27,9 +27,17 @@ function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrol
       <div className="h-full flex flex-col border border-border bg-card transition-colors hover:border-foreground/50">
         {/* Minimal Course Header */}
         <div className="relative aspect-video bg-muted border-b border-border flex items-center justify-center overflow-hidden">
-          {/* Simple placeholder or image */}
-          <div className="absolute inset-0 bg-neutral-100 dark:bg-neutral-800" />
-          <Play className="h-8 w-8 text-foreground/20 group-hover:text-foreground/80 transition-colors relative z-10" />
+          {/* Thumbnail or placeholder */}
+          {normalizeUploadUrl(course.thumbnail) ? (
+            <img
+              src={normalizeUploadUrl(course.thumbnail)}
+              alt={course.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-neutral-100 dark:bg-neutral-800" />
+          )}
+          <Play className="h-8 w-8 text-white/60 group-hover:text-white transition-colors relative z-10 drop-shadow-lg" />
 
           <div className="absolute top-3 right-3 z-10">
             <Badge variant="outline" className="bg-background text-foreground font-medium rounded-none border-foreground/10 capitalize text-xs tracking-wide">

@@ -41,6 +41,7 @@ import { useCourse, useCourseCurriculum, useCourseRatings, useAuth } from "@/hoo
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi } from "@/lib/api/courses";
 import { enrollmentsApi } from "@/lib/api/enrollments";
+import { normalizeUploadUrl } from "@/lib/utils";
 import type { Course, Module, Lesson, Rating } from "@/types";
 
 const levelColors = {
@@ -521,9 +522,9 @@ export default function CourseDetailPage({
               <Card className="sticky top-24 shadow-lg">
                 {/* Preview Image */}
                 <div className="aspect-video bg-gradient-to-br from-violet-500 to-purple-600 rounded-t-lg relative overflow-hidden">
-                  {course.thumbnail && (
+                  {normalizeUploadUrl(course.thumbnail) && (
                     <img
-                      src={course.thumbnail}
+                      src={normalizeUploadUrl(course.thumbnail)}
                       alt={course.title}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
@@ -856,9 +857,9 @@ function RelatedCourses({
               <Link key={course._id} href={`/courses/${course.slug}`}>
                 <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
                   <div className="aspect-video bg-gradient-to-br from-violet-500 to-purple-600 relative">
-                    {course.thumbnail ? (
+                    {normalizeUploadUrl(course.thumbnail) ? (
                       <img
-                        src={course.thumbnail}
+                        src={normalizeUploadUrl(course.thumbnail)}
                         alt={course.title}
                         className="absolute inset-0 w-full h-full object-cover"
                       />

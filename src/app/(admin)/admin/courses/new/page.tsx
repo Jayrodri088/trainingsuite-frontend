@@ -9,15 +9,14 @@ import {
   Loader2,
   X,
   Plus,
-  DollarSign,
-  Clock,
+  Upload,
+  ImageIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import {
   Card,
   CardContent,
@@ -36,26 +35,28 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi, CreateCourseData } from "@/lib/api/courses";
 import { categoriesApi } from "@/lib/api/categories";
+import { uploadApi } from "@/lib/api/upload";
 import type { CourseLevel } from "@/types";
 
 export default function AdminCreateCoursePage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState<CreateCourseData & { thumbnail?: string; previewVideo?: string }>({
+  const [formData, setFormData] = useState<CreateCourseData>({
     title: "",
     description: "",
     category: "",
-    price: 0,
-    isFree: true,
     level: "beginner",
     duration: 0,
     requirements: [],
     objectives: [],
     tags: [],
     thumbnail: "",
-    previewVideo: "",
   });
+
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string>("");
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
 
   const [durationHours, setDurationHours] = useState(0);
   const [durationMinutes, setDurationMinutes] = useState(0);
@@ -86,7 +87,23 @@ export default function AdminCreateCoursePage() {
 
   const categories = categoriesData?.data || [];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({ title: "File size must be less than 5MB", variant: "destructive" });
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        toast({ title: "Please select an image file", variant: "destructive" });
+        return;
+      }
+      setThumbnailFile(file);
+      setThumbnailPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.title.trim() || formData.title.trim().length < 3) {
@@ -104,17 +121,32 @@ export default function AdminCreateCoursePage() {
 
     const totalMinutes = (durationHours * 60) + durationMinutes;
 
+    let thumbnailUrl = formData.thumbnail;
+
+    // Upload thumbnail if a file was selected
+    if (thumbnailFile) {
+      try {
+        setIsUploadingThumbnail(true);
+        const uploadResponse = await uploadApi.uploadThumbnail(thumbnailFile);
+        thumbnailUrl = uploadResponse.data?.fileUrl || "";
+      } catch {
+        toast({ title: "Failed to upload thumbnail", variant: "destructive" });
+        setIsUploadingThumbnail(false);
+        return;
+      }
+      setIsUploadingThumbnail(false);
+    }
+
     createMutation.mutate({
       title: formData.title.trim(),
       description: formData.description.trim(),
       category: formData.category,
-      price: formData.isFree ? 0 : formData.price,
-      isFree: formData.isFree,
       level: formData.level,
       duration: totalMinutes > 0 ? totalMinutes : undefined,
       requirements: formData.requirements,
       objectives: formData.objectives,
       tags: formData.tags,
+      thumbnail: thumbnailUrl || undefined,
     });
   };
 
@@ -382,70 +414,67 @@ export default function AdminCreateCoursePage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Pricing */}
+            {/* Thumbnail */}
             <Card>
               <CardHeader>
-                <CardTitle>Pricing</CardTitle>
+                <CardTitle>Course Thumbnail</CardTitle>
                 <CardDescription>
-                  Set the course price.
+                  Upload an image for the course thumbnail.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="isFree">Free Course</Label>
-                  <Switch
-                    id="isFree"
-                    checked={formData.isFree}
-                    onCheckedChange={(checked) => setFormData({ ...formData, isFree: checked })}
-                  />
-                </div>
-                {!formData.isFree && (
-                  <div className="space-y-2">
-                    <Label htmlFor="price">Price (USD)</Label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="price"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={formData.price}
-                        onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                        className="pl-9"
-                        placeholder="29.99"
+                <div className="space-y-2">
+                  {thumbnailPreview ? (
+                    <div className="relative aspect-video rounded-lg overflow-hidden border">
+                      <img
+                        src={thumbnailPreview}
+                        alt="Thumbnail preview"
+                        className="w-full h-full object-cover"
                       />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-7 w-7"
+                        onClick={() => {
+                          setThumbnailFile(null);
+                          setThumbnailPreview("");
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Media */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Media</CardTitle>
-                <CardDescription>
-                  Add images and videos.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="thumbnail">Thumbnail URL</Label>
-                  <Input
-                    id="thumbnail"
-                    value={formData.thumbnail}
-                    onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
-                    placeholder="https://..."
+                  ) : (
+                    <label
+                      htmlFor="thumbnail-upload"
+                      className="flex flex-col items-center justify-center aspect-video border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                    >
+                      <ImageIcon className="h-10 w-10 text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground">Click to upload</span>
+                      <span className="text-xs text-muted-foreground mt-1">PNG, JPG up to 5MB</span>
+                    </label>
+                  )}
+                  <input
+                    id="thumbnail-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleThumbnailChange}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="previewVideo">Preview Video URL</Label>
-                  <Input
-                    id="previewVideo"
-                    value={formData.previewVideo}
-                    onChange={(e) => setFormData({ ...formData, previewVideo: e.target.value })}
-                    placeholder="https://..."
-                  />
+                  {!thumbnailPreview && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => document.getElementById("thumbnail-upload")?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload Thumbnail
+                    </Button>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Recommended: 1280x720px (16:9 ratio)
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -497,9 +526,14 @@ export default function AdminCreateCoursePage() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={createMutation.isPending}
+                  disabled={createMutation.isPending || isUploadingThumbnail}
                 >
-                  {createMutation.isPending ? (
+                  {isUploadingThumbnail ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : createMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Creating...

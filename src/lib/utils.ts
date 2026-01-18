@@ -226,3 +226,32 @@ export function getMediaUrl(url: string | undefined | null): string | undefined 
 
   return url;
 }
+
+/**
+ * Normalize upload URLs to relative paths that work with the frontend proxy.
+ * Converts absolute URLs (e.g., http://localhost:3001/uploads/...) to relative paths (/uploads/...).
+ */
+export function normalizeUploadUrl(url: string | undefined | null): string | undefined {
+  if (!url) return undefined;
+
+  // If it's already a relative URL starting with /uploads, return as-is
+  if (url.startsWith('/uploads/')) return url;
+
+  // Extract the path from absolute URLs
+  try {
+    const urlObj = new URL(url);
+    if (urlObj.pathname.startsWith('/uploads/')) {
+      return urlObj.pathname;
+    }
+  } catch {
+    // Invalid URL format
+  }
+
+  // If it contains /uploads/ somewhere, extract from there
+  const uploadsIndex = url.indexOf('/uploads/');
+  if (uploadsIndex !== -1) {
+    return url.substring(uploadsIndex);
+  }
+
+  return url;
+}

@@ -47,28 +47,17 @@ export default function CertificateDetailPage() {
     if (!certificate) return;
     setIsDownloading(true);
     try {
-      // Try to get from certificateUrl first if available
-      if (certificate.certificateUrl) {
-        const link = document.createElement("a");
-        link.href = certificate.certificateUrl;
-        link.download = `certificate-${certificate.certificateNumber || certificate._id}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast({ title: "Certificate downloaded!" });
-      } else {
-        // Fallback to API download
-        const blob = await certificatesApi.download(certificate._id);
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `certificate-${certificate.certificateNumber || certificate._id}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-        toast({ title: "Certificate downloaded!" });
-      }
+      // Always use the API download endpoint - it will generate the PDF on-the-fly if needed
+      const blob = await certificatesApi.download(certificate._id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `certificate-${certificate.certificateNumber || certificate._id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast({ title: "Certificate downloaded!" });
     } catch (error) {
       console.error("Failed to download certificate:", error);
       toast({ title: "Failed to download certificate", variant: "destructive" });

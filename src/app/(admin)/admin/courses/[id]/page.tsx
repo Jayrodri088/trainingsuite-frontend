@@ -22,6 +22,8 @@ import {
   Settings,
   Paperclip,
   X,
+  Upload,
+  ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,6 +70,7 @@ import { useToast } from "@/hooks/use-toast";
 import { coursesApi, UpdateCourseData } from "@/lib/api/courses";
 import { modulesApi, lessonsApi, CreateModuleData, CreateLessonData } from "@/lib/api/lessons";
 import { categoriesApi } from "@/lib/api/categories";
+import { uploadApi } from "@/lib/api/upload";
 import type { Module, Lesson, CourseLevel, Material } from "@/types";
 
 export default function AdminCourseEditorPage({
@@ -106,6 +109,7 @@ export default function AdminCourseEditorPage({
   const [durationHours, setDurationHours] = useState(0);
   const [durationMinutes, setDurationMinutes] = useState(0);
   const [durationInitialized, setDurationInitialized] = useState(false);
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
 
   // Queries
   const { data: courseResponse, isLoading: courseLoading } = useQuery({
@@ -297,6 +301,23 @@ export default function AdminCourseEditorPage({
 
   const isLoading = courseLoading || curriculumLoading;
 
+  // Normalize thumbnail URL - convert old absolute URLs to relative
+  const getThumbnailUrl = (url: string | undefined) => {
+    if (!url) return null;
+    // If it's already a relative URL, return as-is
+    if (url.startsWith('/')) return url;
+    // Extract the path from absolute URLs (e.g., http://localhost:3001/uploads/... -> /uploads/...)
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.pathname.startsWith('/uploads/')) {
+        return urlObj.pathname;
+      }
+    } catch {
+      // Invalid URL, return as-is
+    }
+    return url;
+  };
+
   // Initialize duration from course data
   useEffect(() => {
     if (course?.duration && !durationInitialized) {
@@ -311,6 +332,36 @@ export default function AdminCourseEditorPage({
   const handleDurationSave = () => {
     const totalMinutes = (durationHours * 60) + durationMinutes;
     updateCourseMutation.mutate({ duration: totalMinutes });
+  };
+
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please select an image file", variant: "destructive" });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Image must be less than 5MB", variant: "destructive" });
+      return;
+    }
+
+    setThumbnailUploading(true);
+    try {
+      const response = await uploadApi.uploadThumbnail(file);
+      if (response.data?.fileUrl) {
+        await updateCourseMutation.mutateAsync({ thumbnail: response.data.fileUrl });
+        toast({ title: "Thumbnail uploaded successfully" });
+      }
+    } catch (error) {
+      toast({ title: "Failed to upload thumbnail", variant: "destructive" });
+    } finally {
+      setThumbnailUploading(false);
+    }
   };
 
   const toggleModule = (moduleId: string) => {
@@ -459,11 +510,6 @@ export default function AdminCourseEditorPage({
               >
                 {course.status}
               </Badge>
-              {course.isFree ? (
-                <Badge variant="outline">Free</Badge>
-              ) : (
-                <Badge variant="outline">${course.price}</Badge>
-              )}
             </div>
           </div>
         </div>
@@ -712,7 +758,51 @@ export default function AdminCourseEditorPage({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid gap-4 md:grid-cols-2">
+              {/* Thumbnail Upload */}
+              <div className="space-y-3">
+                <Label>Course Thumbnail</Label>
+                <div className="flex items-start gap-4">
+                  <div className="w-48 h-28 border rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                    {getThumbnailUrl(course.thumbnail) ? (
+                      <img
+                        src={getThumbnailUrl(course.thumbnail)!}
+                        alt="Course thumbnail"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbnailUpload}
+                      className="hidden"
+                      id="thumbnail-upload"
+                      disabled={thumbnailUploading}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => document.getElementById("thumbnail-upload")?.click()}
+                      disabled={thumbnailUploading}
+                    >
+                      {thumbnailUploading ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4 mr-2" />
+                      )}
+                      {thumbnailUploading ? "Uploading..." : "Upload Image"}
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      Recommended: 1280x720px (16:9 ratio). Max 5MB.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
                   <Label>Status</Label>
                   <Select
@@ -768,33 +858,6 @@ export default function AdminCourseEditorPage({
                       <SelectItem value="advanced">Advanced</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Price</Label>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={course.isFree}
-                      onCheckedChange={(checked) =>
-                        updateCourseMutation.mutate({
-                          isFree: checked,
-                          price: checked ? 0 : course.price,
-                        })
-                      }
-                    />
-                    <span className="text-sm">Free Course</span>
-                  </div>
-                  {!course.isFree && (
-                    <Input
-                      type="number"
-                      value={course.price}
-                      onChange={(e) =>
-                        updateCourseMutation.mutate({
-                          price: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      className="mt-2"
-                    />
-                  )}
                 </div>
               </div>
               <div className="space-y-2">
