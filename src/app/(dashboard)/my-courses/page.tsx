@@ -80,10 +80,14 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
           </div>
 
           <div className="mt-4 flex items-center justify-between pt-4 border-t border-border">
-            <div className="flex items-center gap-1 text-amber-500">
-              <Star className="h-3.5 w-3.5 fill-current" />
-              <span className="text-xs font-mono font-bold">{course.rating?.toFixed(1) || "N/A"}</span>
-            </div>
+            {course.rating && course.rating > 0 ? (
+              <div className="flex items-center gap-1 text-amber-500">
+                <Star className="h-3.5 w-3.5 fill-current" />
+                <span className="text-xs font-mono font-bold">{course.rating.toFixed(1)}</span>
+              </div>
+            ) : (
+              <div />
+            )}
             <Button size="sm" className="h-8 rounded-none text-xs font-bold uppercase tracking-wider">
               {isCompleted ? "Review" : "Continue"}
             </Button>

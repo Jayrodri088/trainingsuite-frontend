@@ -187,6 +187,7 @@ export default function DashboardPage() {
   );
   const completedCourses = enrollments.filter((e: Enrollment) => (e.progress || 0) >= 100).length;
 
+  // course.duration is in minutes (calculated from lesson videoDuration which is in minutes)
   const totalLearningMinutes = enrollments.reduce((acc: number, e: Enrollment) => {
     const course = typeof e.course === "object" ? e.course : null;
     return acc + ((course as Course)?.duration || 0);
@@ -198,7 +199,7 @@ export default function DashboardPage() {
 
   const stats = [
     { label: "Enrolled Courses", value: enrollments.length.toString(), icon: BookOpen, color: "text-blue-600 border-blue-200 bg-blue-50" },
-    { label: "Hours Learned", value: Math.round(totalLearningMinutes / 60).toString(), icon: Clock, color: "text-green-600 border-green-200 bg-green-50" },
+    { label: "Minutes Learned", value: totalLearningMinutes > 0 ? totalLearningMinutes.toString() : "-", icon: Clock, color: "text-green-600 border-green-200 bg-green-50" },
     { label: "Certificates", value: certificates.length.toString(), icon: Award, color: "text-amber-600 border-amber-200 bg-amber-50" },
     { label: "Avg. Progress", value: `${avgProgress}%`, icon: TrendingUp, color: "text-violet-600 border-violet-200 bg-violet-50" },
   ];

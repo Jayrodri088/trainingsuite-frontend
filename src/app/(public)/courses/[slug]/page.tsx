@@ -85,7 +85,7 @@ function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean })
         )}
       </div>
       <div className="flex items-center gap-2 text-muted-foreground">
-        {lesson.duration && (
+        {lesson.duration && lesson.duration > 0 && (
           <span className="text-xs">{lesson.duration} min</span>
         )}
         {isLocked && !lesson.isFree && <Lock className="h-3.5 w-3.5" />}
@@ -108,7 +108,7 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
           <div>
             <h4 className="font-medium text-sm">{module.title}</h4>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {lessons.length} lessons &bull; {totalDuration} min
+              {lessons.length} lessons{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
             </p>
           </div>
         </div>
@@ -578,7 +578,7 @@ export default function CourseDetailPage({
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-center gap-2">
                         <Video className="h-4 w-4 text-muted-foreground" />
-                        <span>{totalDuration ? `${Math.round(totalDuration / 60)} hours` : "Video content"}</span>
+                        <span>{totalDuration > 0 ? `${totalDuration} min of video` : "Video content"}</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4 text-muted-foreground" />
@@ -622,7 +622,7 @@ export default function CourseDetailPage({
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg">Course Content</CardTitle>
                       <p className="text-sm text-muted-foreground">
-                        {modules.length} modules &bull; {totalLessons} lessons &bull; {Math.round(totalDuration / 60)}h total
+                        {modules.length} modules &bull; {totalLessons} lessons{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
                       </p>
                     </div>
                   </CardHeader>

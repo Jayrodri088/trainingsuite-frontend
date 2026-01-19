@@ -48,13 +48,15 @@ function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrol
 
         <div className="flex flex-col flex-1 p-6">
           <div className="flex justify-between items-start mb-4">
-            {course.rating && (
+            {course.rating && course.rating > 0 ? (
               <div className="flex items-center gap-1">
                 <Star className="h-3 w-3 fill-current text-foreground" />
                 <span className="text-xs font-semibold">{course.rating.toFixed(1)}</span>
               </div>
+            ) : (
+              <span className="text-xs text-muted-foreground">{course.ratingCount || 0} ratings</span>
             )}
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Video Course</span>
+            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold ml-auto">Video Course</span>
           </div>
 
           <h3 className="text-xl font-heading font-bold text-foreground mb-3 leading-tight group-hover:underline decoration-1 underline-offset-4">
@@ -113,6 +115,7 @@ export default function HomePage() {
     status: "published",
     sort: "enrollmentCount",
     order: "desc",
+    limit: 50,
   });
   const { data: enrollmentsResponse } = useEnrollments();
 

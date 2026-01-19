@@ -13,6 +13,7 @@ import {
   HelpCircle,
   ChevronLeft,
   Megaphone,
+  Home,
 } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,9 +23,15 @@ import { useAuth } from "@/hooks/use-auth";
 
 const sidebarItems = [
   {
+    title: "Navigation",
+    items: [
+      { label: "Home", href: "/", icon: Home },
+      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    ],
+  },
+  {
     title: "Training",
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { label: "My Training", href: "/my-courses", icon: BookOpen },
       { label: "Certificates", href: "/certificates", icon: Award },
       { label: "Live Sessions", href: "/live-sessions", icon: Calendar },

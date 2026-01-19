@@ -13,6 +13,7 @@ import {
   LogOut,
   BookOpen,
   Award,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -163,6 +164,12 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild className="rounded-none cursor-pointer">
+                <Link href="/">
+                  <Home className="mr-2 h-4 w-4" />
+                  Home
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild className="rounded-none cursor-pointer">
                 <Link href="/dashboard">
                   <User className="mr-2 h-4 w-4" />

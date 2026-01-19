@@ -106,9 +106,6 @@ export default function AdminCourseEditorPage({
     isFree: false,
   });
 
-  const [durationHours, setDurationHours] = useState(0);
-  const [durationMinutes, setDurationMinutes] = useState(0);
-  const [durationInitialized, setDurationInitialized] = useState(false);
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
 
   // Queries
@@ -316,22 +313,6 @@ export default function AdminCourseEditorPage({
       // Invalid URL, return as-is
     }
     return url;
-  };
-
-  // Initialize duration from course data
-  useEffect(() => {
-    if (course?.duration && !durationInitialized) {
-      const hours = Math.floor(course.duration / 60);
-      const minutes = course.duration % 60;
-      setDurationHours(hours);
-      setDurationMinutes(minutes);
-      setDurationInitialized(true);
-    }
-  }, [course?.duration, durationInitialized]);
-
-  const handleDurationSave = () => {
-    const totalMinutes = (durationHours * 60) + durationMinutes;
-    updateCourseMutation.mutate({ duration: totalMinutes });
   };
 
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -861,46 +842,11 @@ export default function AdminCourseEditorPage({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Estimated Duration</Label>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="number"
-                      min="0"
-                      max="999"
-                      value={durationHours}
-                      onChange={(e) => setDurationHours(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="w-20"
-                    />
-                    <span className="text-sm text-muted-foreground">hours</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="number"
-                      min="0"
-                      max="59"
-                      value={durationMinutes}
-                      onChange={(e) => setDurationMinutes(Math.min(59, Math.max(0, parseInt(e.target.value) || 0)))}
-                      className="w-20"
-                    />
-                    <span className="text-sm text-muted-foreground">minutes</span>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDurationSave}
-                    disabled={updateCourseMutation.isPending}
-                  >
-                    {updateCourseMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      "Save"
-                    )}
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Total: {durationHours > 0 || durationMinutes > 0 ? `${durationHours}h ${durationMinutes}m` : "Not set"}
+                <Label>Course Duration</Label>
+                <p className="text-sm text-muted-foreground">
+                  {course?.duration && course.duration > 0
+                    ? `${course.duration} minutes (calculated from lesson videos)`
+                    : "Duration is automatically calculated from the video lengths of all lessons."}
                 </p>
               </div>
             </CardContent>

@@ -80,7 +80,7 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
 
   return (
     <Link href={`/courses/${course.slug || course._id}`}>
-      <Card className="overflow-hidden group cursor-pointer h-full hover:shadow-lg transition-shadow">
+      <Card className="overflow-hidden group cursor-pointer h-full hover:shadow-lg transition-shadow border shadow-sm">
         <div className={`h-36 ${gradient} relative overflow-hidden`}>
           {normalizeUploadUrl(course.thumbnail) && (
             <img
@@ -107,12 +107,14 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
             {course.title}
           </h3>
           <div className="flex items-center gap-2 mt-2">
-            <div className="flex items-center gap-1 text-amber-500">
-              <Star className="h-3.5 w-3.5 fill-current" />
-              <span className="text-xs font-medium">{course.rating?.toFixed(1) || "N/A"}</span>
-            </div>
+            {course.rating && course.rating > 0 ? (
+              <div className="flex items-center gap-1 text-amber-500">
+                <Star className="h-3.5 w-3.5 fill-current" />
+                <span className="text-xs font-medium">{course.rating.toFixed(1)}</span>
+              </div>
+            ) : null}
             <span className="text-xs text-muted-foreground">
-              ({(course.enrollmentCount || 0).toLocaleString()} enrolled)
+              {(course.enrollmentCount || 0).toLocaleString()} enrolled
             </span>
           </div>
           {isEnrolled ? (
@@ -248,7 +250,7 @@ function CoursesLoading() {
           <Skeleton className="h-96 w-full" />
         </aside>
         <div className="flex-1">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {[...Array(6)].map((_, i) => (
               <CourseCardSkeleton key={i} />
             ))}
@@ -267,6 +269,7 @@ function CoursesContent() {
     status: "published",
     sort: "enrollmentCount",
     order: "desc",
+    limit: 50,
   });
 
   const { data: coursesResponse, isLoading } = useCourses({
@@ -432,7 +435,7 @@ function CoursesContent() {
           </p>
 
           {isLoading ? (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {[...Array(6)].map((_, i) => (
                 <CourseCardSkeleton key={i} />
               ))}
@@ -441,8 +444,8 @@ function CoursesContent() {
             <div
               className={
                 viewMode === "grid"
-                  ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
-                  : "space-y-4"
+                  ? "grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
+                  : "flex flex-col gap-8"
               }
             >
               {courses.map((course, index) => (
