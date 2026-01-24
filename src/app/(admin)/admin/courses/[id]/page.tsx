@@ -1020,7 +1020,7 @@ export default function AdminCourseEditorPage({
                       placeholder="https://example.com/video.mp4 or YouTube URL"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Duration auto-detects for direct video URLs (mp4, webm)
+                      Auto-detects for same-origin videos. External hosts may require manual entry.
                     </p>
                   </div>
                   <div className="space-y-2">

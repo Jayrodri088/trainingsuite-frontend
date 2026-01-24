@@ -257,12 +257,12 @@ export function normalizeUploadUrl(url: string | undefined | null): string | und
 }
 
 /**
- * Extract video duration from a video URL using HTML5 video element.
+ * Extract video duration from a video URL using HTML5 video element (client-side).
  * Works with direct video URLs and streaming URLs, but NOT YouTube/Vimeo embeds.
  * @param url - The video URL to extract duration from
  * @returns Promise resolving to duration in minutes (rounded), or null if extraction fails
  */
-export function getVideoDuration(url: string): Promise<number | null> {
+export function getVideoDurationClient(url: string): Promise<number | null> {
   return new Promise((resolve) => {
     if (!url || typeof url !== "string") {
       resolve(null);
@@ -281,42 +281,121 @@ export function getVideoDuration(url: string): Promise<number | null> {
 
     // Transform the URL if it's a relative path
     const fullUrl = getMediaUrl(url) || url;
+    
+    // Check if this is a same-origin or relative URL
+    let isSameOrigin = false;
+    try {
+      if (fullUrl.startsWith("/")) {
+        isSameOrigin = true;
+      } else {
+        const videoUrl = new URL(fullUrl);
+        const currentUrl = new URL(window.location.href);
+        isSameOrigin = videoUrl.origin === currentUrl.origin;
+      }
+    } catch {
+      // Invalid URL, try anyway
+    }
 
-    const video = document.createElement("video");
-    video.preload = "metadata";
-    video.crossOrigin = "anonymous"; // Help with CORS
+    // Try to load video metadata
+    // First attempt: without crossOrigin (works better for some external servers)
+    // Second attempt (if first fails): with crossOrigin for same-origin URLs
+    const attemptLoad = (useCrossOrigin: boolean): Promise<number | null> => {
+      return new Promise((resolveAttempt) => {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        
+        if (useCrossOrigin) {
+          video.crossOrigin = "anonymous";
+        }
 
-    const cleanup = () => {
-      video.removeAttribute("src");
-      video.load();
+        const cleanup = () => {
+          video.removeAttribute("src");
+          video.load();
+        };
+
+        // Timeout after 8 seconds per attempt
+        const timeout = setTimeout(() => {
+          cleanup();
+          resolveAttempt(null);
+        }, 8000);
+
+        video.onloadedmetadata = () => {
+          clearTimeout(timeout);
+          const durationInSeconds = video.duration;
+          cleanup();
+          
+          if (isFinite(durationInSeconds) && durationInSeconds > 0) {
+            // Return duration in minutes, rounded (minimum 1 minute)
+            const minutes = Math.round(durationInSeconds / 60);
+            resolveAttempt(minutes > 0 ? minutes : 1);
+          } else {
+            resolveAttempt(null);
+          }
+        };
+
+        video.onerror = () => {
+          clearTimeout(timeout);
+          cleanup();
+          resolveAttempt(null);
+        };
+
+        video.src = fullUrl;
+      });
     };
 
-    // Timeout after 15 seconds
-    const timeout = setTimeout(() => {
-      cleanup();
-      resolve(null);
-    }, 15000);
-
-    video.onloadedmetadata = () => {
-      clearTimeout(timeout);
-      const durationInSeconds = video.duration;
-      cleanup();
-      
-      if (isFinite(durationInSeconds) && durationInSeconds > 0) {
-        // Return duration in minutes, rounded (minimum 1 minute)
-        const minutes = Math.round(durationInSeconds / 60);
-        resolve(minutes > 0 ? minutes : 1);
+    // Try without crossOrigin first (works for more external servers)
+    attemptLoad(false).then((duration) => {
+      if (duration !== null) {
+        resolve(duration);
+      } else if (isSameOrigin) {
+        // If same-origin and first attempt failed, try with crossOrigin
+        attemptLoad(true).then(resolve);
       } else {
         resolve(null);
       }
-    };
-
-    video.onerror = () => {
-      clearTimeout(timeout);
-      cleanup();
-      resolve(null);
-    };
-
-    video.src = fullUrl;
+    });
   });
+}
+
+/**
+ * Extract video duration - tries client-side first, then falls back to server-side.
+ * Server-side extraction bypasses CORS restrictions for external video hosts.
+ * @param url - The video URL to extract duration from
+ * @param useServerFallback - Whether to use server-side fallback (requires auth)
+ * @returns Promise resolving to duration in minutes (rounded), or null if extraction fails
+ */
+export async function getVideoDuration(url: string, useServerFallback = true): Promise<number | null> {
+  if (!url || typeof url !== "string") {
+    return null;
+  }
+
+  // Skip YouTube and Vimeo URLs - they require API integration
+  if (
+    url.includes("youtube.com") ||
+    url.includes("youtu.be") ||
+    url.includes("vimeo.com")
+  ) {
+    return null;
+  }
+
+  // Try client-side extraction first (faster, no server load)
+  const clientDuration = await getVideoDurationClient(url);
+  
+  if (clientDuration !== null) {
+    return clientDuration;
+  }
+
+  // If client-side fails and server fallback is enabled, try server-side
+  if (useServerFallback) {
+    try {
+      // Dynamic import to avoid circular dependencies
+      const { utilsApi } = await import("@/lib/api/utils");
+      const serverDuration = await utilsApi.getVideoDuration(url);
+      return serverDuration;
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
 }
