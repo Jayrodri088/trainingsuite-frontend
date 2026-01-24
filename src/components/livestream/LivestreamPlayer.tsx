@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Video, ExternalLink, AlertCircle, Loader2 } from "lucide-react";
+import { Video, ExternalLink, AlertCircle, Loader2, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -290,6 +290,80 @@ export function LivestreamPlayer({
     };
   };
 
+  // For direct video URLs, use native HTML5 video element (more reliable)
+  if (streamType === "direct") {
+    return (
+      <div className={cn("relative aspect-video bg-black rounded-lg overflow-hidden", className)}>
+        {/* Loading overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-slate-900 flex items-center justify-center z-10">
+            <div className="text-center text-white">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+              <p className="text-sm text-white/70">Loading video...</p>
+            </div>
+          </div>
+        )}
+        
+        {/* Live indicator */}
+        {isLive && !isLoading && (
+          <div className="absolute top-4 left-4 z-20">
+            <span className="inline-flex items-center gap-1.5 bg-red-600 text-white text-xs font-medium px-2 py-1 rounded">
+              <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+              LIVE
+            </span>
+          </div>
+        )}
+
+        <video
+          ref={playerRef}
+          className="w-full h-full"
+          controls={controls}
+          autoPlay={autoplay}
+          muted={muted}
+          playsInline
+          onLoadedMetadata={() => {
+            setIsLoading(false);
+            onReady?.();
+          }}
+          onPlay={() => {
+            setIsLoading(false);
+            onPlay?.();
+          }}
+          onPause={onPause}
+          onEnded={onEnded}
+          onError={(e) => {
+            console.error("Video error:", e);
+            handleError(e);
+          }}
+          onTimeUpdate={(e) => {
+            const video = e.currentTarget;
+            if (onProgress && video.duration) {
+              onProgress({
+                played: video.currentTime / video.duration,
+                playedSeconds: video.currentTime,
+                loaded: video.buffered.length > 0 
+                  ? video.buffered.end(video.buffered.length - 1) / video.duration 
+                  : 0,
+                loadedSeconds: video.buffered.length > 0 
+                  ? video.buffered.end(video.buffered.length - 1) 
+                  : 0,
+              });
+            }
+          }}
+          onDurationChange={(e) => {
+            if (onDuration) {
+              onDuration(e.currentTarget.duration);
+            }
+          }}
+        >
+          <source src={url} />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    );
+  }
+
+  // For YouTube, Vimeo, HLS - use ReactPlayer
   return (
     <div className={cn("relative aspect-video bg-black rounded-lg overflow-hidden", className)}>
       {/* Loading overlay */}
