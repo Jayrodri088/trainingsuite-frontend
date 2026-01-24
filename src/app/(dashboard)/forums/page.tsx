@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { T, useT } from "@/components/t";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,7 +50,7 @@ import { formatDistanceToNow, parseISO } from "date-fns";
 
 type SortOption = "recent" | "popular" | "unanswered";
 
-export default function CommunityPage() {
+function CommunityPageContent() {
   const { t } = useT();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -489,5 +490,13 @@ export default function CommunityPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function CommunityPage() {
+  return (
+    <ProtectedRoute>
+      <CommunityPageContent />
+    </ProtectedRoute>
   );
 }

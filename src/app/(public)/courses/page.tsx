@@ -248,6 +248,30 @@ function FilterSidebar({
         </div>
       </div>
 
+      {/* Language */}
+      <div>
+        <h4 className="font-semibold text-sm mb-3"><T>Language</T></h4>
+        <div className="space-y-2 max-h-48 overflow-y-auto">
+          {COURSE_LANGUAGES.slice(0, 10).map((lang) => (
+            <label
+              key={lang.code}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Checkbox
+                checked={filters.language === lang.code}
+                onCheckedChange={(checked) => {
+                  setFilters({
+                    ...filters,
+                    language: checked ? lang.code : undefined,
+                  });
+                }}
+              />
+              <span className="text-sm">{lang.name}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
       {/* Clear Filters */}
       <Button
         variant="outline"
@@ -293,6 +317,7 @@ function CoursesContent() {
   const { t } = useT();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+  const [preferredLanguage, setPreferredLanguage] = useState<string>("");
   const [filters, setFilters] = useState<CourseFilters>({
     status: "published",
     sort: "enrollmentCount",
@@ -315,9 +340,29 @@ function CoursesContent() {
   const { data: categoriesResponse } = useCategories();
   const { data: enrollmentsResponse } = useEnrollments();
 
-  const courses = coursesResponse?.data || [];
+  const rawCourses = coursesResponse?.data || [];
   const categories = categoriesResponse?.data || [];
   const enrollments = enrollmentsResponse?.data || [];
+
+  // Sort courses to show preferred language first (without filtering out others)
+  const courses = useMemo(() => {
+    if (!preferredLanguage) return rawCourses;
+    
+    // Split courses into preferred language and others
+    const preferred: Course[] = [];
+    const others: Course[] = [];
+    
+    rawCourses.forEach((course) => {
+      if (course.language?.toLowerCase() === preferredLanguage.toLowerCase()) {
+        preferred.push(course);
+      } else {
+        others.push(course);
+      }
+    });
+    
+    // Return preferred language courses first, then others
+    return [...preferred, ...others];
+  }, [rawCourses, preferredLanguage]);
 
   // Create a map of course ID to enrollment for quick lookup
   const enrollmentMap = new Map<string, Enrollment>();
@@ -329,6 +374,7 @@ function CoursesContent() {
   const activeFiltersCount = [
     filters.category,
     filters.level,
+    filters.language,
   ].filter(Boolean).length;
 
   return (

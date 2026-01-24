@@ -20,6 +20,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import { T, useT } from "@/components/t";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +46,7 @@ import { getInitials } from "@/lib/utils";
 import type { ForumPost, Comment, User } from "@/types";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 
-export default function PostDetailPage() {
+function PostDetailPageContent() {
   const params = useParams();
   const forumId = params.id as string;
   const postId = params.postId as string;
@@ -521,5 +522,13 @@ export default function PostDetailPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function PostDetailPage() {
+  return (
+    <ProtectedRoute>
+      <PostDetailPageContent />
+    </ProtectedRoute>
   );
 }
