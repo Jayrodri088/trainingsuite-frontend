@@ -18,7 +18,6 @@ import {
   Loader2,
   Send,
   ThumbsUp,
-  Heart,
 } from "lucide-react";
 import { T, useT } from "@/components/t";
 import { Button } from "@/components/ui/button";
@@ -106,12 +105,9 @@ export default function PostDetailPage() {
     },
   });
 
+  // Like post mutation - always use POST, backend handles toggle
   const likePostMutation = useMutation({
     mutationFn: async (id: string) => {
-      const isLiked = likedPosts.has(id);
-      if (isLiked) {
-        return forumsApi.unlikePost(id);
-      }
       return forumsApi.likePost(id);
     },
     onMutate: async (id) => {
@@ -140,16 +136,13 @@ export default function PostDetailPage() {
         }
         return newSet;
       });
-      toast({ title: t("Failed to update like"), variant: "destructive" });
+      toast({ title: t("Failed to update vote"), variant: "destructive" });
     },
   });
 
+  // Like comment mutation - always use POST, backend handles toggle
   const likeCommentMutation = useMutation({
     mutationFn: async (commentId: string) => {
-      const isLiked = likedComments.has(commentId);
-      if (isLiked) {
-        return forumsApi.unlikeComment(commentId);
-      }
       return forumsApi.likeComment(commentId);
     },
     onMutate: async (commentId) => {
@@ -178,7 +171,7 @@ export default function PostDetailPage() {
         }
         return newSet;
       });
-      toast({ title: t("Failed to update like"), variant: "destructive" });
+      toast({ title: t("Failed to update vote"), variant: "destructive" });
     },
   });
 
@@ -195,24 +188,49 @@ export default function PostDetailPage() {
   };
 
   const post = postData?.data;
-  const comments = commentsData?.data || [];
+  const rawComments = commentsData?.data || [];
 
   // Helper to get parent ID (handles both object and string)
-  const getParentId = (comment: Comment): string | null => {
+  const getParentId = (comment: any): string | null => {
     if (!comment.parent) return null;
     if (typeof comment.parent === 'string') return comment.parent;
     if (typeof comment.parent === 'object' && comment.parent !== null) {
-      return (comment.parent as any)._id || null;
+      return comment.parent._id || null;
     }
     return null;
   };
 
+  // Build a map of all comments by ID for quick lookup
+  const commentMap = new Map<string, Comment>();
+  
+  // First pass: collect all comments (including nested replies)
+  const flattenComments = (commentList: any[]): Comment[] => {
+    const result: Comment[] = [];
+    for (const comment of commentList) {
+      result.push(comment);
+      // If API returns nested replies, flatten them
+      if (comment.replies && Array.isArray(comment.replies) && comment.replies.length > 0) {
+        for (const reply of comment.replies) {
+          // Ensure reply has parent set to this comment
+          result.push({ ...reply, parent: reply.parent || comment._id });
+        }
+      }
+    }
+    return result;
+  };
+
+  const comments = flattenComments(rawComments);
+  
+  // Build comment map
+  comments.forEach(c => commentMap.set(c._id, c));
+
   // Organize comments into threads
   const rootComments = comments.filter((c) => !getParentId(c));
-  const childComments = comments.filter((c) => getParentId(c));
-
-  const getChildComments = (parentId: string): Comment[] =>
-    childComments.filter((c) => getParentId(c) === parentId);
+  
+  // Get all child comments for a parent (recursive through all nested levels)
+  const getChildComments = (parentId: string): Comment[] => {
+    return comments.filter((c) => getParentId(c) === parentId);
+  };
 
   const isLoading = postLoading || commentsLoading;
 
@@ -244,20 +262,28 @@ export default function PostDetailPage() {
   const CommentCard = ({ comment, depth = 0 }: { comment: Comment; depth?: number }) => {
     const isOwner = user?._id === (comment.user as User)?._id;
     const replies = getChildComments(comment._id);
+    const parentId = getParentId(comment);
+    const parentComment = parentId ? commentMap.get(parentId) : null;
 
     return (
-      <div className={depth > 0 ? "ml-8 border-l-2 border-muted pl-4" : ""}>
-        <div className="py-4">
-          <div className="flex items-start gap-3">
-            <Avatar className="h-8 w-8">
+      <div className={depth > 0 ? "ml-4 sm:ml-8 border-l-2 border-primary/20 pl-3 sm:pl-4" : ""}>
+        <div className="py-3 sm:py-4">
+          <div className="flex items-start gap-2 sm:gap-3">
+            <Avatar className="h-7 w-7 sm:h-8 sm:w-8 shrink-0">
               <AvatarImage src={comment.user?.avatar} />
-              <AvatarFallback className="bg-primary/10 text-primary text-sm">
+              <AvatarFallback className="bg-primary/10 text-primary text-xs sm:text-sm">
                 {getInitials(comment.user?.name || "?")}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <span className="font-medium text-sm">{comment.user?.name || "Anonymous"}</span>
+                {parentComment && depth > 0 && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Reply className="h-3 w-3" />
+                    <span className="text-primary">@{parentComment.user?.name || "Anonymous"}</span>
+                  </span>
+                )}
                 <span className="text-xs text-muted-foreground">
                   {formatDistanceToNow(parseISO(comment.createdAt), { addSuffix: true })}
                 </span>
@@ -270,11 +296,13 @@ export default function PostDetailPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`h-7 text-xs ${likedComments.has(comment._id) ? "text-red-500" : ""}`}
+                  className={`h-7 text-xs gap-1 ${likedComments.has(comment._id) ? "text-primary bg-primary/10" : ""}`}
                   onClick={() => likeCommentMutation.mutate(comment._id)}
+                  title={t(likedComments.has(comment._id) ? "Remove upvote" : "Upvote this comment")}
                 >
-                  <Heart className={`h-3 w-3 mr-1 ${likedComments.has(comment._id) ? "fill-red-500" : ""}`} />
-                  {comment.likes || 0}
+                  <ThumbsUp className={`h-3 w-3 ${likedComments.has(comment._id) ? "fill-primary" : ""}`} />
+                  <span>{comment.likes || 0}</span>
+                  <span className="hidden sm:inline">{likedComments.has(comment._id) ? t("Upvoted") : t("Upvote")}</span>
                 </Button>
                 <Button
                   variant="ghost"
@@ -309,10 +337,18 @@ export default function PostDetailPage() {
           </div>
         </div>
         {replies.length > 0 && (
-          <div className="space-y-0">
-            {replies.map((reply) => (
-              <CommentCard key={reply._id} comment={reply} depth={depth + 1} />
-            ))}
+          <div className="mt-1">
+            {depth === 0 && replies.length > 0 && (
+              <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                <MessageSquare className="h-3 w-3" />
+                <span>{replies.length} {replies.length === 1 ? t("reply") : t("replies")}</span>
+              </div>
+            )}
+            <div className="space-y-0">
+              {replies.map((reply) => (
+                <CommentCard key={reply._id} comment={reply} depth={depth + 1} />
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -361,11 +397,13 @@ export default function PostDetailPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`h-8 px-3 ${likedPosts.has(post._id) ? "text-red-500" : "text-muted-foreground"}`}
+                  className={`h-8 px-3 gap-1 ${likedPosts.has(post._id) ? "text-primary bg-primary/10" : "text-muted-foreground"}`}
                   onClick={() => likePostMutation.mutate(post._id)}
+                  title={t(likedPosts.has(post._id) ? "Remove upvote" : "Upvote this post")}
                 >
-                  <Heart className={`h-4 w-4 mr-1 ${likedPosts.has(post._id) ? "fill-red-500" : ""}`} />
-                  <span>{post.likes || 0} <T>likes</T></span>
+                  <ThumbsUp className={`h-4 w-4 ${likedPosts.has(post._id) ? "fill-primary" : ""}`} />
+                  <span>{post.likes || 0}</span>
+                  <span className="hidden sm:inline">{likedPosts.has(post._id) ? t("Upvoted") : t("Upvote")}</span>
                 </Button>
                 <div className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />

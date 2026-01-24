@@ -6,14 +6,12 @@ import Link from "next/link";
 import {
   MessageSquare,
   Search,
-  ChevronUp,
-  ChevronDown,
+  ThumbsUp,
   MessageCircle,
   Clock,
   Plus,
   TrendingUp,
   Loader2,
-  Filter,
   X,
 } from "lucide-react";
 import { T, useT } from "@/components/t";
@@ -109,13 +107,9 @@ export default function CommunityPage() {
     }
   }, [allPosts]);
 
-  // Like post mutation
+  // Like post mutation - always use POST, backend handles toggle
   const likePostMutation = useMutation({
     mutationFn: async (postId: string) => {
-      const isLiked = likedPosts.has(postId);
-      if (isLiked) {
-        return forumsApi.unlikePost(postId);
-      }
       return forumsApi.likePost(postId);
     },
     onMutate: async (postId) => {
@@ -144,7 +138,7 @@ export default function CommunityPage() {
         }
         return newSet;
       });
-      toast({ title: t("Failed to update like"), variant: "destructive" });
+      toast({ title: t("Failed to update vote"), variant: "destructive" });
     },
   });
 
@@ -201,6 +195,7 @@ export default function CommunityPage() {
     const forumInfo = postForum || forums.find(f => f._id === (post as any).forumId || f._id === post.forum);
     const isLiked = likedPosts.has(post._id);
     const likeCount = (post as any).likes || 0;
+    const displayCount = isLiked && !(post as any).isLiked ? likeCount + 1 : likeCount;
     
     const handleVote = (e: React.MouseEvent) => {
       e.preventDefault();
@@ -213,26 +208,24 @@ export default function CommunityPage() {
         <CardContent className="p-0">
           <div className="flex">
             {/* Vote Section */}
-            <div className="flex flex-col items-center py-4 px-3 bg-muted/30 border-r border-border">
+            <div className="flex flex-col items-center justify-center py-4 px-2 sm:px-4 bg-muted/30 border-r border-border min-w-[60px] sm:min-w-[80px]">
               <Button 
                 variant="ghost" 
-                size="icon" 
-                className={`h-8 w-8 ${isLiked ? "text-primary" : "text-muted-foreground"} hover:text-primary hover:bg-primary/10`}
+                size="sm"
+                className={`h-auto py-2 px-2 sm:px-3 flex flex-col sm:flex-row items-center gap-1 ${
+                  isLiked 
+                    ? "text-primary bg-primary/10" 
+                    : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+                }`}
                 onClick={handleVote}
+                title={t(isLiked ? "Remove upvote" : "Upvote this question")}
               >
-                <ChevronUp className={`h-5 w-5 ${isLiked ? "fill-primary" : ""}`} />
+                <ThumbsUp className={`h-4 w-4 sm:h-5 sm:w-5 ${isLiked ? "fill-primary" : ""}`} />
+                <span className="text-xs sm:text-sm font-semibold">{displayCount}</span>
               </Button>
-              <span className={`text-sm font-semibold py-1 ${isLiked ? "text-primary" : ""}`}>
-                {isLiked ? likeCount + 1 : likeCount}
+              <span className="text-[10px] text-muted-foreground mt-1 hidden sm:block">
+                {isLiked ? t("Upvoted") : t("Upvote")}
               </span>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8 text-muted-foreground hover:text-muted-foreground/50"
-                disabled
-              >
-                <ChevronDown className="h-5 w-5" />
-              </Button>
             </div>
 
             {/* Content Section */}
