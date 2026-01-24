@@ -52,7 +52,7 @@ export default function PostDetailPage() {
   const postId = params.postId as string;
   const { toast } = useToast();
   const { user } = useAuth();
-  const t = useT();
+  const { t } = useT();
   const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<Comment | null>(null);

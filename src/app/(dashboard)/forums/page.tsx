@@ -31,7 +31,7 @@ import type { Forum, User } from "@/types";
 import { formatDistanceToNow, parseISO } from "date-fns";
 
 export default function ForumsPage() {
-  const t = useT();
+  const { t } = useT();
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: forumsData, isLoading } = useQuery({

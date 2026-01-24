@@ -50,7 +50,7 @@ export default function ForumDetailPage() {
   const params = useParams();
   const forumId = params.id as string;
   const { toast } = useToast();
-  const t = useT();
+  const { t } = useT();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
