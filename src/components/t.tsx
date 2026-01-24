@@ -1,10 +1,11 @@
 "use client";
 
 import { useTranslation } from '@/contexts/translation-context';
+import { ElementType, ComponentPropsWithoutRef } from 'react';
 
-interface TProps {
+interface TProps<C extends ElementType = 'span'> {
   children: string;
-  as?: keyof JSX.IntrinsicElements;
+  as?: C;
   className?: string;
 }
 
@@ -15,8 +16,13 @@ interface TProps {
  *   <T>Welcome to our platform</T>
  *   <T as="h1" className="text-2xl">Page Title</T>
  */
-export function T({ children, as: Component = 'span', className }: TProps) {
+export function T<C extends ElementType = 'span'>({ 
+  children, 
+  as, 
+  className 
+}: TProps<C>) {
   const { t } = useTranslation();
+  const Component = as || 'span';
   
   return <Component className={className}>{t(children)}</Component>;
 }
