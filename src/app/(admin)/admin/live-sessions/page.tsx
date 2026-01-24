@@ -149,7 +149,8 @@ export default function AdminLiveSessionsPage() {
       title: data.title,
       description: data.description || undefined,
       course: data.course || undefined,
-      scheduledAt: data.scheduledAt,
+      // Convert datetime-local format to ISO string
+      scheduledAt: new Date(data.scheduledAt).toISOString(),
       duration: data.duration,
       streamUrl: data.streamUrl || undefined,
       streamProvider: data.streamProvider,
@@ -161,8 +162,9 @@ export default function AdminLiveSessionsPage() {
       resetForm();
       toast({ title: "Live session created successfully" });
     },
-    onError: () => {
-      toast({ title: "Failed to create session", variant: "destructive" });
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || error?.response?.data?.error || "Failed to create session";
+      toast({ title: errorMessage, variant: "destructive" });
     },
   });
 
@@ -176,8 +178,9 @@ export default function AdminLiveSessionsPage() {
       resetForm();
       toast({ title: "Session updated successfully" });
     },
-    onError: () => {
-      toast({ title: "Failed to update session", variant: "destructive" });
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || error?.response?.data?.error || "Failed to update session";
+      toast({ title: errorMessage, variant: "destructive" });
     },
   });
 
@@ -252,7 +255,8 @@ export default function AdminLiveSessionsPage() {
         data: {
           title: formData.title,
           description: formData.description || undefined,
-          scheduledAt: formData.scheduledAt,
+          // Convert datetime-local format to ISO string
+          scheduledAt: new Date(formData.scheduledAt).toISOString(),
           duration: formData.duration,
           streamUrl: formData.streamUrl || undefined,
           streamProvider: formData.streamProvider,
