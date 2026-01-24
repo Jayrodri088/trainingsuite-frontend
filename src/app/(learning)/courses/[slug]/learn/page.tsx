@@ -115,6 +115,61 @@ declare global {
   }
 }
 
+// Helper to format time as MM:SS or HH:MM:SS
+function formatVideoTime(seconds: number): string {
+  if (!isFinite(seconds) || seconds < 0) return "0:00";
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  if (hrs > 0) {
+    return `${hrs}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
+// localStorage key for video progress
+const VIDEO_PROGRESS_KEY = "video-progress";
+
+// Save video progress to localStorage
+function saveVideoProgress(lessonId: string, currentTime: number, duration: number) {
+  if (!lessonId || !isFinite(currentTime) || !isFinite(duration)) return;
+  try {
+    const stored = localStorage.getItem(VIDEO_PROGRESS_KEY);
+    const progress = stored ? JSON.parse(stored) : {};
+    // Only save if not at the end (within 5 seconds of end)
+    if (duration - currentTime > 5) {
+      progress[lessonId] = { currentTime, duration, timestamp: Date.now() };
+    } else {
+      // Clear progress if video completed
+      delete progress[lessonId];
+    }
+    localStorage.setItem(VIDEO_PROGRESS_KEY, JSON.stringify(progress));
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
+// Get saved video progress from localStorage
+function getSavedVideoProgress(lessonId: string): number | null {
+  if (!lessonId) return null;
+  try {
+    const stored = localStorage.getItem(VIDEO_PROGRESS_KEY);
+    if (!stored) return null;
+    const progress = JSON.parse(stored);
+    const saved = progress[lessonId];
+    if (saved && saved.currentTime > 0) {
+      // Only restore if saved within last 30 days
+      const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+      if (Date.now() - saved.timestamp < thirtyDays) {
+        return saved.currentTime;
+      }
+    }
+  } catch {
+    // Ignore localStorage errors
+  }
+  return null;
+}
+
 function VideoPlayer({
   lesson,
   onVideoEnd,
@@ -128,6 +183,18 @@ function VideoPlayer({
   const youtubePlayerRef = useRef<unknown>(null);
   const [ytApiLoaded, setYtApiLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const lastSaveRef = useRef(0);
+
+  // Reset state when lesson changes
+  useEffect(() => {
+    setCurrentTime(0);
+    setDuration(0);
+    setIsPlaying(false);
+    lastSaveRef.current = 0;
+  }, [lessonId]);
 
   // Load YouTube API
   useEffect(() => {
@@ -279,8 +346,37 @@ function VideoPlayer({
     }
   };
 
+  // Handle time update for display and progress saving
+  const handleTimeUpdate = useCallback(() => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      setCurrentTime(video.currentTime);
+      
+      // Save progress every 5 seconds
+      if (lessonId && video.currentTime - lastSaveRef.current >= 5) {
+        lastSaveRef.current = video.currentTime;
+        saveVideoProgress(lessonId, video.currentTime, video.duration);
+      }
+    }
+  }, [lessonId]);
+
+  // Handle video loaded - restore position and set duration
+  const handleLoadedMetadata = useCallback(() => {
+    if (videoRef.current && lessonId) {
+      const video = videoRef.current;
+      setDuration(video.duration);
+      
+      // Restore saved position
+      const savedPosition = getSavedVideoProgress(lessonId);
+      if (savedPosition && savedPosition < video.duration - 5) {
+        video.currentTime = savedPosition;
+        setCurrentTime(savedPosition);
+      }
+    }
+  }, [lessonId]);
+
   return (
-    <div className="aspect-video bg-slate-900 relative">
+    <div className="aspect-video bg-slate-900 relative group">
       <style jsx>{`
         video::-webkit-media-controls-timeline {
           display: none;
@@ -300,6 +396,16 @@ function VideoPlayer({
         autoPlay
         onClick={handleVideoClick}
         onEnded={handleVideoEnd}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => {
+          setIsPlaying(false);
+          // Save progress when paused
+          if (lessonId && videoRef.current) {
+            saveVideoProgress(lessonId, videoRef.current.currentTime, videoRef.current.duration);
+          }
+        }}
         onLoadedData={(e) => {
           // Prevent seeking by resetting currentTime when user tries to seek
           const video = e.currentTarget;
@@ -323,6 +429,13 @@ function VideoPlayer({
         <source src={embedUrl} type="video/webm" />
         Your browser does not support the video tag.
       </video>
+      
+      {/* Time display overlay */}
+      {duration > 0 && (
+        <div className="absolute bottom-14 right-3 bg-black/70 text-white text-sm px-2 py-1 rounded pointer-events-none font-mono">
+          {formatVideoTime(currentTime)} / {formatVideoTime(duration)}
+        </div>
+      )}
     </div>
   );
 }

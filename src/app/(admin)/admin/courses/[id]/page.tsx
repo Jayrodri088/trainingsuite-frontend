@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -24,6 +24,7 @@ import {
   X,
   Upload,
   ImageIcon,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,6 +72,7 @@ import { coursesApi, UpdateCourseData } from "@/lib/api/courses";
 import { modulesApi, lessonsApi, CreateModuleData, CreateLessonData } from "@/lib/api/lessons";
 import { categoriesApi } from "@/lib/api/categories";
 import { uploadApi } from "@/lib/api/upload";
+import { getVideoDuration } from "@/lib/utils";
 import type { Module, Lesson, CourseLevel, Material } from "@/types";
 
 export default function AdminCourseEditorPage({
@@ -107,6 +109,25 @@ export default function AdminCourseEditorPage({
   });
 
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
+  const [durationLoading, setDurationLoading] = useState(false);
+
+  // Auto-extract video duration when URL changes
+  const extractVideoDuration = useCallback(async (url: string) => {
+    if (!url) return;
+    
+    setDurationLoading(true);
+    try {
+      const duration = await getVideoDuration(url);
+      if (duration !== null) {
+        setLessonForm((prev) => ({ ...prev, videoDuration: duration }));
+        toast({ title: `Duration auto-detected: ${duration} minutes` });
+      }
+    } catch {
+      // Silently fail - duration can still be entered manually
+    } finally {
+      setDurationLoading(false);
+    }
+  }, [toast]);
 
   // Queries
   const { data: courseResponse, isLoading: courseLoading } = useQuery({
@@ -988,23 +1009,40 @@ export default function AdminCourseEditorPage({
                       onChange={(e) =>
                         setLessonForm({ ...lessonForm, videoUrl: e.target.value })
                       }
-                      placeholder="https://youtube.com/watch?v=..."
+                      onBlur={(e) => {
+                        const url = e.target.value;
+                        if (url && lessonForm.videoDuration === 0) {
+                          extractVideoDuration(url);
+                        }
+                      }}
+                      placeholder="https://example.com/video.mp4 or YouTube URL"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Duration auto-detects for direct video URLs (mp4, webm)
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="videoDuration">Duration (minutes)</Label>
-                    <Input
-                      id="videoDuration"
-                      type="number"
-                      min="0"
-                      value={lessonForm.videoDuration}
-                      onChange={(e) =>
-                        setLessonForm({
-                          ...lessonForm,
-                          videoDuration: parseInt(e.target.value) || 0,
-                        })
-                      }
-                    />
+                    <div className="relative">
+                      <Input
+                        id="videoDuration"
+                        type="number"
+                        min="0"
+                        value={lessonForm.videoDuration}
+                        onChange={(e) =>
+                          setLessonForm({
+                            ...lessonForm,
+                            videoDuration: parseInt(e.target.value) || 0,
+                          })
+                        }
+                        disabled={durationLoading}
+                      />
+                      {durationLoading && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <Clock className="h-4 w-4 animate-spin text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

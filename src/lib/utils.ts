@@ -255,3 +255,76 @@ export function normalizeUploadUrl(url: string | undefined | null): string | und
 
   return url;
 }
+
+/**
+ * Extract video duration from a video URL using HTML5 video element.
+ * Works with direct video URLs (mp4, webm, etc.) but NOT YouTube/Vimeo.
+ * @param url - The video URL to extract duration from
+ * @returns Promise resolving to duration in minutes (rounded), or null if extraction fails
+ */
+export function getVideoDuration(url: string): Promise<number | null> {
+  return new Promise((resolve) => {
+    if (!url || typeof url !== "string") {
+      resolve(null);
+      return;
+    }
+
+    // Skip YouTube and Vimeo URLs - they require API integration
+    if (
+      url.includes("youtube.com") ||
+      url.includes("youtu.be") ||
+      url.includes("vimeo.com")
+    ) {
+      resolve(null);
+      return;
+    }
+
+    // Transform the URL if it's a relative path
+    const fullUrl = getMediaUrl(url) || url;
+
+    const video = document.createElement("video");
+    video.preload = "metadata";
+
+    const cleanup = () => {
+      video.removeAttribute("src");
+      video.load();
+    };
+
+    video.onloadedmetadata = () => {
+      const durationInSeconds = video.duration;
+      cleanup();
+      
+      if (isFinite(durationInSeconds) && durationInSeconds > 0) {
+        // Return duration in minutes, rounded to nearest minute
+        resolve(Math.round(durationInSeconds / 60));
+      } else {
+        resolve(null);
+      }
+    };
+
+    video.onerror = () => {
+      cleanup();
+      resolve(null);
+    };
+
+    // Timeout after 10 seconds
+    const timeout = setTimeout(() => {
+      cleanup();
+      resolve(null);
+    }, 10000);
+
+    video.onloadedmetadata = () => {
+      clearTimeout(timeout);
+      const durationInSeconds = video.duration;
+      cleanup();
+      
+      if (isFinite(durationInSeconds) && durationInSeconds > 0) {
+        resolve(Math.round(durationInSeconds / 60));
+      } else {
+        resolve(null);
+      }
+    };
+
+    video.src = fullUrl;
+  });
+}
