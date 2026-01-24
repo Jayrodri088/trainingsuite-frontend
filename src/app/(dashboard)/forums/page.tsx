@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Clock,
 } from "lucide-react";
+import { T, useT } from "@/components/t";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,7 @@ import type { Forum, User } from "@/types";
 import { formatDistanceToNow, parseISO } from "date-fns";
 
 export default function ForumsPage() {
+  const t = useT();
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: forumsData, isLoading } = useQuery({
@@ -67,7 +69,7 @@ export default function ForumsPage() {
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="font-heading font-bold uppercase text-base truncate group-hover:text-primary transition-colors">{forum.title}</h3>
                   {forum.isGeneral && (
-                    <Badge variant="secondary" className="rounded-none text-[10px] font-bold uppercase tracking-wider border-0 bg-muted text-muted-foreground">General</Badge>
+                    <Badge variant="secondary" className="rounded-none text-[10px] font-bold uppercase tracking-wider border-0 bg-muted text-muted-foreground"><T>General</T></Badge>
                   )}
                 </div>
                 {forum.description && (
@@ -78,7 +80,7 @@ export default function ForumsPage() {
                 <div className="flex items-center gap-6 text-xs text-muted-foreground font-mono uppercase tracking-wide">
                   <div className="flex items-center gap-2">
                     <MessageCircle className="h-4 w-4" />
-                    <span>{forum.postCount || 0} posts</span>
+                    <span>{forum.postCount || 0} <T>posts</T></span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
@@ -98,9 +100,9 @@ export default function ForumsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">Community Forums</h1>
+          <h1 className="text-3xl font-heading font-bold uppercase tracking-tight"><T>Community Forums</T></h1>
           <p className="text-muted-foreground mt-1">
-            Connect with fellow learners and instructors.
+            <T>Connect with fellow learners and instructors.</T>
           </p>
         </div>
       </div>
@@ -109,7 +111,7 @@ export default function ForumsPage() {
       <div className="relative max-w-lg">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search forums..."
+          placeholder={t("Search forums...")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-9 rounded-none border-border bg-muted/20 focus:bg-background transition-colors"
@@ -126,7 +128,7 @@ export default function ForumsPage() {
               </div>
               <div>
                 <p className="text-3xl font-light text-foreground">{forums.length}</p>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Total Forums</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1"><T>Total Forums</T></p>
               </div>
             </div>
           </CardContent>
@@ -141,7 +143,7 @@ export default function ForumsPage() {
                 <p className="text-3xl font-light text-foreground">
                   {forums.reduce((acc, f) => acc + (f.postCount || 0), 0)}
                 </p>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Total Discussions</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1"><T>Total Discussions</T></p>
               </div>
             </div>
           </CardContent>
@@ -154,7 +156,7 @@ export default function ForumsPage() {
               </div>
               <div>
                 <p className="text-3xl font-light text-foreground">{forums.filter((f) => f.isActive).length}</p>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Active Forums</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1"><T>Active Forums</T></p>
               </div>
             </div>
           </CardContent>
@@ -176,9 +178,9 @@ export default function ForumsPage() {
             <div className="h-16 w-16 mx-auto mb-6 border border-border bg-background flex items-center justify-center text-muted-foreground">
               <MessageSquare className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-heading font-bold uppercase tracking-wide">No forums available</h3>
+            <h3 className="text-xl font-heading font-bold uppercase tracking-wide"><T>No forums available</T></h3>
             <p className="text-muted-foreground mt-2 text-sm">
-              Forums will appear here once they are created.
+              <T>Forums will appear here once they are created.</T>
             </p>
           </CardContent>
         </Card>
@@ -189,7 +191,7 @@ export default function ForumsPage() {
             <section className="space-y-4">
               <h2 className="text-xl font-heading font-bold uppercase tracking-wide flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                General Forums
+                <T>General Forums</T>
               </h2>
               <div className="grid gap-6 md:grid-cols-2">
                 {filteredGeneralForums.map((forum) => (
@@ -204,7 +206,7 @@ export default function ForumsPage() {
             <section className="space-y-4">
               <h2 className="text-xl font-heading font-bold uppercase tracking-wide flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                Course Forums
+                <T>Course Forums</T>
               </h2>
               <div className="grid gap-6 md:grid-cols-2">
                 {filteredCourseForums.map((forum) => (
@@ -220,9 +222,9 @@ export default function ForumsPage() {
                 <div className="h-16 w-16 mx-auto mb-6 border border-border bg-background flex items-center justify-center text-muted-foreground">
                   <Search className="h-8 w-8" />
                 </div>
-                <h3 className="text-xl font-heading font-bold uppercase tracking-wide">No forums found</h3>
+                <h3 className="text-xl font-heading font-bold uppercase tracking-wide"><T>No forums found</T></h3>
                 <p className="text-muted-foreground mt-2 text-sm">
-                  Try adjusting your search query.
+                  <T>Try adjusting your search query.</T>
                 </p>
               </CardContent>
             </Card>

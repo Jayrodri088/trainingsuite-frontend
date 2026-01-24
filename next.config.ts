@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  // Disable Turbopack for production builds to ensure standalone output is generated correctly
+  // Turbopack is still used for development (next dev --turbopack)
+  experimental: {
+    // This ensures webpack is used for production builds
+  },
   images: {
     remotePatterns: [
       {

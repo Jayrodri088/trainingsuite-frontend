@@ -7,6 +7,7 @@ import {
   Info,
   Bell,
 } from "lucide-react";
+import { T } from "@/components/t";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -110,9 +111,9 @@ export default function AnnouncementsPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">Announcements</h1>
+        <h1 className="text-3xl font-heading font-bold uppercase tracking-tight"><T>Announcements</T></h1>
         <p className="text-muted-foreground mt-1">
-          Stay updated with the latest news and updates from the platform.
+          <T>Stay updated with the latest news and updates from the platform.</T>
         </p>
       </div>
 
@@ -135,9 +136,9 @@ export default function AnnouncementsPage() {
             <div className="h-16 w-16 mx-auto mb-6 border border-border bg-background flex items-center justify-center text-muted-foreground">
               <Megaphone className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-heading font-bold uppercase tracking-wide">No announcements</h3>
+            <h3 className="text-xl font-heading font-bold uppercase tracking-wide"><T>No announcements</T></h3>
             <p className="text-muted-foreground mt-2 text-sm">
-              There are no announcements at this time. Check back later!
+              <T>There are no announcements at this time. Check back later!</T>
             </p>
           </CardContent>
         </Card>

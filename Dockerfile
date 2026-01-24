@@ -16,13 +16,16 @@ WORKDIR /app
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+# Disable Turbopack to ensure standalone output is generated correctly
+ENV TURBOPACK=0
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build the application and clean up in one layer to reduce size
-RUN npm run build && \
+# Build the application using webpack (not turbopack) and clean up in one layer to reduce size
+# The --no-turbopack flag ensures standalone output is generated
+RUN npx next build --no-turbopack && \
     rm -rf node_modules/.cache && \
     rm -rf .next/cache
 

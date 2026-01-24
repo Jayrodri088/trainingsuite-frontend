@@ -17,6 +17,7 @@ import {
   Loader2,
   Heart,
 } from "lucide-react";
+import { T, useT } from "@/components/t";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,6 +50,7 @@ export default function ForumDetailPage() {
   const params = useParams();
   const forumId = params.id as string;
   const { toast } = useToast();
+  const t = useT();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -71,10 +73,10 @@ export default function ForumDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["forum-posts", forumId] });
       setDialogOpen(false);
       setNewPost({ title: "", content: "" });
-      toast({ title: "Post created successfully!" });
+      toast({ title: t("Post created successfully!") });
     },
     onError: () => {
-      toast({ title: "Failed to create post", variant: "destructive" });
+      toast({ title: t("Failed to create post"), variant: "destructive" });
     },
   });
 
@@ -97,7 +99,7 @@ export default function ForumDetailPage() {
   const handleSubmitPost = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPost.title.trim() || !newPost.content.trim()) {
-      toast({ title: "Please fill in all fields", variant: "destructive" });
+      toast({ title: t("Please fill in all fields"), variant: "destructive" });
       return;
     }
     createPostMutation.mutate(newPost);
@@ -123,12 +125,12 @@ export default function ForumDetailPage() {
     return (
       <div className="text-center py-12">
         <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h2 className="text-lg font-medium">Forum not found</h2>
+        <h2 className="text-lg font-medium"><T>Forum not found</T></h2>
         <p className="text-muted-foreground mt-1">
-          This forum may have been removed or doesn't exist.
+          <T>This forum may have been removed or doesn&apos;t exist.</T>
         </p>
         <Button asChild className="mt-4">
-          <Link href="/forums">Back to Forums</Link>
+          <Link href="/forums"><T>Back to Forums</T></Link>
         </Button>
       </div>
     );
@@ -146,7 +148,7 @@ export default function ForumDetailPage() {
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">{forum.title}</h1>
-            {forum.isGeneral && <Badge variant="secondary">General</Badge>}
+            {forum.isGeneral && <Badge variant="secondary"><T>General</T></Badge>}
           </div>
           {forum.description && (
             <p className="text-muted-foreground">{forum.description}</p>
@@ -154,7 +156,7 @@ export default function ForumDetailPage() {
         </div>
         <Button onClick={() => setDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          New Discussion
+          <T>New Discussion</T>
         </Button>
       </div>
 
@@ -163,14 +165,14 @@ export default function ForumDetailPage() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search discussions..."
+            placeholder={t("Search discussions...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
           />
         </div>
         <p className="text-sm text-muted-foreground">
-          {sortedPosts.length} discussion{sortedPosts.length !== 1 ? "s" : ""}
+          {sortedPosts.length} {sortedPosts.length !== 1 ? <T>discussions</T> : <T>discussion</T>}
         </p>
       </div>
 
@@ -179,16 +181,16 @@ export default function ForumDetailPage() {
         <Card className="py-12">
           <CardContent className="text-center">
             <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium">No discussions yet</h3>
+            <h3 className="text-lg font-medium"><T>No discussions yet</T></h3>
             <p className="text-muted-foreground mt-1">
               {searchQuery
-                ? "No discussions match your search"
-                : "Be the first to start a discussion!"}
+                ? <T>No discussions match your search</T>
+                : <T>Be the first to start a discussion!</T>}
             </p>
             {!searchQuery && (
               <Button onClick={() => setDialogOpen(true)} className="mt-4">
                 <Plus className="h-4 w-4 mr-2" />
-                Start a Discussion
+                <T>Start a Discussion</T>
               </Button>
             )}
           </CardContent>
@@ -253,30 +255,30 @@ export default function ForumDetailPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Start a New Discussion</DialogTitle>
+            <DialogTitle><T>Start a New Discussion</T></DialogTitle>
             <DialogDescription>
-              Create a new discussion topic in {forum.title}.
+              <T>Create a new discussion topic in</T> {forum.title}.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmitPost}>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title"><T>Title</T></Label>
                 <Input
                   id="title"
                   value={newPost.title}
                   onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                  placeholder="Discussion title"
+                  placeholder={t("Discussion title")}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="content">Content</Label>
+                <Label htmlFor="content"><T>Content</T></Label>
                 <Textarea
                   id="content"
                   value={newPost.content}
                   onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-                  placeholder="Share your thoughts..."
+                  placeholder={t("Share your thoughts...")}
                   rows={6}
                   required
                 />
@@ -284,16 +286,16 @@ export default function ForumDetailPage() {
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancel
+                <T>Cancel</T>
               </Button>
               <Button type="submit" disabled={createPostMutation.isPending}>
                 {createPostMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Posting...
+                    <T>Posting...</T>
                   </>
                 ) : (
-                  "Post Discussion"
+                  <T>Post Discussion</T>
                 )}
               </Button>
             </DialogFooter>

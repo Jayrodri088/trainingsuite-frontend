@@ -20,6 +20,7 @@ import {
   ThumbsUp,
   Heart,
 } from "lucide-react";
+import { T, useT } from "@/components/t";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +52,7 @@ export default function PostDetailPage() {
   const postId = params.postId as string;
   const { toast } = useToast();
   const { user } = useAuth();
+  const t = useT();
   const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
@@ -97,10 +99,10 @@ export default function PostDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["post-comments", postId] });
       setNewComment("");
       setReplyTo(null);
-      toast({ title: "Comment added!" });
+      toast({ title: t("Comment added!") });
     },
     onError: () => {
-      toast({ title: "Failed to add comment", variant: "destructive" });
+      toast({ title: t("Failed to add comment"), variant: "destructive" });
     },
   });
 
@@ -138,7 +140,7 @@ export default function PostDetailPage() {
         }
         return newSet;
       });
-      toast({ title: "Failed to update like", variant: "destructive" });
+      toast({ title: t("Failed to update like"), variant: "destructive" });
     },
   });
 
@@ -176,14 +178,14 @@ export default function PostDetailPage() {
         }
         return newSet;
       });
-      toast({ title: "Failed to update like", variant: "destructive" });
+      toast({ title: t("Failed to update like"), variant: "destructive" });
     },
   });
 
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) {
-      toast({ title: "Please enter a comment", variant: "destructive" });
+      toast({ title: t("Please enter a comment"), variant: "destructive" });
       return;
     }
     createCommentMutation.mutate({
@@ -218,12 +220,12 @@ export default function PostDetailPage() {
     return (
       <div className="text-center py-12">
         <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h2 className="text-lg font-medium">Post not found</h2>
+        <h2 className="text-lg font-medium"><T>Post not found</T></h2>
         <p className="text-muted-foreground mt-1">
-          This post may have been removed or doesn't exist.
+          <T>This post may have been removed or doesn&apos;t exist.</T>
         </p>
         <Button asChild className="mt-4">
-          <Link href={`/forums/${forumId}`}>Back to Forum</Link>
+          <Link href={`/forums/${forumId}`}><T>Back to Forum</T></Link>
         </Button>
       </div>
     );
@@ -250,7 +252,7 @@ export default function PostDetailPage() {
                   {formatDistanceToNow(parseISO(comment.createdAt), { addSuffix: true })}
                 </span>
                 {comment.isEdited && (
-                  <span className="text-xs text-muted-foreground">(edited)</span>
+                  <span className="text-xs text-muted-foreground">(<T>edited</T>)</span>
                 )}
               </div>
               <p className="text-sm whitespace-pre-wrap">{comment.content}</p>
@@ -271,7 +273,7 @@ export default function PostDetailPage() {
                   onClick={() => setReplyTo(comment)}
                 >
                   <Reply className="h-3 w-3 mr-1" />
-                  Reply
+                  <T>Reply</T>
                 </Button>
                 {isOwner && (
                   <DropdownMenu>
@@ -283,11 +285,11 @@ export default function PostDetailPage() {
                     <DropdownMenuContent align="start">
                       <DropdownMenuItem>
                         <Edit className="h-4 w-4 mr-2" />
-                        Edit
+                        <T>Edit</T>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="text-red-600">
                         <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
+                        <T>Delete</T>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -353,15 +355,15 @@ export default function PostDetailPage() {
                   onClick={() => likePostMutation.mutate(post._id)}
                 >
                   <Heart className={`h-4 w-4 mr-1 ${likedPosts.has(post._id) ? "fill-red-500" : ""}`} />
-                  <span>{post.likes || 0} likes</span>
+                  <span>{post.likes || 0} <T>likes</T></span>
                 </Button>
                 <div className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
-                  <span>{post.viewCount || 0} views</span>
+                  <span>{post.viewCount || 0} <T>views</T></span>
                 </div>
                 <div className="flex items-center gap-1">
                   <MessageSquare className="h-4 w-4" />
-                  <span>{comments.length} comments</span>
+                  <span>{comments.length} <T>comments</T></span>
                 </div>
               </div>
             </div>
@@ -373,34 +375,34 @@ export default function PostDetailPage() {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">
-            {replyTo ? `Reply to ${replyTo.user?.name}` : "Add a Comment"}
+            {replyTo ? <><T>Reply to</T> {replyTo.user?.name}</> : <T>Add a Comment</T>}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {post.isLocked ? (
             <div className="text-center py-4 text-muted-foreground">
               <Lock className="h-8 w-8 mx-auto mb-2" />
-              <p>This discussion is locked and no longer accepting comments.</p>
+              <p><T>This discussion is locked and no longer accepting comments.</T></p>
             </div>
           ) : (
             <form onSubmit={handleSubmitComment} className="space-y-3">
               {replyTo && (
                 <div className="flex items-center justify-between p-2 bg-muted rounded-lg text-sm">
-                  <span>Replying to: "{replyTo.content.substring(0, 50)}..."</span>
+                  <span><T>Replying to:</T> &quot;{replyTo.content.substring(0, 50)}...&quot;</span>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     onClick={() => setReplyTo(null)}
                   >
-                    Cancel
+                    <T>Cancel</T>
                   </Button>
                 </div>
               )}
               <Textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Write your comment..."
+                placeholder={t("Write your comment...")}
                 rows={3}
               />
               <div className="flex justify-end">
@@ -408,12 +410,12 @@ export default function PostDetailPage() {
                   {createCommentMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Posting...
+                      <T>Posting...</T>
                     </>
                   ) : (
                     <>
                       <Send className="h-4 w-4 mr-2" />
-                      Post Comment
+                      <T>Post Comment</T>
                     </>
                   )}
                 </Button>
@@ -427,14 +429,14 @@ export default function PostDetailPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">
-            Comments ({comments.length})
+            <T>Comments</T> ({comments.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
           {comments.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>No comments yet. Be the first to comment!</p>
+              <p><T>No comments yet. Be the first to comment!</T></p>
             </div>
           ) : (
             <div className="divide-y">
