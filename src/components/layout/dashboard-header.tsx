@@ -31,6 +31,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useNotifications, useMarkAsRead } from "@/hooks";
 import { getInitials } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { LanguageSelector } from "@/components/language-selector";
 
 interface DashboardHeaderProps {
   onMenuClick?: () => void;
@@ -90,6 +91,9 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 
       {/* Right side */}
       <div className="flex items-center gap-2 ml-auto">
+        {/* Language Selector */}
+        <LanguageSelector />
+
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

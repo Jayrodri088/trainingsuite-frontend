@@ -34,6 +34,8 @@ import { useNotifications, useMarkAsRead } from "@/hooks";
 import { getInitials } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { LanguageSelector, LanguageSelectorCompact } from "@/components/language-selector";
+import { useTranslation } from "@/contexts/translation-context";
 
 const publicNavItems = [
   { label: "Home", href: "/" },
@@ -117,6 +119,11 @@ export function Header() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </form>
+
+          {/* Language Selector */}
+          <div className="hidden sm:block">
+            <LanguageSelector />
+          </div>
 
           {isAuthenticated && user ? (
             <>
@@ -308,6 +315,12 @@ export function Header() {
                         </Button>
                       </div>
                     )}
+
+                    {/* Language Selector in Mobile */}
+                    <div className="pt-6 border-t border-border">
+                      <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Language</div>
+                      <LanguageSelectorCompact />
+                    </div>
                   </div>
                 </div>
               </div>
