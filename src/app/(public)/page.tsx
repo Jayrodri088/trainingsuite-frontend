@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   BookOpen,
@@ -8,13 +9,18 @@ import {
   Award,
   Star,
   Check,
+  Radio,
+  Calendar,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCourses, useAuth, useEnrollments } from "@/hooks";
-import type { Course, Enrollment } from "@/types";
+import { liveSessionsApi } from "@/lib/api/live-sessions";
+import type { Course, Enrollment, LiveSession } from "@/types";
 import { cn, normalizeUploadUrl } from "@/lib/utils";
+import { format, parseISO } from "date-fns";
 
 function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrollment }) {
   const isEnrolled = !!enrollment;
@@ -107,6 +113,119 @@ function CourseCardSkeleton() {
   );
 }
 
+function LiveSessionCard({ session }: { session: LiveSession }) {
+  const isLive = session.status === "live";
+  const isScheduled = session.status === "scheduled";
+
+  return (
+    <Link href={`/live-sessions/${session._id}`} className="block h-full group">
+      <div className="h-full flex flex-col border border-border bg-card transition-colors hover:border-foreground/50 relative overflow-hidden">
+        {/* Live indicator */}
+        {isLive && (
+          <div className="absolute top-0 left-0 right-0 h-1 bg-red-600 animate-pulse" />
+        )}
+
+        {/* Thumbnail or placeholder */}
+        <div className="relative aspect-video bg-muted border-b border-border flex items-center justify-center overflow-hidden">
+          {normalizeUploadUrl(session.thumbnail) ? (
+            <img
+              src={normalizeUploadUrl(session.thumbnail)}
+              alt={session.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 to-neutral-800 flex items-center justify-center">
+              <Radio className="h-12 w-12 text-white/20" />
+            </div>
+          )}
+
+          {/* Status badge */}
+          <div className="absolute top-3 right-3 z-10">
+            {isLive ? (
+              <Badge className="bg-red-600 text-white font-bold rounded-none border-0 uppercase text-[10px] tracking-wider animate-pulse">
+                <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block animate-pulse" />
+                Live Now
+              </Badge>
+            ) : isScheduled ? (
+              <Badge variant="outline" className="bg-background text-foreground font-medium rounded-none border-foreground/10 text-xs tracking-wide">
+                Upcoming
+              </Badge>
+            ) : null}
+          </div>
+
+          {/* Attendee count for live sessions */}
+          {isLive && session.attendeeCount > 0 && (
+            <div className="absolute bottom-3 left-3 z-10">
+              <Badge variant="secondary" className="bg-black/60 text-white rounded-none border-0 text-xs">
+                <Users className="h-3 w-3 mr-1" />
+                {session.attendeeCount} watching
+              </Badge>
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col flex-1 p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Calendar className="h-3 w-3" />
+              <span>{format(parseISO(session.scheduledAt), "MMM d, yyyy")}</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
+              {isLive ? "Live Stream" : "Live Session"}
+            </span>
+          </div>
+
+          <h3 className="text-xl font-heading font-bold text-foreground mb-3 leading-tight group-hover:underline decoration-1 underline-offset-4">
+            {session.title}
+          </h3>
+
+          {session.description && (
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+              {session.description}
+            </p>
+          )}
+
+          <div className="mt-auto pt-4">
+            {isLive ? (
+              <Button className="w-full rounded-none h-9 text-xs uppercase tracking-wide bg-red-600 hover:bg-red-700 text-white">
+                <Radio className="h-3 w-3 mr-2 animate-pulse" />
+                Join Live
+              </Button>
+            ) : isScheduled ? (
+              <div className="flex items-center text-sm font-medium text-foreground/70 group-hover:text-foreground transition-colors">
+                <Clock className="h-4 w-4 mr-2" />
+                <span>{format(parseISO(session.scheduledAt), "h:mm a")}</span>
+                <ArrowRight className="ml-auto h-4 w-4" />
+              </div>
+            ) : (
+              <div className="flex items-center text-sm font-medium text-muted-foreground">
+                <span>View Recording</span>
+                <ArrowRight className="ml-auto h-4 w-4" />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function LiveSessionCardSkeleton() {
+  return (
+    <div className="border border-border h-full bg-card">
+      <Skeleton className="aspect-video w-full rounded-none" />
+      <div className="p-6 space-y-4">
+        <Skeleton className="h-4 w-24 rounded-none" />
+        <Skeleton className="h-6 w-full rounded-none" />
+        <Skeleton className="h-4 w-3/4 rounded-none" />
+        <div className="pt-4 mt-auto">
+          <Skeleton className="h-9 w-full rounded-none" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const { isAuthenticated } = useAuth();
   const { data: coursesResponse, isLoading } = useCourses({
@@ -117,8 +236,30 @@ export default function HomePage() {
   });
   const { data: enrollmentsResponse } = useEnrollments();
 
+  // Fetch live sessions (live first, then scheduled)
+  const { data: liveSessionsResponse, isLoading: isLoadingLiveSessions } = useQuery({
+    queryKey: ["home-live-sessions"],
+    queryFn: () => liveSessionsApi.getAll(1, 10),
+    refetchInterval: 30000, // Refetch every 30 seconds to catch new live sessions
+  });
+
   const courses = coursesResponse?.data || [];
   const enrollments = enrollmentsResponse?.data || [];
+  const liveSessions = liveSessionsResponse?.data || [];
+
+  // Sort live sessions: live first, then scheduled by date
+  const sortedLiveSessions = [...liveSessions]
+    .filter(s => s.status === "live" || s.status === "scheduled")
+    .sort((a, b) => {
+      if (a.status === "live" && b.status !== "live") return -1;
+      if (a.status !== "live" && b.status === "live") return 1;
+      return new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime();
+    })
+    .slice(0, 4);
+
+  const hasLiveSessions = sortedLiveSessions.length > 0;
+  const hasLiveNow = sortedLiveSessions.some(s => s.status === "live");
+
   const enrollmentMap = new Map<string, Enrollment>();
 
   if (enrollments) {
@@ -237,6 +378,45 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* Live Sessions Section - Only show if there are live or upcoming sessions */}
+      {(hasLiveSessions || isLoadingLiveSessions) && (
+        <section className="py-24 md:py-32 border-t border-border bg-muted/5">
+          <div className="container max-w-7xl px-4 md:px-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+              <div className="max-w-2xl">
+                <div className="flex items-center gap-3 mb-4">
+                  {hasLiveNow && (
+                    <Badge className="bg-red-600 text-white font-bold rounded-none border-0 uppercase text-[10px] tracking-wider animate-pulse">
+                      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block animate-pulse" />
+                      Live Now
+                    </Badge>
+                  )}
+                </div>
+                <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6">Live Sessions</h2>
+                <p className="text-lg text-muted-foreground font-light">Join real-time interactive sessions with our leadership and ministry team.</p>
+              </div>
+              <Link href="/live-sessions" className="hidden md:flex items-center text-sm font-bold uppercase tracking-widest hover:text-muted-foreground transition-colors">
+                All Sessions <ArrowRight className="ml-3 h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {isLoadingLiveSessions ? (
+                Array.from({ length: 4 }).map((_, i) => <LiveSessionCardSkeleton key={i} />)
+              ) : sortedLiveSessions.length > 0 ? (
+                sortedLiveSessions.map((session) => (
+                  <LiveSessionCard key={session._id} session={session} />
+                ))
+              ) : null}
+            </div>
+
+            <Link href="/live-sessions" className="md:hidden mt-8 flex items-center justify-center h-12 border border-border text-sm font-bold uppercase tracking-widest hover:bg-secondary transition-colors">
+              All Sessions <ArrowRight className="ml-3 h-4 w-4" />
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Statement Section */}
       <section className="py-32 bg-foreground text-background border-t border-border">

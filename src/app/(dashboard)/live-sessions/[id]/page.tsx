@@ -75,6 +75,24 @@ export default function LiveSessionDetailPage() {
 
   const session = sessionData?.data;
 
+  // Auto-join when session is live (silent join without toast)
+  useEffect(() => {
+    if (!session) return;
+    if (session.status === "live" && !hasJoined) {
+      // Use mutate with callbacks to handle silently
+      liveSessionsApi.join(sessionId)
+        .then(() => {
+          setHasJoined(true);
+          // Refetch to get updated attendee count
+          refetch();
+        })
+        .catch(() => {
+          // Silently mark as joined even on error (user is still watching)
+          setHasJoined(true);
+        });
+    }
+  }, [session?.status, sessionId, hasJoined, refetch]);
+
   // Countdown timer for scheduled sessions
   useEffect(() => {
     if (!session) return;
@@ -215,8 +233,8 @@ export default function LiveSessionDetailPage() {
             url={videoUrl}
             title={session.title}
             isLive={isLive}
-            autoplay={false}
-            muted={false}
+            autoplay={isLive}
+            muted={isLive}
             controls={true}
             onReady={() => {
               // If we're playing and status is still scheduled, it means auto-start worked
