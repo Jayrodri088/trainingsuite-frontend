@@ -877,7 +877,7 @@ export default function AdminCourseEditorPage({
 
       {/* Module Dialog */}
       <Dialog open={moduleDialogOpen} onOpenChange={setModuleDialogOpen}>
-        <DialogContent>
+        <DialogContent className="w-[95vw] max-w-md">
           <DialogHeader>
             <DialogTitle>
               {editingModule ? "Edit Module" : "Add New Module"}
@@ -915,11 +915,12 @@ export default function AdminCourseEditorPage({
                 />
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setModuleDialogOpen(false)}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
@@ -928,6 +929,7 @@ export default function AdminCourseEditorPage({
                 disabled={
                   createModuleMutation.isPending || updateModuleMutation.isPending
                 }
+                className="w-full sm:w-auto"
               >
                 {(createModuleMutation.isPending || updateModuleMutation.isPending) && (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -941,7 +943,7 @@ export default function AdminCourseEditorPage({
 
       {/* Lesson Dialog */}
       <Dialog open={lessonDialogOpen} onOpenChange={setLessonDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingLesson ? "Edit Lesson" : "Add New Lesson"}
@@ -953,8 +955,8 @@ export default function AdminCourseEditorPage({
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleLessonSubmit}>
-            <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
-              <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-4 py-4">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="lessonTitle">Title *</Label>
                   <Input
@@ -1000,7 +1002,7 @@ export default function AdminCourseEditorPage({
               </div>
 
               {lessonForm.type === "video" && (
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="videoUrl">Video URL</Label>
                     <Input
@@ -1062,15 +1064,17 @@ export default function AdminCourseEditorPage({
                 </div>
               )}
 
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="isFree"
-                  checked={lessonForm.isFree}
-                  onCheckedChange={(checked) =>
-                    setLessonForm({ ...lessonForm, isFree: checked })
-                  }
-                />
-                <Label htmlFor="isFree">Free Preview</Label>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="isFree"
+                    checked={lessonForm.isFree}
+                    onCheckedChange={(checked) =>
+                      setLessonForm({ ...lessonForm, isFree: checked })
+                    }
+                  />
+                  <Label htmlFor="isFree">Free Preview</Label>
+                </div>
                 <span className="text-sm text-muted-foreground">
                   (Allow non-enrolled users to access this lesson)
                 </span>
@@ -1150,11 +1154,12 @@ export default function AdminCourseEditorPage({
                 </div>
               )}
             </div>
-            <DialogFooter>
+            <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setLessonDialogOpen(false)}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
@@ -1163,6 +1168,7 @@ export default function AdminCourseEditorPage({
                 disabled={
                   createLessonMutation.isPending || updateLessonMutation.isPending
                 }
+                className="w-full sm:w-auto"
               >
                 {(createLessonMutation.isPending || updateLessonMutation.isPending) && (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
