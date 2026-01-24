@@ -42,6 +42,7 @@ import { coursesApi } from "@/lib/api/courses";
 import { enrollmentsApi } from "@/lib/api/enrollments";
 import { normalizeUploadUrl } from "@/lib/utils";
 import type { Course, Module, Lesson, Rating } from "@/types";
+import { T, useT } from "@/components/t";
 
 const levelColors = {
   beginner: "bg-green-100 text-green-800",
@@ -67,6 +68,7 @@ function CourseDetailSkeleton() {
 }
 
 function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean }) {
+  const { t } = useT();
   const getIcon = () => {
     if (lesson.type === "video") return <Video className="h-4 w-4" />;
     return <FileText className="h-4 w-4" />;
@@ -76,16 +78,16 @@ function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean })
     <div className="flex items-center justify-between py-2 px-3 rounded hover:bg-muted/50">
       <div className="flex items-center gap-3">
         <div className="text-muted-foreground">{getIcon()}</div>
-        <span className="text-sm">{lesson.title}</span>
+        <span className="text-sm">{t(lesson.title)}</span>
         {lesson.isFree && !isLocked && (
           <Badge variant="outline" className="text-xs">
-            Preview
+            <T>Preview</T>
           </Badge>
         )}
       </div>
       <div className="flex items-center gap-2 text-muted-foreground">
         {lesson.duration && lesson.duration > 0 && (
-          <span className="text-xs">{lesson.duration} min</span>
+          <span className="text-xs">{lesson.duration} <T>min</T></span>
         )}
         {isLocked && !lesson.isFree && <Lock className="h-3.5 w-3.5" />}
       </div>
@@ -94,6 +96,7 @@ function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean })
 }
 
 function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index: number; isEnrolled: boolean }) {
+  const { t } = useT();
   const lessons = (module.lessons || []) as Lesson[];
   const totalDuration = lessons.reduce((acc, lesson) => acc + (lesson.duration || 0), 0);
 
@@ -105,9 +108,9 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
             {index + 1}
           </div>
           <div>
-            <h4 className="font-medium text-sm">{module.title}</h4>
+            <h4 className="font-medium text-sm">{t(module.title)}</h4>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {lessons.length} lessons{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
+              {lessons.length} <T>lessons</T>{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
             </p>
           </div>
         </div>
@@ -130,7 +133,7 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
 function RatingBar({ rating, percentage }: { rating: number; percentage: number }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm w-12">{rating} star</span>
+      <span className="text-sm w-12">{rating} <T>star</T></span>
       <Progress value={percentage} className="h-2 flex-1" />
       <span className="text-sm text-muted-foreground w-10">{percentage}%</span>
     </div>
@@ -185,6 +188,7 @@ function ReviewForm({
   existingReview?: Rating;
   onSuccess: () => void;
 }) {
+  const { t } = useT();
   const { toast } = useToast();
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [review, setReview] = useState(existingReview?.review || "");
@@ -194,19 +198,19 @@ function ReviewForm({
     mutationFn: (data: { rating: number; review?: string }) =>
       coursesApi.createRating(courseId, data),
     onSuccess: () => {
-      toast({ title: existingReview ? "Review updated!" : "Review submitted!" });
+      toast({ title: existingReview ? t("Review updated!") : t("Review submitted!") });
       setIsEditing(false);
       onSuccess();
     },
     onError: () => {
-      toast({ title: "Failed to submit review", variant: "destructive" });
+      toast({ title: t("Failed to submit review"), variant: "destructive" });
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (rating === 0) {
-      toast({ title: "Please select a rating", variant: "destructive" });
+      toast({ title: t("Please select a rating"), variant: "destructive" });
       return;
     }
     submitMutation.mutate({ rating, review: review.trim() || undefined });
@@ -216,14 +220,14 @@ function ReviewForm({
     return (
       <div className="bg-muted/50 rounded-lg p-4">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="font-medium">Your Review</h4>
+          <h4 className="font-medium"><T>Your Review</T></h4>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsEditing(true)}
           >
             <Edit className="h-4 w-4 mr-1" />
-            Edit
+            <T>Edit</T>
           </Button>
         </div>
         <div className="flex gap-0.5 mb-2">
@@ -247,18 +251,18 @@ function ReviewForm({
   return (
     <form onSubmit={handleSubmit} className="bg-muted/50 rounded-lg p-4">
       <h4 className="font-medium mb-4">
-        {existingReview ? "Update your review" : "Leave a review"}
+        {existingReview ? <T>Update your review</T> : <T>Leave a review</T>}
       </h4>
       <div className="mb-4">
-        <p className="text-sm text-muted-foreground mb-2">Your rating</p>
+        <p className="text-sm text-muted-foreground mb-2"><T>Your rating</T></p>
         <StarRatingInput value={rating} onChange={setRating} />
       </div>
       <div className="mb-4">
-        <p className="text-sm text-muted-foreground mb-2">Your review (optional)</p>
+        <p className="text-sm text-muted-foreground mb-2"><T>Your review (optional)</T></p>
         <Textarea
           value={review}
           onChange={(e) => setReview(e.target.value)}
-          placeholder="Share your experience with this course..."
+          placeholder={t("Share your experience with this course...")}
           rows={4}
         />
       </div>
@@ -267,7 +271,7 @@ function ReviewForm({
           {submitMutation.isPending && (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           )}
-          {existingReview ? "Update Review" : "Submit Review"}
+          {existingReview ? <T>Update Review</T> : <T>Submit Review</T>}
         </Button>
         {existingReview && isEditing && (
           <Button
@@ -279,7 +283,7 @@ function ReviewForm({
               setReview(existingReview.review || "");
             }}
           >
-            Cancel
+            <T>Cancel</T>
           </Button>
         )}
       </div>
@@ -295,6 +299,7 @@ export default function CourseDetailPage({
   const resolvedParams = use(params);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { t } = useT();
   const { toast } = useToast();
   const { user, isAuthenticated } = useAuth();
   const { data: courseResponse, isLoading: courseLoading } = useCourse(resolvedParams.slug);
@@ -333,7 +338,7 @@ export default function CourseDetailPage({
   const enrollMutation = useMutation({
     mutationFn: (courseId: string) => coursesApi.enroll(courseId),
     onSuccess: () => {
-      toast({ title: "Successfully enrolled!" });
+      toast({ title: t("Successfully enrolled!") });
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
       queryClient.invalidateQueries({ queryKey: ["enrollment-check"] });
       const course = courseResponse?.data;
@@ -342,12 +347,12 @@ export default function CourseDetailPage({
       }
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.message || "Failed to enroll";
+      const message = error?.response?.data?.message || t("Failed to enroll");
       const status = error?.response?.status;
 
       // If 400 error with "already enrolled" message, redirect to learn page
       if (status === 400 && message.toLowerCase().includes("already")) {
-        toast({ title: "You're already enrolled! Redirecting..." });
+        toast({ title: t("You're already enrolled! Redirecting...") });
         queryClient.invalidateQueries({ queryKey: ["enrollment-check"] });
         const course = courseResponse?.data;
         if (course) {
@@ -364,7 +369,7 @@ export default function CourseDetailPage({
     if (!course) return;
 
     if (!isAuthenticated) {
-      toast({ title: "Please login to enroll", variant: "destructive" });
+      toast({ title: t("Please login to enroll"), variant: "destructive" });
       router.push(`/login?redirect=/courses/${resolvedParams.slug}`);
       return;
     }
@@ -395,13 +400,13 @@ export default function CourseDetailPage({
   if (!course) {
     return (
       <div className="container max-w-6xl py-16 text-center">
-        <h1 className="text-2xl font-bold">Course not found</h1>
+        <h1 className="text-2xl font-bold"><T>Course not found</T></h1>
         <p className="text-muted-foreground mt-2">
-          The course you're looking for doesn't exist or has been removed.
+          <T>The course you're looking for doesn't exist or has been removed.</T>
         </p>
         <Button className="mt-6" onClick={() => router.push("/courses")}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Courses
+          <T>Back to Courses</T>
         </Button>
       </div>
     );
@@ -463,42 +468,42 @@ export default function CourseDetailPage({
                 onClick={() => router.push("/courses")}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                All Courses
+                <T>All Courses</T>
               </Button>
 
               <div className="flex items-center gap-2 mb-4">
                 <Badge className={levelColors[course.level as keyof typeof levelColors] || "bg-gray-100 text-gray-800"}>
-                  {course.level}
+                  {t(course.level || "beginner")}
                 </Badge>
                 {course.category && typeof course.category === "object" && (
                   <Badge variant="outline" className="border-slate-500 text-slate-300">
-                    {course.category.name}
+                    {t(course.category.name)}
                   </Badge>
                 )}
                 {isEnrolled && (
                   <Badge className={isCompleted ? "bg-green-600 hover:bg-green-600" : "bg-blue-600 hover:bg-blue-600"}>
-                    {isCompleted ? "Completed" : `${enrollmentProgress}% Complete`}
+                    {isCompleted ? <T>Completed</T> : <>{enrollmentProgress}% <T>Complete</T></>}
                   </Badge>
                 )}
               </div>
 
               <h1 className="text-3xl font-bold tracking-tight mb-4">
-                {course.title}
+                {t(course.title)}
               </h1>
 
               <p className="text-slate-300 text-lg leading-relaxed mb-6">
-                {course.description}
+                {t(course.description || "")}
               </p>
 
               <div className="flex flex-wrap items-center gap-4 text-sm">
                 <div className="flex items-center gap-1 text-amber-400">
                   <Star className="h-4 w-4 fill-current" />
                   <span className="font-semibold">{course.rating?.toFixed(1) || "N/A"}</span>
-                  <span className="text-slate-400">({course.ratingCount || 0} ratings)</span>
+                  <span className="text-slate-400">({course.ratingCount || 0} <T>ratings</T>)</span>
                 </div>
                 <div className="flex items-center gap-1 text-slate-300">
                   <Users className="h-4 w-4" />
-                  <span>{(course.enrollmentCount || 0).toLocaleString()} students</span>
+                  <span>{(course.enrollmentCount || 0).toLocaleString()} <T>students</T></span>
                 </div>
                 {course.language && (
                   <div className="flex items-center gap-1 text-slate-300">
@@ -509,7 +514,7 @@ export default function CourseDetailPage({
                 {course.updatedAt && (
                   <div className="flex items-center gap-1 text-slate-300">
                     <Calendar className="h-4 w-4" />
-                    <span>Updated {new Date(course.updatedAt).toLocaleDateString()}</span>
+                    <span><T>Updated</T> {new Date(course.updatedAt).toLocaleDateString()}</span>
                   </div>
                 )}
               </div>
@@ -524,7 +529,7 @@ export default function CourseDetailPage({
                   {normalizeUploadUrl(course.thumbnail) && (
                     <img
                       src={normalizeUploadUrl(course.thumbnail)}
-                      alt={course.title}
+                      alt={t(course.title)}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
                   )}
@@ -535,10 +540,10 @@ export default function CourseDetailPage({
                       {/* Enrollment Status Badge */}
                       <div className="flex items-center justify-between">
                         <Badge className={isCompleted ? "bg-green-600" : "bg-blue-600"}>
-                          {isCompleted ? "Completed" : "In Progress"}
+                          {isCompleted ? <T>Completed</T> : <T>In Progress</T>}
                         </Badge>
                         <span className="text-sm text-muted-foreground">
-                          {enrollmentProgress}% complete
+                          {enrollmentProgress}% <T>complete</T>
                         </span>
                       </div>
 
@@ -551,7 +556,7 @@ export default function CourseDetailPage({
                       </div>
 
                       <Button size="lg" className={`w-full ${isCompleted ? "bg-green-600 hover:bg-green-700" : ""}`} onClick={handleGoToLearning}>
-                        {isCompleted ? "Review Course" : "Continue Learning"}
+                        {isCompleted ? <T>Review Course</T> : <T>Continue Learning</T>}
                       </Button>
                     </div>
                   ) : (
@@ -562,32 +567,32 @@ export default function CourseDetailPage({
                       disabled={enrollMutation.isPending}
                     >
                       {enrollMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                      Start Training
+                      <T>Start Training</T>
                     </Button>
                   )}
 
                   <div className="mt-6 space-y-3">
-                    <h4 className="font-semibold text-sm">This course includes:</h4>
+                    <h4 className="font-semibold text-sm"><T>This course includes:</T></h4>
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-center gap-2">
                         <Video className="h-4 w-4 text-muted-foreground" />
-                        <span>{totalDuration > 0 ? `${totalDuration} min of video` : "Video content"}</span>
+                        <span>{totalDuration > 0 ? <>{totalDuration} <T>min of video</T></> : <T>Video content</T>}</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4 text-muted-foreground" />
-                        <span>{totalLessons} lessons</span>
+                        <span>{totalLessons} <T>lessons</T></span>
                       </li>
                       <li className="flex items-center gap-2">
                         <FileText className="h-4 w-4 text-muted-foreground" />
-                        <span>Downloadable resources</span>
+                        <span><T>Downloadable resources</T></span>
                       </li>
                       <li className="flex items-center gap-2">
                         <Award className="h-4 w-4 text-muted-foreground" />
-                        <span>Certificate of completion</span>
+                        <span><T>Certificate of completion</T></span>
                       </li>
                       <li className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span>Full lifetime access</span>
+                        <span><T>Full lifetime access</T></span>
                       </li>
                     </ul>
                   </div>
@@ -604,18 +609,18 @@ export default function CourseDetailPage({
           <div className="lg:col-span-2">
             <Tabs defaultValue="curriculum" className="w-full">
               <TabsList className="mb-6 w-full justify-start overflow-x-auto flex-nowrap gap-2">
-                <TabsTrigger value="curriculum" className="shrink-0">Curriculum</TabsTrigger>
-                <TabsTrigger value="overview" className="shrink-0">Overview</TabsTrigger>
-                <TabsTrigger value="reviews" className="shrink-0">Reviews</TabsTrigger>
+                <TabsTrigger value="curriculum" className="shrink-0"><T>Curriculum</T></TabsTrigger>
+                <TabsTrigger value="overview" className="shrink-0"><T>Overview</T></TabsTrigger>
+                <TabsTrigger value="reviews" className="shrink-0"><T>Reviews</T></TabsTrigger>
               </TabsList>
 
               <TabsContent value="curriculum" className="mt-0">
                 <Card>
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Course Content</CardTitle>
+                      <CardTitle className="text-lg"><T>Course Content</T></CardTitle>
                       <p className="text-sm text-muted-foreground">
-                        {modules.length} modules &bull; {totalLessons} lessons{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
+                        {modules.length} <T>modules</T> &bull; {totalLessons} <T>lessons</T>{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
                       </p>
                     </div>
                   </CardHeader>
@@ -639,7 +644,7 @@ export default function CourseDetailPage({
                       </Accordion>
                     ) : (
                       <p className="text-center py-8 text-muted-foreground">
-                        Curriculum coming soon.
+                        <T>Curriculum coming soon.</T>
                       </p>
                     )}
                   </CardContent>
@@ -649,7 +654,7 @@ export default function CourseDetailPage({
               <TabsContent value="overview" className="mt-0">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Course Outcomes</CardTitle>
+                    <CardTitle className="text-lg"><T>Course Outcomes</T></CardTitle>
                   </CardHeader>
                   <CardContent>
                     {course.objectives && course.objectives.length > 0 ? (
@@ -657,22 +662,22 @@ export default function CourseDetailPage({
                         {course.objectives.map((outcome: string, index: number) => (
                           <li key={index} className="flex items-start gap-2">
                             <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                            <span className="text-sm">{outcome}</span>
+                            <span className="text-sm">{t(outcome)}</span>
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-muted-foreground">No course outcomes specified.</p>
+                      <p className="text-muted-foreground"><T>No course outcomes specified.</T></p>
                     )}
 
                     {course.requirements && course.requirements.length > 0 && (
                       <div className="mt-8">
-                        <h3 className="font-semibold mb-4">Requirements</h3>
+                        <h3 className="font-semibold mb-4"><T>Requirements</T></h3>
                         <ul className="space-y-2">
                           {course.requirements.map((req: string, index: number) => (
                             <li key={index} className="flex items-start gap-2">
                               <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
-                              <span className="text-sm">{req}</span>
+                              <span className="text-sm">{t(req)}</span>
                             </li>
                           ))}
                         </ul>
@@ -685,7 +690,7 @@ export default function CourseDetailPage({
               <TabsContent value="reviews" className="mt-0">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Student Reviews</CardTitle>
+                    <CardTitle className="text-lg"><T>Student Reviews</T></CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid md:grid-cols-[200px,1fr] gap-8">
@@ -706,7 +711,7 @@ export default function CourseDetailPage({
                           ))}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Based on {course.ratingCount || 0} reviews
+                          <T>Based on</T> {course.ratingCount || 0} <T>reviews</T>
                         </p>
                       </div>
 
@@ -729,19 +734,19 @@ export default function CourseDetailPage({
                       ) : isAuthenticated ? (
                         <div className="bg-muted/50 rounded-lg p-4 text-center">
                           <p className="text-muted-foreground mb-3">
-                            Enroll in this course to leave a review
+                            <T>Enroll in this course to leave a review</T>
                           </p>
                           <Button onClick={handleEnroll}>
-                            Start Training
+                            <T>Start Training</T>
                           </Button>
                         </div>
                       ) : (
                         <div className="bg-muted/50 rounded-lg p-4 text-center">
                           <p className="text-muted-foreground mb-3">
-                            Sign in to leave a review
+                            <T>Sign in to leave a review</T>
                           </p>
                           <Button asChild>
-                            <Link href="/login">Sign In</Link>
+                            <Link href="/login"><T>Sign In</T></Link>
                           </Button>
                         </div>
                       )}
@@ -762,7 +767,7 @@ export default function CourseDetailPage({
                                 </Avatar>
                                 <div className="flex-1">
                                   <div className="flex items-center justify-between">
-                                    <h4 className="font-medium">{rating.user?.name || "Anonymous"}</h4>
+                                    <h4 className="font-medium">{rating.user?.name || t("Anonymous")}</h4>
                                     <span className="text-sm text-muted-foreground">
                                       {new Date(rating.createdAt).toLocaleDateString()}
                                     </span>
@@ -790,7 +795,7 @@ export default function CourseDetailPage({
                       </div>
                     ) : !userReview ? (
                       <p className="text-center py-8 text-muted-foreground mt-6">
-                        No reviews yet. Be the first to review this course!
+                        <T>No reviews yet. Be the first to review this course!</T>
                       </p>
                     ) : null}
                   </CardContent>
@@ -818,6 +823,7 @@ function RelatedCourses({
   categoryId?: string;
   currentCourseId: string;
 }) {
+  const { t } = useT();
   const { data: relatedResponse, isLoading } = useQuery({
     queryKey: ["related-courses", categoryId],
     queryFn: () => coursesApi.getAll({
@@ -839,7 +845,7 @@ function RelatedCourses({
   return (
     <div className="border-t bg-muted/30">
       <div className="container max-w-6xl py-12">
-        <h2 className="text-2xl font-bold mb-6">Related Courses</h2>
+        <h2 className="text-2xl font-bold mb-6"><T>Related Courses</T></h2>
         {isLoading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
@@ -862,7 +868,7 @@ function RelatedCourses({
                     {normalizeUploadUrl(course.thumbnail) ? (
                       <img
                         src={normalizeUploadUrl(course.thumbnail)}
-                        alt={course.title}
+                        alt={t(course.title)}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     ) : (
@@ -872,17 +878,17 @@ function RelatedCourses({
                     )}
                   </div>
                   <CardContent className="p-4">
-                    <h3 className="font-semibold line-clamp-2 mb-2">{course.title}</h3>
+                    <h3 className="font-semibold line-clamp-2 mb-2">{t(course.title)}</h3>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <div className="flex items-center gap-1">
                         <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
                         <span>{course.rating?.toFixed(1) || "N/A"}</span>
                       </div>
                       <span>•</span>
-                      <span>{course.enrollmentCount || 0} students</span>
+                      <span>{course.enrollmentCount || 0} <T>students</T></span>
                     </div>
                     <Badge variant="secondary" className="text-xs">
-                      Training Material
+                      <T>Training Material</T>
                     </Badge>
                   </CardContent>
                 </Card>

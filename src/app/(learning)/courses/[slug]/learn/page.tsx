@@ -39,6 +39,7 @@ import { useToast } from "@/hooks/use-toast";
 import { lessonsApi } from "@/lib/api/lessons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Module, Lesson, Course } from "@/types";
+import { T, useT } from "@/components/t";
 
 function getVideoEmbedUrl(url: string): { type: 'youtube' | 'vimeo' | 'direct' | 'unknown'; embedUrl: string; videoId?: string } {
   if (!url) return { type: 'unknown', embedUrl: '' };
@@ -301,7 +302,7 @@ function VideoPlayer({
   if (!lesson) {
     return (
       <div className="aspect-video bg-slate-900 flex items-center justify-center">
-        <p className="text-slate-400">Select a lesson to start learning</p>
+        <p className="text-slate-400"><T>Select a lesson to start learning</T></p>
       </div>
     );
   }
@@ -311,9 +312,9 @@ function VideoPlayer({
       <div className="aspect-video bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <Video className="h-16 w-16 text-slate-600 mx-auto mb-4" />
-          <p className="text-slate-400">No video for this lesson</p>
+          <p className="text-slate-400"><T>No video for this lesson</T></p>
           {lesson.type === 'text' && (
-            <p className="text-slate-500 text-sm mt-2">This is a text-based lesson. See content below.</p>
+            <p className="text-slate-500 text-sm mt-2"><T>This is a text-based lesson. See content below.</T></p>
           )}
         </div>
       </div>
@@ -473,6 +474,7 @@ function LessonItem({
   isLocked: boolean;
   onClick: () => void;
 }) {
+  const { t } = useT();
   const getIcon = () => {
     if (isCompleted) return <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />;
     if (isLocked) return <Lock className="h-4 w-4 text-muted-foreground shrink-0" />;
@@ -496,18 +498,18 @@ function LessonItem({
         <div className="mt-0.5">{getIcon()}</div>
         <div className="flex-1 min-w-0">
           <p className={`text-sm font-medium line-clamp-2 break-words ${isActive ? "text-primary" : ""}`}>
-            {lesson.title}
+            {t(lesson.title)}
           </p>
           <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
             {lesson.duration && (
               <span className="flex items-center gap-1">
                 <Clock className="h-3 w-3 shrink-0" />
-                {lesson.duration} min
+                {lesson.duration} <T>min</T>
               </span>
             )}
             {lesson.isFree && !isLocked && (
               <Badge variant="outline" className="text-xs h-5">
-                Preview
+                <T>Preview</T>
               </Badge>
             )}
           </div>
@@ -530,6 +532,7 @@ function CurriculumSidebar({
   courseProgress: number;
   completedLessonIds: Set<string>;
 }) {
+  const { t } = useT();
   const defaultOpenModules = modules.map((m) => m._id);
 
   return (
@@ -537,7 +540,7 @@ function CurriculumSidebar({
       {/* Progress header - pt-14 on mobile to avoid sheet close button */}
       <div className="p-3 sm:p-4 pt-14 lg:pt-4 border-b shrink-0">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium">Course Progress</span>
+          <span className="text-sm font-medium"><T>Course Progress</T></span>
           <span className="text-sm text-muted-foreground">{courseProgress}%</span>
         </div>
         <Progress value={courseProgress} className="h-2" />
@@ -563,9 +566,9 @@ function CurriculumSidebar({
                         {moduleIndex + 1}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-sm truncate">{module.title}</p>
+                        <p className="font-medium text-sm truncate">{t(module.title)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {completedLessonsCount}/{lessons.length} lessons
+                          {completedLessonsCount}/{lessons.length} <T>lessons</T>
                         </p>
                       </div>
                     </div>
@@ -595,23 +598,24 @@ function CurriculumSidebar({
 }
 
 function LessonContent({ lesson }: { lesson: Lesson | null }) {
+  const { t } = useT();
   if (!lesson) {
     return (
       <div className="p-6 text-center text-muted-foreground">
-        Select a lesson to view its content
+        <T>Select a lesson to view its content</T>
       </div>
     );
   }
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-bold mb-4">{lesson.title}</h2>
+      <h2 className="text-xl font-bold mb-4">{t(lesson.title)}</h2>
 
       {lesson.content ? (
         <RichContentRenderer content={lesson.content} />
       ) : (
         <p className="text-muted-foreground">
-          Watch the video above to complete this lesson.
+          <T>Watch the video above to complete this lesson.</T>
         </p>
       )}
 
@@ -620,7 +624,7 @@ function LessonContent({ lesson }: { lesson: Lesson | null }) {
         <div className="mt-8">
           <h3 className="font-semibold mb-4 flex items-center gap-2">
             <Download className="h-5 w-5" />
-            Lesson Materials
+            <T>Lesson Materials</T>
           </h3>
           <div className="space-y-2">
             {lesson.materials.map((material: any, index: number) => (
@@ -628,7 +632,7 @@ function LessonContent({ lesson }: { lesson: Lesson | null }) {
                 <CardContent className="p-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-sm">{material.name || `Material ${index + 1}`}</span>
+                    <span className="text-sm">{t(material.name || `Material ${index + 1}`)}</span>
                   </div>
                   <Button variant="ghost" size="sm">
                     <Download className="h-4 w-4" />
@@ -676,6 +680,7 @@ export default function CourseLearnPage({
   const router = useRouter();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { t } = useT();
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [completionDialogOpen, setCompletionDialogOpen] = useState(false);
@@ -751,12 +756,12 @@ export default function CourseLearnPage({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Course not found</h1>
+          <h1 className="text-2xl font-bold"><T>Course not found</T></h1>
           <p className="text-muted-foreground mt-2">
-            The course you're looking for doesn't exist.
+            <T>The course you're looking for doesn't exist.</T>
           </p>
           <Button className="mt-4" onClick={() => router.push("/courses")}>
-            Browse Courses
+            <T>Browse Courses</T>
           </Button>
         </div>
       </div>
@@ -780,16 +785,16 @@ export default function CourseLearnPage({
             onClick={() => router.push(`/courses/${course.slug || course._id}`)}
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Back to Course
+            <T>Back to Course</T>
           </Button>
           <div className="hidden sm:block">
-            <h1 className="font-semibold text-sm line-clamp-1">{course.title}</h1>
+            <h1 className="font-semibold text-sm line-clamp-1">{t(course.title)}</h1>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{courseProgress}% complete</span>
+            <span>{courseProgress}% <T>complete</T></span>
           </div>
 
           {/* Mobile curriculum toggle */}
@@ -797,7 +802,7 @@ export default function CourseLearnPage({
             <SheetTrigger asChild>
               <Button variant="outline" size="sm" className="lg:hidden">
                 <Menu className="h-4 w-4 mr-2" />
-                Curriculum
+                <T>Curriculum</T>
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-80 p-0">
