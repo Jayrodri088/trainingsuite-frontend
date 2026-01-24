@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
@@ -58,7 +58,8 @@ export default function CommunityPage() {
   const [sortBy, setSortBy] = useState<SortOption>("recent");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newPost, setNewPost] = useState({ title: "", content: "", forumId: "" });
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+  // Track optimistic updates - maps postId to optimistic liked state (true = liked, false = unliked)
+  const [optimisticLikes, setOptimisticLikes] = useState<Map<string, boolean>>(new Map());
 
   // Fetch all forums
   const { data: forumsData, isLoading: forumsLoading } = useQuery({
@@ -94,16 +95,14 @@ export default function CommunityPage() {
 
   const allPosts = allPostsData || [];
 
-  // Initialize liked posts from server data
-  useEffect(() => {
-    if (allPosts.length > 0) {
-      const likedIds = new Set<string>();
-      allPosts.forEach((post: any) => {
-        if (post.isLiked) likedIds.add(post._id);
-      });
-      setLikedPosts(likedIds);
+  // Helper to get the effective liked state for a post
+  const getIsLiked = (post: ForumPost) => {
+    // If we have an optimistic override, use it; otherwise use server state
+    if (optimisticLikes.has(post._id)) {
+      return optimisticLikes.get(post._id)!;
     }
-  }, [allPosts]);
+    return !!(post as any).isLiked;
+  };
 
   // Like/unlike post mutation - uses correct method based on current state
   const likePostMutation = useMutation({
@@ -114,31 +113,29 @@ export default function CommunityPage() {
       return forumsApi.likePost(postId);
     },
     onMutate: async ({ postId, isCurrentlyLiked }) => {
-      // Optimistic update
-      setLikedPosts((prev) => {
-        const newSet = new Set(prev);
-        if (isCurrentlyLiked) {
-          newSet.delete(postId);
-        } else {
-          newSet.add(postId);
-        }
-        return newSet;
+      // Optimistic update - store the new desired state
+      setOptimisticLikes((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(postId, !isCurrentlyLiked);
+        return newMap;
       });
       return { postId, isCurrentlyLiked };
     },
-    onSuccess: () => {
+    onSuccess: (_, { postId }) => {
+      // Clear optimistic state for this post - server state will be authoritative after refetch
+      setOptimisticLikes((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(postId);
+        return newMap;
+      });
       queryClient.invalidateQueries({ queryKey: ["all-forum-posts"] });
     },
-    onError: (_, { postId, isCurrentlyLiked }) => {
-      // Revert on error
-      setLikedPosts((prev) => {
-        const newSet = new Set(prev);
-        if (isCurrentlyLiked) {
-          newSet.add(postId); // Was liked, failed to unlike, restore
-        } else {
-          newSet.delete(postId); // Was not liked, failed to like, remove
-        }
-        return newSet;
+    onError: (_, { postId }) => {
+      // Clear optimistic state on error - revert to server state
+      setOptimisticLikes((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(postId);
+        return newMap;
       });
       toast({ title: t("Failed to update vote"), variant: "destructive" });
     },
@@ -195,9 +192,19 @@ export default function CommunityPage() {
     const author = post.user as User;
     const postForum = typeof post.forum === 'object' ? post.forum : null;
     const forumInfo = postForum || forums.find(f => f._id === (post as any).forumId || f._id === post.forum);
-    const isLiked = likedPosts.has(post._id);
-    const likeCount = (post as any).likes || 0;
-    const displayCount = isLiked && !(post as any).isLiked ? likeCount + 1 : likeCount;
+    
+    // Get liked state - uses optimistic state if available, otherwise server state
+    const isLiked = getIsLiked(post);
+    const serverLikeCount = (post as any).likes || 0;
+    const serverIsLiked = !!(post as any).isLiked;
+    
+    // Adjust display count based on optimistic state vs server state
+    const displayCount = (() => {
+      if (isLiked === serverIsLiked) return serverLikeCount;
+      if (isLiked && !serverIsLiked) return serverLikeCount + 1;
+      if (!isLiked && serverIsLiked) return Math.max(0, serverLikeCount - 1);
+      return serverLikeCount;
+    })();
     
     const handleVote = (e: React.MouseEvent) => {
       e.preventDefault();

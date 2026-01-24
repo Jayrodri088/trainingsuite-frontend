@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
@@ -55,8 +55,9 @@ export default function PostDetailPage() {
   const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
-  const [likedComments, setLikedComments] = useState<Set<string>>(new Set());
+  // Track optimistic updates - maps id to optimistic liked state
+  const [optimisticPostLikes, setOptimisticPostLikes] = useState<Map<string, boolean>>(new Map());
+  const [optimisticCommentLikes, setOptimisticCommentLikes] = useState<Map<string, boolean>>(new Map());
 
   const { data: postData, isLoading: postLoading } = useQuery({
     queryKey: ["post", postId],
@@ -68,28 +69,21 @@ export default function PostDetailPage() {
     queryFn: () => forumsApi.getComments(postId, 1, 100),
   });
 
-  // Initialize liked state from server response
-  useEffect(() => {
-    const post = postData?.data;
-    if (post?.isLiked) {
-      setLikedPosts((prev) => new Set([...prev, post._id]));
+  // Helper to get effective liked state for post
+  const getPostIsLiked = (postItem: ForumPost) => {
+    if (optimisticPostLikes.has(postItem._id)) {
+      return optimisticPostLikes.get(postItem._id)!;
     }
-  }, [postData]);
+    return !!(postItem as any).isLiked;
+  };
 
-  useEffect(() => {
-    if (commentsData?.data) {
-      const likedIds = new Set<string>();
-      commentsData.data.forEach((comment: any) => {
-        if (comment.isLiked) likedIds.add(comment._id);
-        comment.replies?.forEach((reply: any) => {
-          if (reply.isLiked) likedIds.add(reply._id);
-        });
-      });
-      if (likedIds.size > 0) {
-        setLikedComments(likedIds);
-      }
+  // Helper to get effective liked state for comment
+  const getCommentIsLiked = (comment: Comment) => {
+    if (optimisticCommentLikes.has(comment._id)) {
+      return optimisticCommentLikes.get(comment._id)!;
     }
-  }, [commentsData]);
+    return !!(comment as any).isLiked;
+  };
 
   const createCommentMutation = useMutation({
     mutationFn: ({ content, parentId }: { content: string; parentId?: string }) =>
@@ -114,31 +108,29 @@ export default function PostDetailPage() {
       return forumsApi.likePost(id);
     },
     onMutate: async ({ id, isCurrentlyLiked }) => {
-      // Optimistic update
-      setLikedPosts((prev) => {
-        const newSet = new Set(prev);
-        if (isCurrentlyLiked) {
-          newSet.delete(id);
-        } else {
-          newSet.add(id);
-        }
-        return newSet;
+      // Optimistic update - store the new desired state
+      setOptimisticPostLikes((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(id, !isCurrentlyLiked);
+        return newMap;
       });
       return { id, isCurrentlyLiked };
     },
-    onSuccess: () => {
+    onSuccess: (_, { id }) => {
+      // Clear optimistic state - server state will be authoritative after refetch
+      setOptimisticPostLikes((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(id);
+        return newMap;
+      });
       queryClient.invalidateQueries({ queryKey: ["post", postId] });
     },
-    onError: (_, { id, isCurrentlyLiked }) => {
-      // Revert on error
-      setLikedPosts((prev) => {
-        const newSet = new Set(prev);
-        if (isCurrentlyLiked) {
-          newSet.add(id); // Was liked, failed to unlike, restore
-        } else {
-          newSet.delete(id); // Was not liked, failed to like, remove
-        }
-        return newSet;
+    onError: (_, { id }) => {
+      // Clear optimistic state on error - revert to server state
+      setOptimisticPostLikes((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(id);
+        return newMap;
       });
       toast({ title: t("Failed to update vote"), variant: "destructive" });
     },
@@ -153,31 +145,29 @@ export default function PostDetailPage() {
       return forumsApi.likeComment(commentId);
     },
     onMutate: async ({ commentId, isCurrentlyLiked }) => {
-      // Optimistic update
-      setLikedComments((prev) => {
-        const newSet = new Set(prev);
-        if (isCurrentlyLiked) {
-          newSet.delete(commentId);
-        } else {
-          newSet.add(commentId);
-        }
-        return newSet;
+      // Optimistic update - store the new desired state
+      setOptimisticCommentLikes((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(commentId, !isCurrentlyLiked);
+        return newMap;
       });
       return { commentId, isCurrentlyLiked };
     },
-    onSuccess: () => {
+    onSuccess: (_, { commentId }) => {
+      // Clear optimistic state - server state will be authoritative after refetch
+      setOptimisticCommentLikes((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(commentId);
+        return newMap;
+      });
       queryClient.invalidateQueries({ queryKey: ["post-comments", postId] });
     },
-    onError: (_, { commentId, isCurrentlyLiked }) => {
-      // Revert on error
-      setLikedComments((prev) => {
-        const newSet = new Set(prev);
-        if (isCurrentlyLiked) {
-          newSet.add(commentId); // Was liked, failed to unlike, restore
-        } else {
-          newSet.delete(commentId); // Was not liked, failed to like, remove
-        }
-        return newSet;
+    onError: (_, { commentId }) => {
+      // Clear optimistic state on error - revert to server state
+      setOptimisticCommentLikes((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(commentId);
+        return newMap;
       });
       toast({ title: t("Failed to update vote"), variant: "destructive" });
     },
@@ -272,6 +262,19 @@ export default function PostDetailPage() {
     const replies = getChildComments(comment._id);
     const parentId = getParentId(comment);
     const parentComment = parentId ? commentMap.get(parentId) : null;
+    
+    // Get liked state using helper (handles optimistic updates)
+    const isCommentLiked = getCommentIsLiked(comment);
+    const serverIsLiked = !!(comment as any).isLiked;
+    const serverLikeCount = comment.likes || 0;
+    
+    // Adjust display count based on optimistic state vs server state
+    const displayLikeCount = (() => {
+      if (isCommentLiked === serverIsLiked) return serverLikeCount;
+      if (isCommentLiked && !serverIsLiked) return serverLikeCount + 1;
+      if (!isCommentLiked && serverIsLiked) return Math.max(0, serverLikeCount - 1);
+      return serverLikeCount;
+    })();
 
     return (
       <div className={depth > 0 ? "ml-4 sm:ml-8 border-l-2 border-primary/20 pl-3 sm:pl-4" : ""}>
@@ -304,13 +307,13 @@ export default function PostDetailPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`h-7 text-xs gap-1 ${likedComments.has(comment._id) ? "text-primary bg-primary/10" : ""}`}
-                  onClick={() => likeCommentMutation.mutate({ commentId: comment._id, isCurrentlyLiked: likedComments.has(comment._id) })}
-                  title={t(likedComments.has(comment._id) ? "Remove upvote" : "Upvote this comment")}
+                  className={`h-7 text-xs gap-1 ${isCommentLiked ? "text-primary bg-primary/10" : ""}`}
+                  onClick={() => likeCommentMutation.mutate({ commentId: comment._id, isCurrentlyLiked: isCommentLiked })}
+                  title={t(isCommentLiked ? "Remove upvote" : "Upvote this comment")}
                 >
-                  <ThumbsUp className={`h-3 w-3 ${likedComments.has(comment._id) ? "fill-primary" : ""}`} />
-                  <span>{comment.likes || 0}</span>
-                  <span className="hidden sm:inline">{likedComments.has(comment._id) ? t("Upvoted") : t("Upvote")}</span>
+                  <ThumbsUp className={`h-3 w-3 ${isCommentLiked ? "fill-primary" : ""}`} />
+                  <span>{displayLikeCount}</span>
+                  <span className="hidden sm:inline">{isCommentLiked ? t("Upvoted") : t("Upvote")}</span>
                 </Button>
                 <Button
                   variant="ghost"
@@ -402,17 +405,31 @@ export default function PostDetailPage() {
                 <p className="whitespace-pre-wrap">{post.content}</p>
               </div>
               <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`h-8 px-3 gap-1 ${likedPosts.has(post._id) ? "text-primary bg-primary/10" : "text-muted-foreground"}`}
-                  onClick={() => likePostMutation.mutate({ id: post._id, isCurrentlyLiked: likedPosts.has(post._id) })}
-                  title={t(likedPosts.has(post._id) ? "Remove upvote" : "Upvote this post")}
-                >
-                  <ThumbsUp className={`h-4 w-4 ${likedPosts.has(post._id) ? "fill-primary" : ""}`} />
-                  <span>{post.likes || 0}</span>
-                  <span className="hidden sm:inline">{likedPosts.has(post._id) ? t("Upvoted") : t("Upvote")}</span>
-                </Button>
+                {(() => {
+                  const isPostLiked = getPostIsLiked(post);
+                  const serverPostIsLiked = !!(post as any).isLiked;
+                  const serverPostLikeCount = post.likes || 0;
+                  const displayPostLikeCount = (() => {
+                    if (isPostLiked === serverPostIsLiked) return serverPostLikeCount;
+                    if (isPostLiked && !serverPostIsLiked) return serverPostLikeCount + 1;
+                    if (!isPostLiked && serverPostIsLiked) return Math.max(0, serverPostLikeCount - 1);
+                    return serverPostLikeCount;
+                  })();
+                  
+                  return (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={`h-8 px-3 gap-1 ${isPostLiked ? "text-primary bg-primary/10" : "text-muted-foreground"}`}
+                      onClick={() => likePostMutation.mutate({ id: post._id, isCurrentlyLiked: isPostLiked })}
+                      title={t(isPostLiked ? "Remove upvote" : "Upvote this post")}
+                    >
+                      <ThumbsUp className={`h-4 w-4 ${isPostLiked ? "fill-primary" : ""}`} />
+                      <span>{displayPostLikeCount}</span>
+                      <span className="hidden sm:inline">{isPostLiked ? t("Upvoted") : t("Upvote")}</span>
+                    </Button>
+                  );
+                })()}
                 <div className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
                   <span>{post.viewCount || 0} <T>views</T></span>

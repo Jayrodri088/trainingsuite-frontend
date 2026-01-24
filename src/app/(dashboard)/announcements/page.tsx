@@ -7,7 +7,7 @@ import {
   Info,
   Bell,
 } from "lucide-react";
-import { T } from "@/components/t";
+import { T, useT } from "@/components/t";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,8 +37,16 @@ const priorityConfig: Record<AnnouncementPriority, { icon: typeof AlertCircle; c
 };
 
 function AnnouncementCard({ announcement }: { announcement: Announcement }) {
+  const { t } = useT();
   const config = priorityConfig[announcement.priority] || priorityConfig.low;
   const Icon = config.icon;
+  
+  // Only translate the static priority labels, not dynamic content
+  const priorityLabels: Record<AnnouncementPriority, string> = {
+    high: t("High"),
+    medium: t("Medium"),
+    low: t("Low"),
+  };
 
   return (
     <Card className="rounded-none border-border group overflow-hidden bg-card hover:border-primary/50 transition-colors">
@@ -58,7 +66,7 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
                       "border-blue-200 text-blue-700 bg-blue-50"
                   }`}
               >
-                {announcement.priority}
+                {priorityLabels[announcement.priority]}
               </Badge>
             </div>
             <p className="text-muted-foreground whitespace-pre-wrap text-sm leading-relaxed mb-4">{announcement.content}</p>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -10,6 +10,7 @@ import {
   List,
   Star,
   X,
+  Globe,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,35 @@ import { useCourses, useCategories, useEnrollments } from "@/hooks";
 import { normalizeUploadUrl } from "@/lib/utils";
 import type { Course, CourseFilters, Enrollment } from "@/types";
 import { T, useT } from "@/components/t";
+
+// Available course languages
+const COURSE_LANGUAGES = [
+  { code: "en", name: "English" },
+  { code: "es", name: "Spanish" },
+  { code: "fr", name: "French" },
+  { code: "de", name: "German" },
+  { code: "pt", name: "Portuguese" },
+  { code: "zh", name: "Chinese" },
+  { code: "ar", name: "Arabic" },
+  { code: "hi", name: "Hindi" },
+  { code: "ru", name: "Russian" },
+  { code: "ja", name: "Japanese" },
+  { code: "ko", name: "Korean" },
+  { code: "it", name: "Italian" },
+  { code: "nl", name: "Dutch" },
+  { code: "pl", name: "Polish" },
+  { code: "tr", name: "Turkish" },
+  { code: "vi", name: "Vietnamese" },
+  { code: "th", name: "Thai" },
+  { code: "id", name: "Indonesian" },
+  { code: "ms", name: "Malay" },
+  { code: "sw", name: "Swahili" },
+];
+
+const getLanguageName = (code: string): string => {
+  const lang = COURSE_LANGUAGES.find(l => l.code === code?.toLowerCase());
+  return lang?.name || code?.toUpperCase() || "Unknown";
+};
 
 const cardGradients = [
   "bg-gradient-to-br from-violet-500 to-purple-600",
@@ -78,10 +108,16 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
             />
           )}
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-          <div className="absolute top-3 left-3 flex gap-2">
+          <div className="absolute top-3 left-3 flex gap-2 flex-wrap">
             <Badge variant="secondary" className="text-xs capitalize">
               {t(course.level || "beginner")}
             </Badge>
+            {course.language && (
+              <Badge variant="outline" className="text-xs bg-background/80 backdrop-blur-sm">
+                <Globe className="h-3 w-3 mr-1" />
+                {getLanguageName(course.language)}
+              </Badge>
+            )}
             {getEnrollmentBadge()}
           </div>
         </div>

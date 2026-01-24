@@ -391,6 +391,8 @@ export interface CourseFilters {
   category?: string;
   instructor?: string;
   level?: CourseLevel;
+  language?: string;
+  preferredLanguage?: string; // For sorting - shows preferred language first
   isFree?: boolean;
   status?: CourseStatus;
   search?: string;

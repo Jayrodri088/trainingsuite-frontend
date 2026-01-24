@@ -116,8 +116,8 @@ function NotificationItem({
             }`}
         />
         <div className="flex-1 min-w-0">
-          <p className={`text-sm ${isUnread ? "font-bold" : "font-medium"} uppercase tracking-wide`}>{title}</p>
-          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{message}</p>
+          <p className={`text-sm ${isUnread ? "font-bold" : "font-medium"} uppercase tracking-wide`}><T>{title}</T></p>
+          <p className="text-sm text-muted-foreground line-clamp-2 mt-1"><T>{message}</T></p>
           <p className="text-xs font-mono text-muted-foreground mt-2">{time}</p>
         </div>
       </div>
