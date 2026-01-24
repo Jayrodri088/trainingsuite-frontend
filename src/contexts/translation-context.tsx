@@ -72,7 +72,7 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'lo', name: 'ລາວ', flag: '🇱🇦' },
   { code: 'mn', name: 'Монгол', flag: '🇲🇳' },
   { code: 'ka', name: 'ქართული', flag: '🇬🇪' },
-  { code: 'hy', name: 'Հայdelays', flag: '🇦🇲' },
+  { code: 'hy', name: 'Հdelays', flag: '🇦🇲' },
   { code: 'az', name: 'Azərbaycan', flag: '🇦🇿' },
   { code: 'kk', name: 'Қазақ', flag: '🇰🇿' },
   { code: 'uz', name: 'Oʻzbek', flag: '🇺🇿' },
@@ -235,8 +235,8 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
     }
   }, []);
 
-  // Translate batch of texts via API
-  const translateBatch = useCallback(async (texts: string[]) => {
+  // Translate batch of texts via API with retry logic
+  const translateBatch = useCallback(async (texts: string[], retryCount = 0) => {
     if (language === 'en' || texts.length === 0) return;
 
     // Filter out already cached/pending texts
@@ -262,17 +262,26 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data.translations) {
-          Object.entries(data.data.translations).forEach(([original, translated]) => {
-            const cacheKey = getCacheKey(original, 'en', language);
-            translationCache.set(cacheKey, translated as string);
-          });
-          saveCache();
-          // Force re-render after translations arrive
-          setTranslationVersion(v => v + 1);
-        }
+      const data = await response.json();
+
+      if (response.ok && data.success && data.data?.translations) {
+        Object.entries(data.data.translations).forEach(([original, translated]) => {
+          const cacheKey = getCacheKey(original, 'en', language);
+          translationCache.set(cacheKey, translated as string);
+        });
+        saveCache();
+        // Force re-render after translations arrive
+        setTranslationVersion(v => v + 1);
+      } else if (response.status === 429 && retryCount < 3) {
+        // Rate limited - retry after delay
+        console.warn('Translation rate limited, retrying in 2s...');
+        toTranslate.forEach(text => pendingTranslations.current.delete(text));
+        setTimeout(() => {
+          translateBatch(toTranslate, retryCount + 1);
+        }, 2000 * (retryCount + 1)); // Exponential backoff
+        return;
+      } else {
+        console.error('Translation failed:', data.error || 'Unknown error');
       }
     } catch (error) {
       console.error('Translation batch failed:', error);
@@ -289,9 +298,12 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
     const cacheKey = getCacheKey(text, 'en', language);
     if (translationCache.has(cacheKey) || pendingTranslations.current.has(text)) return;
 
-    batchQueue.current.push(text);
+    // Avoid duplicates in the queue
+    if (!batchQueue.current.includes(text)) {
+      batchQueue.current.push(text);
+    }
     
-    // Debounce batch requests
+    // Debounce batch requests - wait 300ms to collect more texts
     if (batchTimeout.current) clearTimeout(batchTimeout.current);
     batchTimeout.current = setTimeout(() => {
       const batch = [...new Set(batchQueue.current)];
@@ -299,7 +311,7 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
       if (batch.length > 0) {
         translateBatch(batch);
       }
-    }, 100);
+    }, 300);
   }, [language, translateBatch]);
 
   // Get translation (sync - returns cached or original)
