@@ -222,7 +222,7 @@ export interface Payment {
 
 // Live Session Types
 export type LiveSessionStatus = "scheduled" | "live" | "ended" | "cancelled";
-export type StreamProvider = "youtube" | "vimeo" | "custom";
+export type StreamProvider = "youtube" | "vimeo" | "hls" | "custom";
 
 export interface LiveSession {
   _id: string;

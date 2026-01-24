@@ -15,6 +15,8 @@ import {
   Calendar,
   Clock,
   ExternalLink,
+  Radio,
+  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,11 +61,59 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { coursesApi } from "@/lib/api/courses";
+import { detectStreamType } from "@/components/livestream";
 import type { LiveSession, LiveSessionStatus, StreamProvider } from "@/types";
 import { format, parseISO } from "date-fns";
+
+// Stream provider configuration for user guidance
+const STREAM_PROVIDER_CONFIG: Record<StreamProvider, { 
+  label: string; 
+  placeholder: string; 
+  description: string;
+  examples: string[];
+}> = {
+  youtube: {
+    label: "YouTube Live",
+    placeholder: "https://youtube.com/watch?v=... or https://youtu.be/...",
+    description: "Paste a YouTube video or live stream URL. Supports regular videos, live streams, and YouTube Live.",
+    examples: [
+      "https://youtube.com/watch?v=abc123",
+      "https://youtu.be/abc123",
+      "https://youtube.com/live/abc123",
+    ],
+  },
+  vimeo: {
+    label: "Vimeo",
+    placeholder: "https://vimeo.com/123456789",
+    description: "Paste a Vimeo video URL. Supports standard videos and Vimeo Live events.",
+    examples: [
+      "https://vimeo.com/123456789",
+      "https://vimeo.com/event/1234567",
+    ],
+  },
+  hls: {
+    label: "HLS Stream (M3U8)",
+    placeholder: "https://stream.example.com/live/stream.m3u8",
+    description: "Paste an HLS manifest URL (.m3u8). Used for self-hosted streams, CDN streams, or RTMP re-streams.",
+    examples: [
+      "https://cdn.example.com/live/stream.m3u8",
+      "https://stream.example.com/hls/live.m3u8",
+    ],
+  },
+  custom: {
+    label: "Custom/Direct URL",
+    placeholder: "https://example.com/video.mp4",
+    description: "Paste any video URL. Supports MP4, WebM, and other direct video files. For RTMP, use a media server to convert to HLS first.",
+    examples: [
+      "https://example.com/video.mp4",
+      "https://cdn.example.com/video.webm",
+    ],
+  },
+};
 
 export default function AdminLiveSessionsPage() {
   const { toast } = useToast();
@@ -574,15 +624,36 @@ export default function AdminLiveSessionsPage() {
                   <Label htmlFor="streamProvider" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Stream Provider</Label>
                   <Select
                     value={formData.streamProvider}
-                    onValueChange={(value: StreamProvider) => setFormData({ ...formData, streamProvider: value })}
+                    onValueChange={(value: StreamProvider) => setFormData({ ...formData, streamProvider: value, streamUrl: "" })}
                   >
                     <SelectTrigger className="rounded-none border-border">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-none border-border">
-                      <SelectItem value="youtube">YouTube</SelectItem>
-                      <SelectItem value="vimeo">Vimeo</SelectItem>
-                      <SelectItem value="custom">Custom</SelectItem>
+                      <SelectItem value="youtube">
+                        <div className="flex items-center gap-2">
+                          <Radio className="h-3.5 w-3.5" />
+                          YouTube Live
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="vimeo">
+                        <div className="flex items-center gap-2">
+                          <Radio className="h-3.5 w-3.5" />
+                          Vimeo
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="hls">
+                        <div className="flex items-center gap-2">
+                          <Radio className="h-3.5 w-3.5" />
+                          HLS Stream (M3U8)
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="custom">
+                        <div className="flex items-center gap-2">
+                          <Radio className="h-3.5 w-3.5" />
+                          Custom/Direct URL
+                        </div>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -598,15 +669,35 @@ export default function AdminLiveSessionsPage() {
                   />
                 </div>
               </div>
+              
+              {/* Stream URL with provider-specific guidance */}
               <div className="space-y-2">
                 <Label htmlFor="streamUrl" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Stream URL</Label>
                 <Input
                   id="streamUrl"
                   value={formData.streamUrl}
                   onChange={(e) => setFormData({ ...formData, streamUrl: e.target.value })}
-                  placeholder="https://youtube.com/..."
-                  className="rounded-none border-border"
+                  placeholder={STREAM_PROVIDER_CONFIG[formData.streamProvider].placeholder}
+                  className="rounded-none border-border font-mono text-sm"
                 />
+                <Alert className="rounded-none border-border bg-muted/30">
+                  <Info className="h-4 w-4" />
+                  <AlertDescription className="text-xs">
+                    <p className="mb-1">{STREAM_PROVIDER_CONFIG[formData.streamProvider].description}</p>
+                    <p className="text-muted-foreground">
+                      Examples: {STREAM_PROVIDER_CONFIG[formData.streamProvider].examples.slice(0, 2).join(", ")}
+                    </p>
+                  </AlertDescription>
+                </Alert>
+                {/* Auto-detect stream type feedback */}
+                {formData.streamUrl && (
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-muted-foreground">Detected:</span>
+                    <Badge variant="outline" className="rounded-none text-[10px] font-mono uppercase">
+                      {detectStreamType(formData.streamUrl)}
+                    </Badge>
+                  </div>
+                )}
               </div>
             </div>
             <DialogFooter>

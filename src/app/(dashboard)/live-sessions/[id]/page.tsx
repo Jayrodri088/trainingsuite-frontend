@@ -15,6 +15,7 @@ import {
   Share2,
   Bell,
   CheckCircle,
+  Radio,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +32,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { getInitials } from "@/lib/utils";
+import { LivestreamPlayer, detectStreamType } from "@/components/livestream";
 import type { LiveSession } from "@/types";
 import { format, parseISO, differenceInMinutes, differenceInSeconds } from "date-fns";
 
@@ -164,50 +166,33 @@ export default function LiveSessionDetailPage() {
         );
       }
 
-      // YouTube embed
-      if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
-        const videoId = videoUrl.includes("youtu.be")
-          ? videoUrl.split("/").pop()
-          : new URLSearchParams(new URL(videoUrl).search).get("v");
+      const streamType = detectStreamType(videoUrl);
+      const isLive = session.status === "live";
 
-        return (
-          <div className="aspect-video bg-black rounded-lg overflow-hidden">
-            <iframe
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-              className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        );
-      }
-
-      // Vimeo embed
-      if (videoUrl.includes("vimeo.com")) {
-        const videoId = videoUrl.split("/").pop();
-        return (
-          <div className="aspect-video bg-black rounded-lg overflow-hidden">
-            <iframe
-              src={`https://player.vimeo.com/video/${videoId}?autoplay=1`}
-              className="w-full h-full"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        );
-      }
-
-      // Generic video or external link
       return (
-        <div className="aspect-video bg-slate-900 rounded-lg flex items-center justify-center">
-          <div className="text-center">
-            <Video className="h-16 w-16 mx-auto mb-4 text-white/50" />
-            <Button asChild>
-              <a href={videoUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Open Stream in New Tab
-              </a>
-            </Button>
+        <div className="relative">
+          <LivestreamPlayer
+            url={videoUrl}
+            title={session.title}
+            isLive={isLive}
+            autoplay={isLive}
+            muted={false}
+            controls={true}
+            onError={(err) => {
+              console.error("Stream playback error:", err);
+              toast({
+                title: "Playback Error",
+                description: "Failed to play the stream. Try opening externally.",
+                variant: "destructive",
+              });
+            }}
+          />
+          {/* Stream type indicator */}
+          <div className="absolute bottom-4 right-4 z-20">
+            <Badge variant="secondary" className="text-xs bg-black/50 text-white">
+              <Radio className="h-3 w-3 mr-1" />
+              {streamType.toUpperCase()}
+            </Badge>
           </div>
         </div>
       );
