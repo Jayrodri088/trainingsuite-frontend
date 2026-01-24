@@ -123,31 +123,36 @@ export default function LiveSessionsPage() {
       </div>
 
       {/* Live Now Banner */}
-      {upcomingSessions.some((s) => s.status === "live") && (
-        <Card className="bg-gradient-to-r from-red-600 to-red-500 text-white border-0">
-          <CardContent className="py-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
-                  <Video className="h-6 w-6" />
+      {upcomingSessions.some((s) => s.status === "live") && (() => {
+        const liveSession = upcomingSessions.find((s) => s.status === "live");
+        return (
+          <Card className="bg-gradient-to-r from-red-600 to-red-500 text-white border-0">
+            <CardContent className="py-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
+                    <Video className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">Sessions are live now!</h3>
+                    <p className="text-red-100">
+                      {upcomingSessions.filter((s) => s.status === "live").length} session(s) currently streaming
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg">Sessions are live now!</h3>
-                  <p className="text-red-100">
-                    {upcomingSessions.filter((s) => s.status === "live").length} session(s) currently streaming
-                  </p>
-                </div>
+                {liveSession && (
+                  <Button variant="secondary" asChild>
+                    <Link href={`/live-sessions/${liveSession._id}`}>
+                      <Play className="h-4 w-4 mr-2" />
+                      Join Now
+                    </Link>
+                  </Button>
+                )}
               </div>
-              <Button variant="secondary" asChild>
-                <Link href="#live-sessions">
-                  <Play className="h-4 w-4 mr-2" />
-                  Join Now
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* Tabs and Search */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
