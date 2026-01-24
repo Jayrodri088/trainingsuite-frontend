@@ -21,8 +21,10 @@ import { liveSessionsApi } from "@/lib/api/live-sessions";
 import type { Course, Enrollment, LiveSession } from "@/types";
 import { cn, normalizeUploadUrl } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
+import { T, useT } from "@/components/t";
 
 function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrollment }) {
+  const { t } = useT();
   const isEnrolled = !!enrollment;
   const progress = enrollment?.progress || 0;
   const isCompleted = enrollment?.status === "completed" || progress >= 100;
@@ -58,9 +60,9 @@ function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrol
                 <span className="text-xs font-semibold">{course.rating.toFixed(1)}</span>
               </div>
             ) : (
-              <span className="text-xs text-muted-foreground">{course.ratingCount || 0} ratings</span>
+              <span className="text-xs text-muted-foreground">{course.ratingCount || 0} <T>ratings</T></span>
             )}
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold ml-auto">Video Course</span>
+            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold ml-auto"><T>Video Course</T></span>
           </div>
 
           <h3 className="text-xl font-heading font-bold text-foreground mb-3 leading-tight group-hover:underline decoration-1 underline-offset-4">
@@ -71,7 +73,7 @@ function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrol
             {isEnrolled ? (
               <div className="space-y-3">
                 <div className="flex justify-between text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                  <span>Progress</span>
+                  <T>Progress</T>
                   <span>{progress}%</span>
                 </div>
                 <div className="h-1 w-full bg-secondary">
@@ -81,12 +83,12 @@ function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrol
                   />
                 </div>
                 <Button variant="outline" className="w-full rounded-none h-9 text-xs uppercase tracking-wide border-foreground/20 hover:bg-foreground hover:text-background transition-colors">
-                  {isCompleted ? "Review" : "Continue"}
+                  {isCompleted ? <T>Review</T> : <T>Continue</T>}
                 </Button>
               </div>
             ) : (
               <div className="flex items-center text-sm font-medium text-foreground/70 group-hover:text-foreground transition-colors">
-                <span>Start Learning</span>
+                <T>Start Learning</T>
                 <ArrowRight className="ml-2 h-4 w-4" />
               </div>
             )}
@@ -114,6 +116,7 @@ function CourseCardSkeleton() {
 }
 
 function LiveSessionCard({ session }: { session: LiveSession }) {
+  const { t } = useT();
   const isLive = session.status === "live";
   const isScheduled = session.status === "scheduled";
 
@@ -144,11 +147,11 @@ function LiveSessionCard({ session }: { session: LiveSession }) {
             {isLive ? (
               <Badge className="bg-red-600 text-white font-bold rounded-none border-0 uppercase text-[10px] tracking-wider animate-pulse">
                 <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block animate-pulse" />
-                Live Now
+                <T>Live Now</T>
               </Badge>
             ) : isScheduled ? (
               <Badge variant="outline" className="bg-background text-foreground font-medium rounded-none border-foreground/10 text-xs tracking-wide">
-                Upcoming
+                <T>Upcoming</T>
               </Badge>
             ) : null}
           </div>
@@ -158,7 +161,7 @@ function LiveSessionCard({ session }: { session: LiveSession }) {
             <div className="absolute bottom-3 left-3 z-10">
               <Badge variant="secondary" className="bg-black/60 text-white rounded-none border-0 text-xs">
                 <Users className="h-3 w-3 mr-1" />
-                {session.attendeeCount} watching
+                {session.attendeeCount} <T>watching</T>
               </Badge>
             </div>
           )}
@@ -171,7 +174,7 @@ function LiveSessionCard({ session }: { session: LiveSession }) {
               <span>{format(parseISO(session.scheduledAt), "MMM d, yyyy")}</span>
             </div>
             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
-              {isLive ? "Live Stream" : "Live Session"}
+              {isLive ? <T>Live Stream</T> : <T>Live Session</T>}
             </span>
           </div>
 
@@ -189,7 +192,7 @@ function LiveSessionCard({ session }: { session: LiveSession }) {
             {isLive ? (
               <Button className="w-full rounded-none h-9 text-xs uppercase tracking-wide bg-red-600 hover:bg-red-700 text-white">
                 <Radio className="h-3 w-3 mr-2 animate-pulse" />
-                Join Live
+                <T>Join Live</T>
               </Button>
             ) : isScheduled ? (
               <div className="flex items-center text-sm font-medium text-foreground/70 group-hover:text-foreground transition-colors">
@@ -199,7 +202,7 @@ function LiveSessionCard({ session }: { session: LiveSession }) {
               </div>
             ) : (
               <div className="flex items-center text-sm font-medium text-muted-foreground">
-                <span>View Recording</span>
+                <T>View Recording</T>
                 <ArrowRight className="ml-auto h-4 w-4" />
               </div>
             )}
@@ -228,6 +231,7 @@ function LiveSessionCardSkeleton() {
 
 export default function HomePage() {
   const { isAuthenticated } = useAuth();
+  const { t } = useT();
   const { data: coursesResponse, isLoading } = useCourses({
     status: "published",
     sort: "enrollmentCount",
@@ -270,6 +274,33 @@ export default function HomePage() {
     });
   }
 
+  // Info grid items with translations
+  const infoItems = [
+    {
+      title: t("Structured Curriculum"),
+      desc: t("Theological and practical training materials curated for depth."),
+    },
+    {
+      title: t("HD Video Lessons"),
+      desc: t("On-demand high-definition content from senior leadership."),
+    },
+    {
+      title: t("Live Mentorship"),
+      desc: t("Real-time interactive sessions and spiritual guidance."),
+    },
+    {
+      title: t("Official Certification"),
+      desc: t("Recognized validation of completed ministry training."),
+    },
+  ];
+
+  // Statement section list items
+  const statementItems = [
+    t("Global Networking"),
+    t("Resource Library Access"),
+    t("Priority Event Registration"),
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
 
@@ -280,31 +311,31 @@ export default function HomePage() {
             <div className="flex items-center gap-3 mb-8">
               <span className="h-px w-8 bg-foreground/20"></span>
               <p className="text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground">
-                Rhapsody Global Missionaries
+                <T>Rhapsody Global Missionaries</T>
               </p>
             </div>
 
             <h1 className="font-heading text-5xl sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight text-foreground mb-10 leading-[0.95] text-balance">
-              Equipping Ministers for <br />
-              <span className="text-muted-foreground/40">Global Impact.</span>
+              <T>Equipping Ministers for</T> <br />
+              <span className="text-muted-foreground/40"><T>Global Impact.</T></span>
             </h1>
 
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl leading-relaxed mb-12 font-light">
-              A professional training portal designed for the rigorous spiritual and practical development of ministers worldwide.
+              <T>A professional training portal designed for the rigorous spiritual and practical development of ministers worldwide.</T>
             </p>
 
             <div className="flex flex-wrap gap-4">
               {isAuthenticated ? (
                 <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none bg-foreground text-background hover:bg-foreground/90 transition-colors uppercase tracking-wider font-medium" asChild>
-                  <Link href="/dashboard">Access Dashboard</Link>
+                  <Link href="/dashboard"><T>Access Dashboard</T></Link>
                 </Button>
               ) : (
                 <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none bg-foreground text-background hover:bg-foreground/90 transition-colors uppercase tracking-wider font-medium" asChild>
-                  <Link href="/register">Begin Training</Link>
+                  <Link href="/register"><T>Begin Training</T></Link>
                 </Button>
               )}
               <Button variant="outline" size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none border-border hover:bg-secondary transition-colors uppercase tracking-wider font-medium" asChild>
-                <Link href="/courses">View Curriculum</Link>
+                <Link href="/courses"><T>View Curriculum</T></Link>
               </Button>
             </div>
           </div>
@@ -315,24 +346,7 @@ export default function HomePage() {
       <section className="border-b border-border">
         <div className="container max-w-7xl px-0">
           <div className="grid md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border">
-            {[
-              {
-                title: "Structured Curriculum",
-                desc: "Theological and practical training materials curated for depth.",
-              },
-              {
-                title: "HD Video Lessons",
-                desc: "On-demand high-definition content from senior leadership.",
-              },
-              {
-                title: "Live Mentorship",
-                desc: "Real-time interactive sessions and spiritual guidance.",
-              },
-              {
-                title: "Official Certification",
-                desc: "Recognized validation of completed ministry training.",
-              },
-            ].map((item, idx) => (
+            {infoItems.map((item, idx) => (
               <div key={idx} className="p-8 md:p-12 hover:bg-secondary/20 transition-colors">
                 <h3 className="font-heading font-bold text-xl mb-3">{item.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
@@ -347,11 +361,11 @@ export default function HomePage() {
         <div className="container max-w-7xl px-4 md:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
             <div className="max-w-2xl">
-              <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6">Training Programs</h2>
-              <p className="text-lg text-muted-foreground font-light">Select a comprehensive module to begin your preparation journey.</p>
+              <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6"><T>Training Programs</T></h2>
+              <p className="text-lg text-muted-foreground font-light"><T>Select a comprehensive module to begin your preparation journey.</T></p>
             </div>
             <Link href="/courses" className="hidden md:flex items-center text-sm font-bold uppercase tracking-widest hover:text-muted-foreground transition-colors">
-              Full Curriculum <ArrowRight className="ml-3 h-4 w-4" />
+              <T>Full Curriculum</T> <ArrowRight className="ml-3 h-4 w-4" />
             </Link>
           </div>
 
@@ -368,13 +382,13 @@ export default function HomePage() {
               ))
             ) : (
               <div className="col-span-full py-32 text-center border border-border bg-muted/10">
-                <p className="text-muted-foreground uppercase tracking-widest text-sm font-medium">No courses available</p>
+                <p className="text-muted-foreground uppercase tracking-widest text-sm font-medium"><T>No courses available</T></p>
               </div>
             )}
           </div>
 
           <Link href="/courses" className="md:hidden mt-8 flex items-center justify-center h-12 border border-border text-sm font-bold uppercase tracking-widest hover:bg-secondary transition-colors">
-            Full Curriculum <ArrowRight className="ml-3 h-4 w-4" />
+            <T>Full Curriculum</T> <ArrowRight className="ml-3 h-4 w-4" />
           </Link>
         </div>
       </section>
@@ -389,15 +403,15 @@ export default function HomePage() {
                   {hasLiveNow && (
                     <Badge className="bg-red-600 text-white font-bold rounded-none border-0 uppercase text-[10px] tracking-wider animate-pulse">
                       <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block animate-pulse" />
-                      Live Now
+                      <T>Live Now</T>
                     </Badge>
                   )}
                 </div>
-                <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6">Live Sessions</h2>
-                <p className="text-lg text-muted-foreground font-light">Join real-time interactive sessions with our leadership and ministry team.</p>
+                <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6"><T>Live Sessions</T></h2>
+                <p className="text-lg text-muted-foreground font-light"><T>Join real-time interactive sessions with our leadership and ministry team.</T></p>
               </div>
               <Link href="/live-sessions" className="hidden md:flex items-center text-sm font-bold uppercase tracking-widest hover:text-muted-foreground transition-colors">
-                All Sessions <ArrowRight className="ml-3 h-4 w-4" />
+                <T>All Sessions</T> <ArrowRight className="ml-3 h-4 w-4" />
               </Link>
             </div>
 
@@ -412,7 +426,7 @@ export default function HomePage() {
             </div>
 
             <Link href="/live-sessions" className="md:hidden mt-8 flex items-center justify-center h-12 border border-border text-sm font-bold uppercase tracking-widest hover:bg-secondary transition-colors">
-              All Sessions <ArrowRight className="ml-3 h-4 w-4" />
+              <T>All Sessions</T> <ArrowRight className="ml-3 h-4 w-4" />
             </Link>
           </div>
         </section>
@@ -424,15 +438,15 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             <div>
               <h2 className="font-heading text-4xl md:text-6xl font-bold leading-[1.1] mb-8">
-                Ready to answer the call to service?
+                <T>Ready to answer the call to service?</T>
               </h2>
             </div>
             <div className="space-y-8">
               <p className="text-xl text-background/80 font-light leading-relaxed">
-                Join a global network of ministers equipping themselves for the next level of impact through the Rhapsody Global Missionaries Portal.
+                <T>Join a global network of ministers equipping themselves for the next level of impact through the Rhapsody Global Missionaries Portal.</T>
               </p>
               <ul className="space-y-4 text-background/80">
-                {["Global Networking", "Resource Library Access", "Priority Event Registration"].map((item, i) => (
+                {statementItems.map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
                     <Check className="h-5 w-5 opacity-50" />
                     <span className="text-base">{item}</span>
@@ -442,11 +456,11 @@ export default function HomePage() {
               <div className="pt-4">
                 {isAuthenticated ? (
                   <Button size="lg" className="w-full sm:w-auto h-16 px-12 rounded-none bg-background text-foreground hover:bg-background/90 text-sm uppercase tracking-widest font-bold" asChild>
-                    <Link href="/dashboard">Continue Learning</Link>
+                    <Link href="/dashboard"><T>Continue Learning</T></Link>
                   </Button>
                 ) : (
                   <Button size="lg" className="w-full sm:w-auto h-16 px-12 rounded-none bg-background text-foreground hover:bg-background/90 text-sm uppercase tracking-widest font-bold" asChild>
-                    <Link href="/register">Register Now</Link>
+                    <Link href="/register"><T>Register Now</T></Link>
                   </Button>
                 )}
               </div>

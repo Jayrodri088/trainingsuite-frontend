@@ -1,28 +1,33 @@
+"use client";
+
 import Link from "next/link";
 import { Logo } from "./logo";
-
-const footerLinks = {
-  training: [
-    { label: "Training Materials", href: "/courses" },
-    { label: "Live Sessions", href: "/live-sessions" },
-    { label: "My Progress", href: "/dashboard" },
-  ],
-  resources: [
-    { label: "About", href: "/about" },
-    { label: "Contact", href: "/contact" },
-    { label: "FAQ", href: "/faq" },
-  ],
-  support: [
-    { label: "Help Center", href: "/help" },
-    { label: "Community", href: "/community" },
-  ],
-  legal: [
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Privacy Policy", href: "/privacy" },
-  ],
-};
+import { T, useT } from "@/components/t";
 
 export function Footer() {
+  const { t } = useT();
+
+  const footerLinks = {
+    training: [
+      { label: t("Training Materials"), href: "/courses" },
+      { label: t("Live Sessions"), href: "/live-sessions" },
+      { label: t("My Progress"), href: "/dashboard" },
+    ],
+    resources: [
+      { label: t("About"), href: "/about" },
+      { label: t("Contact"), href: "/contact" },
+      { label: t("FAQ"), href: "/faq" },
+    ],
+    support: [
+      { label: t("Help Center"), href: "/help" },
+      { label: t("Community"), href: "/community" },
+    ],
+    legal: [
+      { label: t("Terms of Service"), href: "/terms" },
+      { label: t("Privacy Policy"), href: "/privacy" },
+    ],
+  };
+
   return (
     <footer className="border-t border-border bg-background">
       <div className="container max-w-7xl py-12 lg:py-16">
@@ -31,7 +36,7 @@ export function Footer() {
           <div className="col-span-2">
             <Logo className="mb-4" />
             <p className="text-sm text-slate-500 dark:text-slate-400 max-w-[260px] leading-relaxed">
-              Equipping ministers worldwide with world-class training materials and live mentorship for global impact.
+              <T>Equipping ministers worldwide with world-class training materials and live mentorship for global impact.</T>
             </p>
             {/* Social Links */}
             <div className="flex items-center gap-3 mt-6">
@@ -57,7 +62,7 @@ export function Footer() {
 
           {/* Training */}
           <div>
-            <h4 className="font-heading font-semibold text-foreground mb-4">Training</h4>
+            <h4 className="font-heading font-semibold text-foreground mb-4"><T>Training</T></h4>
             <ul className="space-y-3">
               {footerLinks.training.map((link) => (
                 <li key={link.href}>
@@ -74,7 +79,7 @@ export function Footer() {
 
           {/* Resources */}
           <div>
-            <h4 className="font-heading font-semibold text-foreground mb-4">Resources</h4>
+            <h4 className="font-heading font-semibold text-foreground mb-4"><T>Resources</T></h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.href}>
@@ -91,7 +96,7 @@ export function Footer() {
 
           {/* Support */}
           <div>
-            <h4 className="font-heading font-semibold text-foreground mb-4">Support</h4>
+            <h4 className="font-heading font-semibold text-foreground mb-4"><T>Support</T></h4>
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.href}>
@@ -108,7 +113,7 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="font-heading font-semibold text-foreground mb-4">Legal</h4>
+            <h4 className="font-heading font-semibold text-foreground mb-4"><T>Legal</T></h4>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.href}>
@@ -127,26 +132,26 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Rhapsody Global Missionaries. All rights reserved.
+            &copy; {new Date().getFullYear()} <T>Rhapsody Global Missionaries. All rights reserved.</T>
           </p>
           <div className="flex items-center gap-6">
             <Link
               href="/terms"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Terms
+              <T>Terms</T>
             </Link>
             <Link
               href="/privacy"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Privacy
+              <T>Privacy</T>
             </Link>
             <Link
               href="/cookies"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Cookies
+              <T>Cookies</T>
             </Link>
           </div>
         </div>

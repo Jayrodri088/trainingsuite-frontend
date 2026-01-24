@@ -35,14 +35,7 @@ import { getInitials } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { LanguageSelector, LanguageSelectorCompact } from "@/components/language-selector";
-import { useTranslation } from "@/contexts/translation-context";
-
-const publicNavItems = [
-  { label: "Home", href: "/" },
-  { label: "Training", href: "/courses" },
-  { label: "Live Sessions", href: "/live-sessions" },
-  { label: "About", href: "/about" },
-];
+import { T, useT } from "@/components/t";
 
 export function Header() {
   const pathname = usePathname();
@@ -52,6 +45,7 @@ export function Header() {
   const markAsRead = useMarkAsRead();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useT();
 
   const notifications = notificationsResponse?.data || [];
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -75,8 +69,8 @@ export function Header() {
   };
 
   const navItems = [
-    { label: "Curriculum", href: "/courses", icon: BookOpen },
-    { label: "Mentorship", href: "/live-sessions", icon: Users },
+    { label: t("Curriculum"), href: "/courses", icon: BookOpen },
+    { label: t("Mentorship"), href: "/live-sessions", icon: Users },
   ];
 
   return (
@@ -113,7 +107,7 @@ export function Header() {
           <form onSubmit={handleSearch} className="hidden md:flex relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search..."
+              placeholder={t("Search...")}
               className="w-[200px] pl-9 h-9 bg-muted/30 border-transparent focus:bg-background focus:border-border transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -139,9 +133,9 @@ export function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-80 rounded-none border-border">
                   <DropdownMenuLabel className="flex items-center justify-between p-4 pb-2">
-                    <span className="font-heading font-bold">Notifications</span>
+                    <span className="font-heading font-bold"><T>Notifications</T></span>
                     {unreadCount > 0 && (
-                      <span className="text-xs text-muted-foreground">{unreadCount} unread</span>
+                      <span className="text-xs text-muted-foreground">{unreadCount} <T>unread</T></span>
                     )}
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -169,7 +163,7 @@ export function Header() {
                       ))
                     ) : (
                       <div className="p-8 text-center text-sm text-muted-foreground">
-                        No new notifications
+                        <T>No new notifications</T>
                       </div>
                     )}
                   </div>
@@ -197,10 +191,10 @@ export function Header() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild className="rounded-none cursor-pointer">
-                    <Link href="/dashboard">Dashboard</Link>
+                    <Link href="/dashboard"><T>Dashboard</T></Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="rounded-none cursor-pointer">
-                    <Link href="/settings">Settings</Link>
+                    <Link href="/settings"><T>Settings</T></Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -208,7 +202,7 @@ export function Header() {
                     disabled={isLoggingOut}
                     className="text-destructive focus:text-destructive rounded-none cursor-pointer"
                   >
-                    Sign out
+                    <T>Sign out</T>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -216,10 +210,10 @@ export function Header() {
           ) : (
             <div className="hidden md:flex items-center gap-3">
               <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Sign in
+                <T>Sign in</T>
               </Link>
               <Button asChild className="rounded-none h-9 px-6 text-sm uppercase tracking-wide font-bold">
-                <Link href="/register">Get Started</Link>
+                <Link href="/register"><T>Get Started</T></Link>
               </Button>
             </div>
           )}
@@ -241,7 +235,7 @@ export function Header() {
                   <form onSubmit={handleSearch} className="mb-8 relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search curriculum..."
+                      placeholder={t("Search curriculum...")}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10 h-12 rounded-none bg-muted/40 border-border text-base"
@@ -250,7 +244,7 @@ export function Header() {
 
                   <div className="space-y-6">
                     <div className="space-y-2">
-                      <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Menu</div>
+                      <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4"><T>Menu</T></div>
                       <nav className="flex flex-col space-y-2">
                         {navItems.map((item) => (
                           <Link
@@ -275,12 +269,12 @@ export function Header() {
                       <div className="space-y-3 pt-6 border-t border-border">
                         <Button asChild size="lg" className="w-full rounded-none h-12 text-base uppercase tracking-wider font-bold">
                           <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                            Start Training
+                            <T>Start Training</T>
                           </Link>
                         </Button>
                         <Button asChild variant="outline" size="lg" className="w-full rounded-none h-12 text-base uppercase tracking-wider font-bold border-border">
                           <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                            Sign In
+                            <T>Sign In</T>
                           </Link>
                         </Button>
                       </div>
@@ -299,7 +293,7 @@ export function Header() {
                           </Avatar>
                           <div>
                             <div className="font-semibold">{user?.name}</div>
-                            <div className="text-xs text-muted-foreground">My Dashboard</div>
+                            <div className="text-xs text-muted-foreground"><T>My Dashboard</T></div>
                           </div>
                         </Link>
                         <Button
@@ -311,14 +305,14 @@ export function Header() {
                           }}
                         >
                           <LogOut className="mr-2 h-4 w-4" />
-                          Sign Out
+                          <T>Sign Out</T>
                         </Button>
                       </div>
                     )}
 
                     {/* Language Selector in Mobile */}
                     <div className="pt-6 border-t border-border">
-                      <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Language</div>
+                      <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4"><T>Language</T></div>
                       <LanguageSelectorCompact />
                     </div>
                   </div>
