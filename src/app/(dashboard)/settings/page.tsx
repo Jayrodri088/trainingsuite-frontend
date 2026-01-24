@@ -35,17 +35,18 @@ import { getInitials, getErrorMessage } from "@/lib/utils";
 import { apiClient } from "@/lib/api/client";
 import { authApi } from "@/lib/api/auth";
 import { useAuthStore } from "@/stores";
+import { T, useT } from "@/components/t";
 
 export default function SettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useT();
   const queryClient = useQueryClient();
   const { setUser } = useAuthStore();
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  // Profile form state
   const [profileForm, setProfileForm] = useState({
     firstName: "",
     lastName: "",
@@ -53,7 +54,6 @@ export default function SettingsPage() {
     phone: "",
   });
 
-  // Initialize form with user data
   useEffect(() => {
     if (user) {
       const nameParts = user.name?.split(" ") || [];
@@ -66,7 +66,6 @@ export default function SettingsPage() {
     }
   }, [user]);
 
-  // Upload avatar mutation
   const uploadAvatarMutation = useMutation({
     mutationFn: async (file: File) => {
       const formData = new FormData();
@@ -82,14 +81,10 @@ export default function SettingsPage() {
         throw new Error("Upload failed");
       }
 
-      // Update user profile with new avatar URL
       await authApi.updateProfile({ avatar: uploadResponse.data.data.fileUrl });
-
       return uploadResponse.data.data.fileUrl;
     },
     onSuccess: (fileUrl) => {
-      console.log("[Settings] Avatar uploaded, fileUrl:", fileUrl);
-
       const updateState = () => {
         if (user) {
           setUser({ ...user, avatar: fileUrl });
@@ -98,29 +93,23 @@ export default function SettingsPage() {
         setAvatarPreview(null);
       };
 
-      // Preload the new image before clearing preview with retry logic
       const preloadImage = (retriesLeft: number) => {
         const img = new Image();
         img.onload = () => {
-          console.log("[Settings] New avatar image loaded successfully");
           updateState();
-          toast({ title: "Avatar updated successfully!" });
+          toast({ title: t("Avatar updated successfully!") });
         };
         img.onerror = () => {
           if (retriesLeft > 0) {
-            // Retry after a short delay to handle timing issues
             setTimeout(() => preloadImage(retriesLeft - 1), 500);
           } else {
-            // Still update state even if preload fails - the image should load eventually
-            console.warn("[Settings] Image preload failed, updating state anyway");
             updateState();
-            toast({ title: "Avatar updated successfully!" });
+            toast({ title: t("Avatar updated successfully!") });
           }
         };
         img.src = fileUrl;
       };
 
-      // Start preloading with 2 retries
       preloadImage(2);
     },
     onError: (error) => {
@@ -133,26 +122,22 @@ export default function SettingsPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast({ title: "Please select an image file", variant: "destructive" });
+      toast({ title: t("Please select an image file"), variant: "destructive" });
       return;
     }
 
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      toast({ title: "File size must be less than 2MB", variant: "destructive" });
+      toast({ title: t("File size must be less than 2MB"), variant: "destructive" });
       return;
     }
 
-    // Show preview
     const reader = new FileReader();
     reader.onload = (e) => {
       setAvatarPreview(e.target?.result as string);
     };
     reader.readAsDataURL(file);
 
-    // Upload file
     uploadAvatarMutation.mutate(file);
   };
 
@@ -169,7 +154,7 @@ export default function SettingsPage() {
       if (response.success && response.data) {
         setUser(response.data);
         queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
-        toast({ title: "Profile updated successfully!" });
+        toast({ title: t("Profile updated successfully!") });
       }
     } catch (error) {
       toast({ title: getErrorMessage(error), variant: "destructive" });
@@ -180,11 +165,10 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Header */}
       <div>
-        <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">Settings</h1>
+        <h1 className="text-3xl font-heading font-bold uppercase tracking-tight"><T>Settings</T></h1>
         <p className="text-muted-foreground mt-1">
-          Manage your account settings and preferences
+          <T>Manage your account settings and preferences</T>
         </p>
       </div>
 
@@ -195,40 +179,39 @@ export default function SettingsPage() {
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3 font-bold uppercase text-xs tracking-wider text-muted-foreground data-[state=active]:text-foreground transition-none shrink-0"
           >
             <User className="h-4 w-4 mr-2" />
-            Profile
+            <T>Profile</T>
           </TabsTrigger>
           <TabsTrigger
             value="security"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3 font-bold uppercase text-xs tracking-wider text-muted-foreground data-[state=active]:text-foreground transition-none shrink-0"
           >
             <Lock className="h-4 w-4 mr-2" />
-            Security
+            <T>Security</T>
           </TabsTrigger>
           <TabsTrigger
             value="notifications"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3 font-bold uppercase text-xs tracking-wider text-muted-foreground data-[state=active]:text-foreground transition-none shrink-0"
           >
             <Bell className="h-4 w-4 mr-2" />
-            Alerts
+            <T>Alerts</T>
           </TabsTrigger>
           <TabsTrigger
             value="preferences"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3 font-bold uppercase text-xs tracking-wider text-muted-foreground data-[state=active]:text-foreground transition-none shrink-0"
           >
             <Globe className="h-4 w-4 mr-2" />
-            Preferences
+            <T>Preferences</T>
           </TabsTrigger>
         </TabsList>
 
         {/* Profile Tab */}
         <TabsContent value="profile" className="mt-8 space-y-8">
           <div className="grid gap-8">
-            {/* Avatar Section */}
             <Card className="rounded-none border-border">
               <CardHeader className="bg-muted/5 border-b border-border">
-                <CardTitle className="font-heading font-bold uppercase tracking-wide">Profile Picture</CardTitle>
+                <CardTitle className="font-heading font-bold uppercase tracking-wide"><T>Profile Picture</T></CardTitle>
                 <CardDescription>
-                  Upload a profile picture to personalize your account
+                  <T>Upload a profile picture to personalize your account</T>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
@@ -262,83 +245,82 @@ export default function SettingsPage() {
                       className="rounded-none border-border uppercase text-xs font-bold tracking-wider"
                     >
                       <Camera className="h-4 w-4 mr-2" />
-                      {uploadAvatarMutation.isPending ? "Uploading..." : "Change Photo"}
+                      {uploadAvatarMutation.isPending ? t("Uploading...") : t("Change Photo")}
                     </Button>
                     <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                      JPG, PNG or GIF. Max size 2MB.
+                      <T>JPG, PNG or GIF. Max size 2MB.</T>
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Personal Information */}
             <Card className="rounded-none border-border">
               <CardHeader className="bg-muted/5 border-b border-border">
-                <CardTitle className="font-heading font-bold uppercase tracking-wide">Personal Information</CardTitle>
+                <CardTitle className="font-heading font-bold uppercase tracking-wide"><T>Personal Information</T></CardTitle>
                 <CardDescription>
-                  Update your personal details
+                  <T>Update your personal details</T>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 <div className="grid gap-6 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">First Name</Label>
+                    <Label htmlFor="firstName" className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>First Name</T></Label>
                     <Input
                       id="firstName"
                       value={profileForm.firstName}
                       onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
-                      placeholder="Enter your first name"
+                      placeholder={t("Enter your first name")}
                       className="rounded-none border-border bg-muted/20 focus:bg-background transition-colors"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Last Name</Label>
+                    <Label htmlFor="lastName" className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>Last Name</T></Label>
                     <Input
                       id="lastName"
                       value={profileForm.lastName}
                       onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
-                      placeholder="Enter your last name"
+                      placeholder={t("Enter your last name")}
                       className="rounded-none border-border bg-muted/20 focus:bg-background transition-colors"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email</Label>
+                  <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>Email</T></Label>
                   <Input
                     id="email"
                     type="email"
                     value={user?.email || ""}
                     disabled
-                    placeholder="Enter your email"
+                    placeholder={t("Enter your email")}
                     className="rounded-none border-border bg-muted opacity-100 font-mono"
                   />
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide pt-1">Email cannot be changed</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide pt-1"><T>Email cannot be changed</T></p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="bio" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Bio</Label>
+                  <Label htmlFor="bio" className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>Bio</T></Label>
                   <Textarea
                     id="bio"
                     value={profileForm.bio}
                     onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
-                    placeholder="Tell us about yourself..."
+                    placeholder={t("Tell us about yourself...")}
                     rows={4}
                     className="rounded-none border-border bg-muted/20 focus:bg-background transition-colors resize-none"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Phone Number</Label>
+                  <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>Phone Number</T></Label>
                   <Input
                     id="phone"
                     value={profileForm.phone}
                     onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                    placeholder="Enter your phone number"
+                    placeholder={t("Enter your phone number")}
                     className="rounded-none border-border bg-muted/20 focus:bg-background transition-colors"
                   />
                 </div>
                 <Button onClick={handleSave} disabled={isSaving} className="rounded-none font-bold uppercase tracking-wider">
                   {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Save Changes
+                  <T>Save Changes</T>
                 </Button>
               </CardContent>
             </Card>
@@ -348,60 +330,58 @@ export default function SettingsPage() {
         {/* Security Tab */}
         <TabsContent value="security" className="mt-8 space-y-8">
           <div className="grid gap-8">
-            {/* Change Password */}
             <Card className="rounded-none border-border">
               <CardHeader className="bg-muted/5 border-b border-border">
-                <CardTitle className="font-heading font-bold uppercase tracking-wide">Change Password</CardTitle>
+                <CardTitle className="font-heading font-bold uppercase tracking-wide"><T>Change Password</T></CardTitle>
                 <CardDescription>
-                  Update your password to keep your account secure
+                  <T>Update your password to keep your account secure</T>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="currentPassword" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Current Password</Label>
+                  <Label htmlFor="currentPassword" className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>Current Password</T></Label>
                   <Input
                     id="currentPassword"
                     type="password"
-                    placeholder="Enter current password"
+                    placeholder={t("Enter current password")}
                     className="rounded-none border-border bg-muted/20 focus:bg-background transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">New Password</Label>
+                  <Label htmlFor="newPassword" className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>New Password</T></Label>
                   <Input
                     id="newPassword"
                     type="password"
-                    placeholder="Enter new password"
+                    placeholder={t("Enter new password")}
                     className="rounded-none border-border bg-muted/20 focus:bg-background transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Confirm New Password</Label>
+                  <Label htmlFor="confirmPassword" className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>Confirm New Password</T></Label>
                   <Input
                     id="confirmPassword"
                     type="password"
-                    placeholder="Confirm new password"
+                    placeholder={t("Confirm new password")}
                     className="rounded-none border-border bg-muted/20 focus:bg-background transition-colors"
                   />
                 </div>
-                <Button className="rounded-none font-bold uppercase tracking-wider">Update Password</Button>
+                <Button className="rounded-none font-bold uppercase tracking-wider"><T>Update Password</T></Button>
               </CardContent>
             </Card>
 
-            {/* Two-Factor Authentication */}
             <Card className="rounded-none border-border">
               <CardHeader className="bg-muted/5 border-b border-border">
-                <CardTitle className="font-heading font-bold uppercase tracking-wide">Two-Factor Authentication</CardTitle>
+                <CardTitle className="font-heading font-bold uppercase tracking-wide"><T>Two-Factor Authentication</T></CardTitle>
                 <CardDescription>
-                  Add an extra layer of security to your account
+                  <T>Add an extra layer of security to your account</T>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="font-bold text-sm">Enable 2FA</p>
+                    <p className="font-bold text-sm"><T>Enable 2FA</T></p>
                     <p className="text-sm text-muted-foreground">
-                      Secure your account with two-factor authentication
+                      <T>Secure your account with two-factor authentication</T>
                     </p>
                   </div>
                   <Switch />
@@ -409,28 +389,27 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            {/* Sessions */}
             <Card className="rounded-none border-border">
               <CardHeader className="bg-muted/5 border-b border-border">
-                <CardTitle className="font-heading font-bold uppercase tracking-wide">Active Sessions</CardTitle>
+                <CardTitle className="font-heading font-bold uppercase tracking-wide"><T>Active Sessions</T></CardTitle>
                 <CardDescription>
-                  Manage devices where you&apos;re currently logged in
+                  <T>Manage devices where you're currently logged in</T>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 border border-border bg-muted/20">
                     <div>
-                      <p className="font-bold text-sm">Current Device</p>
+                      <p className="font-bold text-sm"><T>Current Device</T></p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Chrome on macOS • Last active now
+                        Chrome on macOS • <T>Last active now</T>
                       </p>
                     </div>
-                    <Badge variant="secondary" className="rounded-none bg-primary/10 text-primary border-0 font-bold uppercase text-[10px] tracking-wider">Current</Badge>
+                    <Badge variant="secondary" className="rounded-none bg-primary/10 text-primary border-0 font-bold uppercase text-[10px] tracking-wider"><T>Current</T></Badge>
                   </div>
                 </div>
                 <Button variant="outline" className="mt-6 rounded-none border-border uppercase text-xs font-bold tracking-wider">
-                  Sign out of all other devices
+                  <T>Sign out of all other devices</T>
                 </Button>
               </CardContent>
             </Card>
@@ -441,47 +420,47 @@ export default function SettingsPage() {
         <TabsContent value="notifications" className="mt-8">
           <Card className="rounded-none border-border">
             <CardHeader className="bg-muted/5 border-b border-border">
-              <CardTitle className="font-heading font-bold uppercase tracking-wide">Notification Preferences</CardTitle>
+              <CardTitle className="font-heading font-bold uppercase tracking-wide"><T>Notification Preferences</T></CardTitle>
               <CardDescription>
-                Choose what notifications you want to receive
+                <T>Choose what notifications you want to receive</T>
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6 space-y-8">
               <div className="space-y-6">
-                <h4 className="font-heading font-bold uppercase text-sm tracking-widest text-muted-foreground border-b border-border pb-2">Email Notifications</h4>
+                <h4 className="font-heading font-bold uppercase text-sm tracking-widest text-muted-foreground border-b border-border pb-2"><T>Email Notifications</T></h4>
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="font-bold text-sm">Course Updates</p>
+                      <p className="font-bold text-sm"><T>Course Updates</T></p>
                       <p className="text-sm text-muted-foreground">
-                        Receive updates about your enrolled courses
+                        <T>Receive updates about your enrolled courses</T>
                       </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="font-bold text-sm">New Courses</p>
+                      <p className="font-bold text-sm"><T>New Courses</T></p>
                       <p className="text-sm text-muted-foreground">
-                        Get notified when new courses are available
+                        <T>Get notified when new courses are available</T>
                       </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="font-bold text-sm">Promotions</p>
+                      <p className="font-bold text-sm"><T>Promotions</T></p>
                       <p className="text-sm text-muted-foreground">
-                        Receive promotional offers and discounts
+                        <T>Receive promotional offers and discounts</T>
                       </p>
                     </div>
                     <Switch />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="font-bold text-sm">Weekly Progress</p>
+                      <p className="font-bold text-sm"><T>Weekly Progress</T></p>
                       <p className="text-sm text-muted-foreground">
-                        Get a weekly summary of your learning progress
+                        <T>Get a weekly summary of your learning progress</T>
                       </p>
                     </div>
                     <Switch defaultChecked />
@@ -490,22 +469,22 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-6">
-                <h4 className="font-heading font-bold uppercase text-sm tracking-widest text-muted-foreground border-b border-border pb-2">Push Notifications</h4>
+                <h4 className="font-heading font-bold uppercase text-sm tracking-widest text-muted-foreground border-b border-border pb-2"><T>Push Notifications</T></h4>
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="font-bold text-sm">Live Session Reminders</p>
+                      <p className="font-bold text-sm"><T>Live Session Reminders</T></p>
                       <p className="text-sm text-muted-foreground">
-                        Get reminded before live sessions start
+                        <T>Get reminded before live sessions start</T>
                       </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="font-bold text-sm">Certificate Earned</p>
+                      <p className="font-bold text-sm"><T>Certificate Earned</T></p>
                       <p className="text-sm text-muted-foreground">
-                        Get notified when you earn a certificate
+                        <T>Get notified when you earn a certificate</T>
                       </p>
                     </div>
                     <Switch defaultChecked />
@@ -515,7 +494,7 @@ export default function SettingsPage() {
 
               <Button onClick={handleSave} disabled={isSaving} className="rounded-none font-bold uppercase tracking-wider">
                 {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Save Preferences
+                <T>Save Preferences</T>
               </Button>
             </CardContent>
           </Card>
@@ -526,18 +505,18 @@ export default function SettingsPage() {
           <div className="grid gap-8">
             <Card className="rounded-none border-border">
               <CardHeader className="bg-muted/5 border-b border-border">
-                <CardTitle className="font-heading font-bold uppercase tracking-wide">Language & Region</CardTitle>
+                <CardTitle className="font-heading font-bold uppercase tracking-wide"><T>Language & Region</T></CardTitle>
                 <CardDescription>
-                  Set your preferred language and regional settings
+                  <T>Set your preferred language and regional settings</T>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 <div className="grid gap-6 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Language</Label>
+                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>Language</T></Label>
                     <Select defaultValue="en">
                       <SelectTrigger className="rounded-none border-border">
-                        <SelectValue placeholder="Select language" />
+                        <SelectValue placeholder={t("Select language")} />
                       </SelectTrigger>
                       <SelectContent className="rounded-none border-border">
                         <SelectItem value="en">English</SelectItem>
@@ -548,10 +527,10 @@ export default function SettingsPage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Timezone</Label>
+                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>Timezone</T></Label>
                     <Select defaultValue="utc">
                       <SelectTrigger className="rounded-none border-border">
-                        <SelectValue placeholder="Select timezone" />
+                        <SelectValue placeholder={t("Select timezone")} />
                       </SelectTrigger>
                       <SelectContent className="rounded-none border-border">
                         <SelectItem value="utc">UTC (GMT+0)</SelectItem>
@@ -567,22 +546,22 @@ export default function SettingsPage() {
 
             <Card className="rounded-none border-border">
               <CardHeader className="bg-muted/5 border-b border-border">
-                <CardTitle className="font-heading font-bold uppercase tracking-wide">Appearance</CardTitle>
+                <CardTitle className="font-heading font-bold uppercase tracking-wide"><T>Appearance</T></CardTitle>
                 <CardDescription>
-                  Customize how the application looks
+                  <T>Customize how the application looks</T>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Theme</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>Theme</T></Label>
                   <Select defaultValue="system">
                     <SelectTrigger className="w-[200px] rounded-none border-border">
-                      <SelectValue placeholder="Select theme" />
+                      <SelectValue placeholder={t("Select theme")} />
                     </SelectTrigger>
                     <SelectContent className="rounded-none border-border">
-                      <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="system">System</SelectItem>
+                      <SelectItem value="light"><T>Light</T></SelectItem>
+                      <SelectItem value="dark"><T>Dark</T></SelectItem>
+                      <SelectItem value="system"><T>System</T></SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -591,17 +570,17 @@ export default function SettingsPage() {
 
             <Card className="rounded-none border-border">
               <CardHeader className="bg-muted/5 border-b border-border">
-                <CardTitle className="font-heading font-bold uppercase tracking-wide">Learning Preferences</CardTitle>
+                <CardTitle className="font-heading font-bold uppercase tracking-wide"><T>Learning Preferences</T></CardTitle>
                 <CardDescription>
-                  Customize your learning experience
+                  <T>Customize your learning experience</T>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="font-bold text-sm">Autoplay Videos</p>
+                    <p className="font-bold text-sm"><T>Autoplay Videos</T></p>
                     <p className="text-sm text-muted-foreground">
-                      Automatically play the next video in a lesson
+                      <T>Automatically play the next video in a lesson</T>
                     </p>
                   </div>
                   <Switch defaultChecked />
@@ -609,22 +588,22 @@ export default function SettingsPage() {
                 <Separator className="bg-border" />
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="font-bold text-sm">Show Subtitles</p>
+                    <p className="font-bold text-sm"><T>Show Subtitles</T></p>
                     <p className="text-sm text-muted-foreground">
-                      Display subtitles when available
+                      <T>Display subtitles when available</T>
                     </p>
                   </div>
                   <Switch />
                 </div>
                 <Separator className="bg-border" />
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Default Video Quality</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground"><T>Default Video Quality</T></Label>
                   <Select defaultValue="auto">
                     <SelectTrigger className="w-[200px] rounded-none border-border">
-                      <SelectValue placeholder="Select quality" />
+                      <SelectValue placeholder={t("Select quality")} />
                     </SelectTrigger>
                     <SelectContent className="rounded-none border-border">
-                      <SelectItem value="auto">Auto</SelectItem>
+                      <SelectItem value="auto"><T>Auto</T></SelectItem>
                       <SelectItem value="1080p">1080p (HD)</SelectItem>
                       <SelectItem value="720p">720p</SelectItem>
                       <SelectItem value="480p">480p</SelectItem>
@@ -634,7 +613,7 @@ export default function SettingsPage() {
 
                 <Button onClick={handleSave} disabled={isSaving} className="mt-4 rounded-none font-bold uppercase tracking-wider">
                   {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Save Preferences
+                  <T>Save Preferences</T>
                 </Button>
               </CardContent>
             </Card>

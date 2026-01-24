@@ -40,9 +40,11 @@ import { useToast } from "@/hooks/use-toast";
 import { certificatesApi } from "@/lib/api/certificates";
 import { format } from "date-fns";
 import type { Certificate, Course } from "@/types";
+import { T, useT } from "@/components/t";
 
 function CertificateCard({ certificate }: { certificate: Certificate }) {
   const { toast } = useToast();
+  const { t } = useT();
   const [isDownloading, setIsDownloading] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -56,7 +58,6 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
-      // Always use the API download endpoint - it will generate the PDF on-the-fly if needed
       const blob = await certificatesApi.download(certificate._id);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -66,9 +67,9 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      toast({ title: "Certificate downloaded!" });
+      toast({ title: t("Certificate downloaded!") });
     } catch (error) {
-      toast({ title: "Failed to download certificate", variant: "destructive" });
+      toast({ title: t("Failed to download certificate"), variant: "destructive" });
     } finally {
       setIsDownloading(false);
     }
@@ -78,15 +79,15 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
     try {
       await navigator.clipboard.writeText(certificateUrl);
       setCopied(true);
-      toast({ title: "Link copied to clipboard!" });
+      toast({ title: t("Link copied to clipboard!") });
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast({ title: "Failed to copy link", variant: "destructive" });
+      toast({ title: t("Failed to copy link"), variant: "destructive" });
     }
   };
 
   const handleShareSocial = (platform: "twitter" | "linkedin" | "facebook") => {
-    const text = `I just earned a certificate for completing "${course?.title || "a course"}"! Check it out:`;
+    const text = t(`I just earned a certificate for completing "${course?.title || "a course"}"! Check it out:`);
     const urls = {
       twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(certificateUrl)}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(certificateUrl)}`,
@@ -100,7 +101,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
     <>
       <Card className="overflow-hidden rounded-none border-border group hover:border-primary/50 transition-colors">
         <div className="bg-amber-50/50 p-6 border-b border-border text-center relative">
-          <Badge className="absolute top-3 left-3 rounded-none bg-amber-600 hover:bg-amber-600 border-0 uppercase text-[10px] tracking-widest font-bold">Verified</Badge>
+          <Badge className="absolute top-3 left-3 rounded-none bg-amber-600 hover:bg-amber-600 border-0 uppercase text-[10px] tracking-widest font-bold"><T>Verified</T></Badge>
           <div className="flex items-center justify-center py-4">
             <div className="relative">
               <div className="h-20 w-20 border-2 border-amber-200 bg-amber-100/50 flex items-center justify-center">
@@ -114,17 +115,17 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
         </div>
         <CardContent className="p-5">
           <h3 className="font-heading font-bold uppercase text-center text-sm line-clamp-2 min-h-[40px] mb-4">
-            {course?.title || "Course Certificate"}
+            {t(course?.title || "Course Certificate")}
           </h3>
 
           <div className="space-y-3 mb-6">
             <div className="flex items-center justify-between text-xs border-b border-border/50 pb-2">
-              <span className="text-muted-foreground font-bold uppercase tracking-wider">Issued</span>
+              <span className="text-muted-foreground font-bold uppercase tracking-wider"><T>Issued</T></span>
               <span className="font-mono text-muted-foreground">{format(new Date(certificate.issuedAt || certificate.createdAt), "MMM d, yyyy")}</span>
             </div>
             {(certificate.certificateId || certificate.certificateNumber) && (
               <div className="flex items-center justify-between text-xs border-b border-border/50 pb-2">
-                <span className="text-muted-foreground font-bold uppercase tracking-wider">ID</span>
+                <span className="text-muted-foreground font-bold uppercase tracking-wider"><T>ID</T></span>
                 <span className="font-mono text-muted-foreground truncate max-w-[150px]">{certificate.certificateId || certificate.certificateNumber}</span>
               </div>
             )}
@@ -143,7 +144,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
               ) : (
                 <Download className="h-3 w-3 mr-2" />
               )}
-              Download
+              <T>Download</T>
             </Button>
             <Button
               variant="outline"
@@ -152,13 +153,13 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
               onClick={() => setShareDialogOpen(true)}
             >
               <Share2 className="h-3 w-3 mr-2" />
-              Share
+              <T>Share</T>
             </Button>
           </div>
 
           <Button variant="ghost" size="sm" className="w-full mt-2 rounded-none uppercase text-xs font-bold tracking-wider h-9 hover:bg-transparent hover:text-primary" asChild>
             <Link href={`/certificates/${certificate._id}`}>
-              View Certificate <ExternalLink className="h-3 w-3 ml-2" />
+              <T>View Certificate</T> <ExternalLink className="h-3 w-3 ml-2" />
             </Link>
           </Button>
         </CardContent>
@@ -168,9 +169,9 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
         <DialogContent className="sm:max-w-md rounded-none border-border">
           <DialogHeader>
-            <DialogTitle className="font-heading font-bold uppercase tracking-wide">Share Certificate</DialogTitle>
+            <DialogTitle className="font-heading font-bold uppercase tracking-wide"><T>Share Certificate</T></DialogTitle>
             <DialogDescription>
-              Share your achievement with others
+              <T>Share your achievement with others</T>
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 pt-4">
@@ -260,9 +261,9 @@ export default function CertificatesPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">My Certificates</h1>
+        <h1 className="text-3xl font-heading font-bold uppercase tracking-tight"><T>My Certificates</T></h1>
         <p className="text-muted-foreground mt-1">
-          View and download your earned certificates
+          <T>View and download your earned certificates</T>
         </p>
       </div>
 
@@ -275,7 +276,7 @@ export default function CertificatesPage() {
             </div>
             <div>
               <p className="text-3xl font-light text-foreground">{certificates.length}</p>
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Total Certificates</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1"><T>Total Certificates</T></p>
             </div>
           </CardContent>
         </Card>
@@ -286,7 +287,7 @@ export default function CertificatesPage() {
             </div>
             <div>
               <p className="text-3xl font-light text-foreground">{certificates.length}</p>
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Courses Completed</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1"><T>Courses Completed</T></p>
             </div>
           </CardContent>
         </Card>
@@ -297,7 +298,7 @@ export default function CertificatesPage() {
             </div>
             <div>
               <p className="text-3xl font-light text-foreground">0</p>
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Shared Certificates</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1"><T>Shared Certificates</T></p>
             </div>
           </CardContent>
         </Card>
@@ -322,12 +323,12 @@ export default function CertificatesPage() {
             <div className="h-16 w-16 mx-auto mb-6 border border-border bg-background flex items-center justify-center text-muted-foreground">
               <Award className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-heading font-bold uppercase tracking-wide">No certificates yet</h3>
+            <h3 className="text-xl font-heading font-bold uppercase tracking-wide"><T>No certificates yet</T></h3>
             <p className="text-muted-foreground mt-2 max-w-md mx-auto text-sm">
-              Complete courses to earn certificates that showcase your achievements.
+              <T>Complete courses to earn certificates that showcase your achievements.</T>
             </p>
             <Button className="mt-8 rounded-none font-bold uppercase tracking-wider" asChild>
-              <Link href="/courses">Browse Courses</Link>
+              <Link href="/courses"><T>Browse Courses</T></Link>
             </Button>
           </CardContent>
         </Card>

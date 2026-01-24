@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { T, useT } from "@/components/t";
 
 const contactMethods = [
   {
@@ -67,6 +68,7 @@ const supportCategories = [
 
 export default function ContactPage() {
   const { toast } = useToast();
+  const { t } = useT();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -84,8 +86,8 @@ export default function ContactPage() {
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     toast({
-      title: "Message sent!",
-      description: "We'll get back to you as soon as possible.",
+      title: t("Message sent!"),
+      description: t("We'll get back to you as soon as possible."),
       variant: "success",
     });
 
@@ -104,10 +106,9 @@ export default function ContactPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-primary/10 to-background py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Contact Us</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6"><T>Contact Us</T></h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Have a question or need help? We're here for you. Reach out to our
-            team and we'll get back to you as soon as possible.
+            <T>Have a question or need help? We're here for you. Reach out to our team and we'll get back to you as soon as possible.</T>
           </p>
         </div>
       </section>
@@ -124,9 +125,9 @@ export default function ContactPage() {
                       <method.icon className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{method.title}</h3>
+                      <h3 className="font-semibold">{t(method.title)}</h3>
                       <p className="text-sm text-muted-foreground mb-2">
-                        {method.description}
+                        {t(method.description)}
                       </p>
                       <a
                         href={method.href}
@@ -149,27 +150,27 @@ export default function ContactPage() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
             <div>
-              <h2 className="text-2xl font-bold mb-2">Send us a message</h2>
+              <h2 className="text-2xl font-bold mb-2"><T>Send us a message</T></h2>
               <p className="text-muted-foreground mb-8">
-                Fill out the form below and we'll respond within 24-48 hours.
+                <T>Fill out the form below and we'll respond within 24-48 hours.</T>
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name *</Label>
+                    <Label htmlFor="name"><T>Full Name</T> *</Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      placeholder="John Doe"
+                      placeholder={t("John Doe")}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address *</Label>
+                    <Label htmlFor="email"><T>Email Address</T> *</Label>
                     <Input
                       id="email"
                       type="email"
@@ -185,7 +186,7 @@ export default function ContactPage() {
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="category">Category *</Label>
+                    <Label htmlFor="category"><T>Category</T> *</Label>
                     <Select
                       value={formData.category}
                       onValueChange={(value) =>
@@ -193,40 +194,40 @@ export default function ContactPage() {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
+                        <SelectValue placeholder={t("Select category")} />
                       </SelectTrigger>
                       <SelectContent>
                         {supportCategories.map((cat) => (
                           <SelectItem key={cat.value} value={cat.value}>
-                            {cat.label}
+                            {t(cat.label)}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Subject *</Label>
+                    <Label htmlFor="subject"><T>Subject</T> *</Label>
                     <Input
                       id="subject"
                       value={formData.subject}
                       onChange={(e) =>
                         setFormData({ ...formData, subject: e.target.value })
                       }
-                      placeholder="How can we help?"
+                      placeholder={t("How can we help?")}
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="message">Message *</Label>
+                  <Label htmlFor="message"><T>Message</T> *</Label>
                   <Textarea
                     id="message"
                     value={formData.message}
                     onChange={(e) =>
                       setFormData({ ...formData, message: e.target.value })
                     }
-                    placeholder="Tell us more about your inquiry..."
+                    placeholder={t("Tell us more about your inquiry...")}
                     rows={6}
                     required
                   />
@@ -241,12 +242,12 @@ export default function ContactPage() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Sending...
+                      <T>Sending...</T>
                     </>
                   ) : (
                     <>
                       <Send className="h-4 w-4 mr-2" />
-                      Send Message
+                      <T>Send Message</T>
                     </>
                   )}
                 </Button>
@@ -255,9 +256,9 @@ export default function ContactPage() {
 
             {/* Quick Links */}
             <div>
-              <h2 className="text-2xl font-bold mb-2">Quick Help</h2>
+              <h2 className="text-2xl font-bold mb-2"><T>Quick Help</T></h2>
               <p className="text-muted-foreground mb-8">
-                Find answers to common questions or explore our resources.
+                <T>Find answers to common questions or explore our resources.</T>
               </p>
 
               <div className="space-y-4">
@@ -271,9 +272,9 @@ export default function ContactPage() {
                         <HelpCircle className="h-5 w-5 text-blue-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold">Frequently Asked Questions</h3>
+                        <h3 className="font-semibold"><T>Frequently Asked Questions</T></h3>
                         <p className="text-sm text-muted-foreground">
-                          Find answers to common questions
+                          <T>Find answers to common questions</T>
                         </p>
                       </div>
                     </Link>
@@ -290,9 +291,9 @@ export default function ContactPage() {
                         <MessageSquare className="h-5 w-5 text-green-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold">Browse Courses</h3>
+                        <h3 className="font-semibold"><T>Browse Courses</T></h3>
                         <p className="text-sm text-muted-foreground">
-                          Explore our course catalog
+                          <T>Explore our course catalog</T>
                         </p>
                       </div>
                     </Link>
@@ -309,9 +310,9 @@ export default function ContactPage() {
                         <Users className="h-5 w-5 text-purple-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold">About Us</h3>
+                        <h3 className="font-semibold"><T>About Us</T></h3>
                         <p className="text-sm text-muted-foreground">
-                          Learn more about our mission
+                          <T>Learn more about our mission</T>
                         </p>
                       </div>
                     </Link>
@@ -322,25 +323,25 @@ export default function ContactPage() {
               {/* Business Hours */}
               <Card className="mt-8">
                 <CardHeader>
-                  <CardTitle className="text-lg">Business Hours</CardTitle>
+                  <CardTitle className="text-lg"><T>Business Hours</T></CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Monday - Friday</span>
+                      <span className="text-muted-foreground"><T>Monday - Friday</T></span>
                       <span>9:00 AM - 6:00 PM EST</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Saturday</span>
+                      <span className="text-muted-foreground"><T>Saturday</T></span>
                       <span>10:00 AM - 4:00 PM EST</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Sunday</span>
-                      <span>Closed</span>
+                      <span className="text-muted-foreground"><T>Sunday</T></span>
+                      <span><T>Closed</T></span>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-4">
-                    * Response times may vary during holidays
+                    <T>* Response times may vary during holidays</T>
                   </p>
                 </CardContent>
               </Card>

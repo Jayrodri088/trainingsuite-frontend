@@ -27,6 +27,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { T, useT } from "@/components/t";
 
 const categories = [
   { id: "getting-started", label: "Getting Started", icon: BookOpen },
@@ -168,6 +169,7 @@ const faqs = [
 export default function FAQPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const { t } = useT();
 
   const filteredFaqs = faqs.filter((faq) => {
     const matchesSearch =
@@ -185,18 +187,17 @@ export default function FAQPage() {
       <section className="bg-gradient-to-b from-primary/10 to-background py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Frequently Asked Questions
+            <T>Frequently Asked Questions</T>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Find answers to common questions about Training Suite. Can't find what
-            you're looking for? Contact our support team.
+            <T>Find answers to common questions about Training Suite. Can't find what you're looking for? Contact our support team.</T>
           </p>
 
           {/* Search */}
           <div className="max-w-lg mx-auto relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
-              placeholder="Search for answers..."
+              placeholder={t("Search for answers...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 h-12 text-lg"
@@ -213,7 +214,7 @@ export default function FAQPage() {
               variant={activeCategory === null ? "default" : "outline"}
               onClick={() => setActiveCategory(null)}
             >
-              All Topics
+              <T>All Topics</T>
             </Button>
             {categories.map((cat) => (
               <Button
@@ -222,7 +223,7 @@ export default function FAQPage() {
                 onClick={() => setActiveCategory(cat.id)}
               >
                 <cat.icon className="h-4 w-4 mr-2" />
-                {cat.label}
+                {t(cat.label)}
               </Button>
             ))}
           </div>
@@ -237,9 +238,9 @@ export default function FAQPage() {
               <Card className="text-center py-12">
                 <CardContent>
                   <HelpCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium">No results found</h3>
+                  <h3 className="text-lg font-medium"><T>No results found</T></h3>
                   <p className="text-muted-foreground mt-1">
-                    Try adjusting your search or browse all categories
+                    <T>Try adjusting your search or browse all categories</T>
                   </p>
                   <Button
                     variant="outline"
@@ -249,7 +250,7 @@ export default function FAQPage() {
                       setActiveCategory(null);
                     }}
                   >
-                    Clear filters
+                    <T>Clear filters</T>
                   </Button>
                 </CardContent>
               </Card>
@@ -262,10 +263,10 @@ export default function FAQPage() {
                     className="border rounded-lg px-4"
                   >
                     <AccordionTrigger className="text-left hover:no-underline">
-                      <span className="font-medium">{faq.question}</span>
+                      <span className="font-medium">{t(faq.question)}</span>
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground">
-                      {faq.answer}
+                      {t(faq.answer)}
                     </AccordionContent>
                   </AccordionItem>
                 ))}
@@ -283,15 +284,14 @@ export default function FAQPage() {
               <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                 <MessageSquare className="h-8 w-8 text-primary" />
               </div>
-              <CardTitle className="text-2xl">Still have questions?</CardTitle>
+              <CardTitle className="text-2xl"><T>Still have questions?</T></CardTitle>
               <CardDescription>
-                Can't find the answer you're looking for? Our support team is here
-                to help.
+                <T>Can't find the answer you're looking for? Our support team is here to help.</T>
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col sm:flex-row justify-center gap-4">
               <Button size="lg" asChild>
-                <Link href="/contact">Contact Support</Link>
+                <Link href="/contact"><T>Contact Support</T></Link>
               </Button>
             </CardContent>
           </Card>

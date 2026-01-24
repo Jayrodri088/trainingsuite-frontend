@@ -33,11 +33,13 @@ import { getInitials } from "@/lib/utils";
 import { LivestreamPlayer, detectStreamType } from "@/components/livestream";
 import type { LiveSession } from "@/types";
 import { format, parseISO, differenceInSeconds, isPast } from "date-fns";
+import { T, useT } from "@/components/t";
 
 export default function LiveSessionDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useT();
   const queryClient = useQueryClient();
   const sessionId = params.id as string;
   const [countdown, setCountdown] = useState<string | null>(null);
@@ -60,15 +62,15 @@ export default function LiveSessionDetailPage() {
     mutationFn: () => liveSessionsApi.join(sessionId),
     onSuccess: () => {
       setHasJoined(true);
-      toast({ title: "You've joined the session!" });
+      toast({ title: t("You've joined the session!") });
     },
     onError: (error: any) => {
       // If session is not live yet, just mark as notified locally
       if (error?.response?.status === 400) {
         setHasJoined(true);
-        toast({ title: "You'll be notified when the session starts!" });
+        toast({ title: t("You'll be notified when the session starts!") });
       } else {
-        toast({ title: "Failed to join session", variant: "destructive" });
+        toast({ title: t("Failed to join session"), variant: "destructive" });
       }
     },
   });
@@ -162,12 +164,12 @@ export default function LiveSessionDetailPage() {
     return (
       <div className="text-center py-12">
         <Video className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h2 className="text-lg font-medium">Session not found</h2>
+        <h2 className="text-lg font-medium"><T>Session not found</T></h2>
         <p className="text-muted-foreground mt-1">
-          This session may have been removed or doesn't exist.
+          <T>This session may have been removed or doesn't exist.</T>
         </p>
         <Button asChild className="mt-4">
-          <Link href="/live-sessions">Back to Sessions</Link>
+          <Link href="/live-sessions"><T>Back to Sessions</T></Link>
         </Button>
       </div>
     );
@@ -178,21 +180,21 @@ export default function LiveSessionDetailPage() {
       return (
         <Badge className="bg-red-600 animate-pulse text-base px-4 py-1">
           <span className="mr-2 h-2 w-2 rounded-full bg-white inline-block animate-pulse" />
-          Live Now
+          <T>Live Now</T>
         </Badge>
       );
     }
     if (session.status === "scheduled") {
       return (
         <Badge className="bg-blue-600 text-base px-4 py-1">
-          Scheduled
+          <T>Scheduled</T>
         </Badge>
       );
     }
     if (session.status === "ended") {
       return (
         <Badge variant="secondary" className="text-base px-4 py-1">
-          {session.recordingUrl ? "Recording Available" : "Ended"}
+          {session.recordingUrl ? <T>Recording Available</T> : <T>Ended</T>}
         </Badge>
       );
     }
@@ -218,7 +220,7 @@ export default function LiveSessionDetailPage() {
           <div className="aspect-video bg-slate-900 rounded-lg flex items-center justify-center">
             <div className="text-center text-white">
               <Video className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <p>Stream URL not available</p>
+              <p><T>Stream URL not available</T></p>
             </div>
           </div>
         );
@@ -239,14 +241,14 @@ export default function LiveSessionDetailPage() {
             onReady={() => {
               // If we're playing and status is still scheduled, it means auto-start worked
               if (session.status === "scheduled" && isScheduledTimePassed) {
-                toast({ title: "Stream is now live!" });
+                toast({ title: t("Stream is now live!") });
               }
             }}
             onError={(err) => {
               console.error("Stream playback error:", err);
               toast({
-                title: "Playback Error",
-                description: "Failed to play the stream. Try refreshing the page.",
+                title: t("Playback Error"),
+                description: t("Failed to play the stream. Try refreshing the page."),
                 variant: "destructive",
               });
             }}
@@ -268,7 +270,7 @@ export default function LiveSessionDetailPage() {
         <div className="aspect-video bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg flex items-center justify-center">
           <div className="text-center text-white">
             <Video className="h-16 w-16 mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-medium mb-2">Session Starting Soon</h3>
+            <h3 className="text-xl font-medium mb-2"><T>Session Starting Soon</T></h3>
             {countdown && (
               <div className="text-4xl font-bold text-primary mb-4">{countdown}</div>
             )}
@@ -281,13 +283,13 @@ export default function LiveSessionDetailPage() {
                 disabled={joinMutation.isPending}
               >
                 <Bell className="h-4 w-4 mr-2" />
-                {joinMutation.isPending ? "Joining..." : "Get Notified"}
+                {joinMutation.isPending ? <T>Joining...</T> : <T>Get Notified</T>}
               </Button>
             )}
             {hasJoined && (
               <div className="flex items-center justify-center gap-2 text-green-400">
                 <CheckCircle className="h-5 w-5" />
-                <span>You'll be notified when the session starts</span>
+                <span><T>You'll be notified when the session starts</T></span>
               </div>
             )}
           </div>
@@ -301,12 +303,12 @@ export default function LiveSessionDetailPage() {
         <div className="text-center text-white">
           <Video className="h-16 w-16 mx-auto mb-4 opacity-50" />
           <h3 className="text-xl font-medium mb-2">
-            {session.status === "ended" ? "Session Ended" : "Stream Not Available"}
+            {session.status === "ended" ? <T>Session Ended</T> : <T>Stream Not Available</T>}
           </h3>
           <p className="text-white/70">
             {session.status === "ended" 
-              ? "No recording is available for this session."
-              : "The stream URL has not been configured yet."}
+              ? <T>No recording is available for this session.</T>
+              : <T>The stream URL has not been configured yet.</T>}
           </p>
         </div>
       </div>
@@ -342,22 +344,22 @@ export default function LiveSessionDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>About this session</CardTitle>
+              <CardTitle><T>About this session</T></CardTitle>
             </CardHeader>
             <CardContent>
               {session.description ? (
                 <p className="text-muted-foreground whitespace-pre-wrap">
-                  {session.description}
+                  {t(session.description)}
                 </p>
               ) : (
-                <p className="text-muted-foreground italic">No description provided.</p>
+                <p className="text-muted-foreground italic"><T>No description provided.</T></p>
               )}
 
               {session.course && (
                 <>
                   <Separator className="my-4" />
                   <div>
-                    <h4 className="font-medium mb-2">Related Course</h4>
+                    <h4 className="font-medium mb-2"><T>Related Course</T></h4>
                     <Link
                       href={`/courses/${session.course.slug}`}
                       className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
@@ -374,8 +376,8 @@ export default function LiveSessionDetailPage() {
                         )}
                       </div>
                       <div>
-                        <p className="font-medium">{session.course.title}</p>
-                        <p className="text-sm text-muted-foreground">View course</p>
+                        <p className="font-medium">{t(session.course.title)}</p>
+                        <p className="text-sm text-muted-foreground"><T>View course</T></p>
                       </div>
                     </Link>
                   </div>
@@ -390,7 +392,7 @@ export default function LiveSessionDetailPage() {
           {/* Session Details */}
           <Card>
             <CardHeader>
-              <CardTitle>Session Details</CardTitle>
+              <CardTitle><T>Session Details</T></CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
@@ -408,8 +410,8 @@ export default function LiveSessionDetailPage() {
                 <div className="flex items-center gap-3">
                   <Clock className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">{session.duration} minutes</p>
-                    <p className="text-sm text-muted-foreground">Duration</p>
+                    <p className="font-medium">{session.duration} <T>minutes</T></p>
+                    <p className="text-sm text-muted-foreground"><T>Duration</T></p>
                   </div>
                 </div>
               )}
@@ -418,9 +420,9 @@ export default function LiveSessionDetailPage() {
                 <div>
                   <p className="font-medium">
                     {session.attendeeCount || 0}
-                    {session.maxAttendees ? ` / ${session.maxAttendees}` : " (Unlimited)"}
+                    {session.maxAttendees ? ` / ${session.maxAttendees}` : ` (${t("Unlimited")})`}
                   </p>
-                  <p className="text-sm text-muted-foreground">Attendees</p>
+                  <p className="text-sm text-muted-foreground"><T>Attendees</T></p>
                 </div>
               </div>
             </CardContent>
@@ -429,7 +431,7 @@ export default function LiveSessionDetailPage() {
           {/* Instructor */}
           <Card>
             <CardHeader>
-              <CardTitle>Instructor</CardTitle>
+              <CardTitle><T>Instructor</T></CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-4">
@@ -440,7 +442,7 @@ export default function LiveSessionDetailPage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{session.instructor?.name || "Instructor"}</p>
+                  <p className="font-medium">{session.instructor?.name || t("Instructor")}</p>
                   {session.instructor?.title && (
                     <p className="text-sm text-muted-foreground">{session.instructor.title}</p>
                   )}
@@ -448,7 +450,7 @@ export default function LiveSessionDetailPage() {
               </div>
               {session.instructor?.bio && (
                 <p className="mt-4 text-sm text-muted-foreground line-clamp-3">
-                  {session.instructor.bio}
+                  {t(session.instructor.bio)}
                 </p>
               )}
             </CardContent>

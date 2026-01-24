@@ -12,10 +12,12 @@ import { certificatesApi } from "@/lib/api/certificates";
 import { format } from "date-fns";
 import Link from "next/link";
 import type { CertificateWithDetails } from "@/types";
+import { T, useT } from "@/components/t";
 
 export default function CertificateDetailPage() {
   const params = useParams();
   const { toast } = useToast();
+  const { t } = useT();
   const [certificate, setCertificate] = useState<CertificateWithDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -33,11 +35,11 @@ export default function CertificateDetailPage() {
       if (response.success && response.data) {
         setCertificate(response.data);
       } else {
-        toast({ title: "Certificate not found", variant: "destructive" });
+        toast({ title: t("Certificate not found"), variant: "destructive" });
       }
     } catch (error) {
       console.error("Failed to load certificate:", error);
-      toast({ title: "Failed to load certificate", variant: "destructive" });
+      toast({ title: t("Failed to load certificate"), variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -57,10 +59,10 @@ export default function CertificateDetailPage() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      toast({ title: "Certificate downloaded!" });
+      toast({ title: t("Certificate downloaded!") });
     } catch (error) {
       console.error("Failed to download certificate:", error);
-      toast({ title: "Failed to download certificate", variant: "destructive" });
+      toast({ title: t("Failed to download certificate"), variant: "destructive" });
     } finally {
       setIsDownloading(false);
     }
@@ -91,12 +93,12 @@ export default function CertificateDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <Award className="h-16 w-16 text-muted-foreground" />
-        <h2 className="text-xl font-semibold">Certificate not found</h2>
-        <p className="text-muted-foreground">The certificate you're looking for doesn't exist.</p>
+        <h2 className="text-xl font-semibold"><T>Certificate not found</T></h2>
+        <p className="text-muted-foreground"><T>The certificate you're looking for doesn't exist.</T></p>
         <Button asChild>
           <Link href="/certificates">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Certificates
+            <T>Back to Certificates</T>
           </Link>
         </Button>
       </div>
@@ -116,8 +118,8 @@ export default function CertificateDetailPage() {
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">Certificate Details</h1>
-          <p className="text-muted-foreground">View and download your certificate</p>
+          <h1 className="text-2xl font-bold"><T>Certificate Details</T></h1>
+          <p className="text-muted-foreground"><T>View and download your certificate</T></p>
         </div>
       </div>
 
@@ -135,19 +137,19 @@ export default function CertificateDetailPage() {
             </div>
             <div className="text-center space-y-2">
               <Badge className="bg-amber-600 hover:bg-amber-600 text-base px-4 py-1">
-                Certificate of Completion
+                <T>Certificate of Completion</T>
               </Badge>
               <h2 className="text-3xl font-bold text-gray-900">
-                {course?.title || "Course Certificate"}
+                {t(course?.title || "Course Certificate")}
               </h2>
               <p className="text-gray-600">
-                This is to certify that
+                <T>This is to certify that</T>
               </p>
               <p className="text-2xl font-semibold text-gray-900">
-                {user?.name || "Student"}
+                {user?.name || t("Student")}
               </p>
               <p className="text-gray-600">
-                has successfully completed the course
+                <T>has successfully completed the course</T>
               </p>
             </div>
           </div>
@@ -157,21 +159,21 @@ export default function CertificateDetailPage() {
           {/* Certificate Details */}
           <div className="space-y-4">
             <div className="flex items-center justify-between py-3 border-b">
-              <span className="text-sm text-muted-foreground">Certificate Number</span>
+              <span className="text-sm text-muted-foreground"><T>Certificate Number</T></span>
               <span className="font-mono text-sm font-medium">
                 {certificate.certificateNumber || certificate.certificateId || "N/A"}
               </span>
             </div>
             <div className="flex items-center justify-between py-3 border-b">
-              <span className="text-sm text-muted-foreground">Issued Date</span>
+              <span className="text-sm text-muted-foreground"><T>Issued Date</T></span>
               <span className="text-sm font-medium">
                 {format(new Date(certificate.issuedAt || certificate.createdAt), "MMMM d, yyyy")}
               </span>
             </div>
             <div className="flex items-center justify-between py-3 border-b">
-              <span className="text-sm text-muted-foreground">Course</span>
+              <span className="text-sm text-muted-foreground"><T>Course</T></span>
               <span className="text-sm font-medium text-right">
-                {course?.title || "N/A"}
+                {t(course?.title || "N/A")}
               </span>
             </div>
           </div>
@@ -186,12 +188,12 @@ export default function CertificateDetailPage() {
             {isDownloading ? (
               <>
                 <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Downloading...
+                <T>Downloading...</T>
               </>
             ) : (
               <>
                 <Download className="h-5 w-5 mr-2" />
-                Download Certificate
+                <T>Download Certificate</T>
               </>
             )}
           </Button>

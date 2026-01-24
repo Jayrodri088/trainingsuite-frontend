@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNotifications, useMarkAsRead, useMarkAllAsRead } from "@/hooks";
 import { formatDistanceToNow } from "date-fns";
 import type { Notification } from "@/types";
+import { T, useT } from "@/components/t";
 
 const notificationIcons: Record<string, React.ElementType> = {
   course: BookOpen,
@@ -51,6 +52,7 @@ function NotificationCard({
   onMarkAsRead: (id: string) => void;
   onNavigate: (notification: Notification) => void;
 }) {
+  const { t } = useT();
   const type = notification.type || "info";
   const Icon = notificationIcons[type] || Info;
   const colors = notificationColors[type] || notificationColors.info;
@@ -74,14 +76,14 @@ function NotificationCard({
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h4 className={`font-heading font-bold uppercase text-sm ${!notification.isRead ? "text-primary" : "text-foreground"}`}>
-                    {notification.title}
+                    {t(notification.title)}
                   </h4>
                   {!notification.isRead && (
-                    <Badge className="rounded-none h-4 px-1 text-[10px] font-bold uppercase tracking-wider bg-primary border-0">New</Badge>
+                    <Badge className="rounded-none h-4 px-1 text-[10px] font-bold uppercase tracking-wider bg-primary border-0"><T>New</T></Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-2">
-                  {notification.message}
+                  {t(notification.message)}
                 </p>
                 <div className="flex items-center gap-3 mt-3">
                   <p className="text-xs font-mono text-muted-foreground uppercase tracking-wide">
@@ -90,7 +92,7 @@ function NotificationCard({
                   {notification.link && (
                     <span className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1 group-hover:underline">
                       <ExternalLink className="h-3 w-3" />
-                      View Details
+                      <T>View Details</T>
                     </span>
                   )}
                 </div>
@@ -105,7 +107,7 @@ function NotificationCard({
                       onMarkAsRead(notification._id);
                     }}
                     className="shrink-0 h-8 w-8 rounded-none hover:bg-background border border-transparent hover:border-border"
-                    title="Mark as read"
+                    title={t("Mark as read")}
                   >
                     <Check className="h-4 w-4" />
                   </Button>
@@ -158,11 +160,9 @@ export default function NotificationsPage() {
   };
 
   const handleNavigate = (notification: Notification) => {
-    // Mark as read when clicking
     if (!notification.isRead) {
       markAsRead.mutate(notification._id);
     }
-    // Navigate to the link if it exists
     if (notification.link) {
       router.push(notification.link);
     }
@@ -170,12 +170,11 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">Notifications</h1>
+          <h1 className="text-3xl font-heading font-bold uppercase tracking-tight"><T>Notifications</T></h1>
           <p className="text-muted-foreground mt-1">
-            Stay updated with your learning journey
+            <T>Stay updated with your learning journey</T>
           </p>
         </div>
         {unreadNotifications.length > 0 && (
@@ -187,12 +186,11 @@ export default function NotificationsPage() {
             className="rounded-none border-primary/20 hover:bg-primary/5 hover:text-primary uppercase text-xs font-bold tracking-wider w-full sm:w-auto"
           >
             <CheckCheck className="h-3.5 w-3.5 mr-2" />
-            Mark all as read
+            <T>Mark all as read</T>
           </Button>
         )}
       </div>
 
-      {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="rounded-none border-border bg-card">
           <CardContent className="p-6 flex items-center gap-4">
@@ -201,7 +199,7 @@ export default function NotificationsPage() {
             </div>
             <div>
               <p className="text-3xl font-light text-foreground">{notifications.length}</p>
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Total</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1"><T>Total</T></p>
             </div>
           </CardContent>
         </Card>
@@ -212,7 +210,7 @@ export default function NotificationsPage() {
             </div>
             <div>
               <p className="text-3xl font-light text-foreground">{unreadNotifications.length}</p>
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Unread</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1"><T>Unread</T></p>
             </div>
           </CardContent>
         </Card>
@@ -223,32 +221,31 @@ export default function NotificationsPage() {
             </div>
             <div>
               <p className="text-3xl font-light text-foreground">{readNotifications.length}</p>
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Read</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1"><T>Read</T></p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Notifications */}
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="bg-transparent border-b border-border w-full justify-start rounded-none h-auto p-0 gap-4 sm:gap-8 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="all"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3 font-bold uppercase text-xs tracking-wider text-muted-foreground data-[state=active]:text-foreground transition-none shrink-0"
           >
-            All <Badge className="ml-2 rounded-none bg-muted text-muted-foreground border-0 text-[10px]">{notifications.length}</Badge>
+            <T>All</T> <Badge className="ml-2 rounded-none bg-muted text-muted-foreground border-0 text-[10px]">{notifications.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="unread"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3 font-bold uppercase text-xs tracking-wider text-muted-foreground data-[state=active]:text-foreground transition-none shrink-0"
           >
-            Unread <Badge className="ml-2 rounded-none bg-muted text-muted-foreground border-0 text-[10px]">{unreadNotifications.length}</Badge>
+            <T>Unread</T> <Badge className="ml-2 rounded-none bg-muted text-muted-foreground border-0 text-[10px]">{unreadNotifications.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="read"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3 font-bold uppercase text-xs tracking-wider text-muted-foreground data-[state=active]:text-foreground transition-none shrink-0"
           >
-            Read <Badge className="ml-2 rounded-none bg-muted text-muted-foreground border-0 text-[10px]">{readNotifications.length}</Badge>
+            <T>Read</T> <Badge className="ml-2 rounded-none bg-muted text-muted-foreground border-0 text-[10px]">{readNotifications.length}</Badge>
           </TabsTrigger>
         </TabsList>
 
@@ -276,9 +273,9 @@ export default function NotificationsPage() {
                 <div className="h-16 w-16 mx-auto mb-6 border border-border bg-background flex items-center justify-center text-muted-foreground">
                   <BellOff className="h-8 w-8" />
                 </div>
-                <h3 className="text-xl font-heading font-bold uppercase tracking-wide">No notifications</h3>
+                <h3 className="text-xl font-heading font-bold uppercase tracking-wide"><T>No notifications</T></h3>
                 <p className="text-muted-foreground mt-2 text-sm">
-                  You&apos;re all caught up! Check back later for updates.
+                  <T>You're all caught up! Check back later for updates.</T>
                 </p>
               </CardContent>
             </Card>
@@ -309,9 +306,9 @@ export default function NotificationsPage() {
                 <div className="h-16 w-16 mx-auto mb-6 border border-border bg-background flex items-center justify-center text-green-600/50">
                   <Check className="h-8 w-8" />
                 </div>
-                <h3 className="text-xl font-heading font-bold uppercase tracking-wide">All caught up!</h3>
+                <h3 className="text-xl font-heading font-bold uppercase tracking-wide"><T>All caught up!</T></h3>
                 <p className="text-muted-foreground mt-2 text-sm">
-                  You have no unread notifications.
+                  <T>You have no unread notifications.</T>
                 </p>
               </CardContent>
             </Card>
@@ -342,9 +339,9 @@ export default function NotificationsPage() {
                 <div className="h-16 w-16 mx-auto mb-6 border border-border bg-background flex items-center justify-center text-muted-foreground">
                   <Bell className="h-8 w-8" />
                 </div>
-                <h3 className="text-xl font-heading font-bold uppercase tracking-wide">No read notifications</h3>
+                <h3 className="text-xl font-heading font-bold uppercase tracking-wide"><T>No read notifications</T></h3>
                 <p className="text-muted-foreground mt-2 text-sm">
-                  Notifications you&apos;ve read will appear here.
+                  <T>Notifications you've read will appear here.</T>
                 </p>
               </CardContent>
             </Card>

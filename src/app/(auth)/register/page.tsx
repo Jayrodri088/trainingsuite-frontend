@@ -24,6 +24,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AxiosError } from "axios";
+import { T, useT } from "@/components/t";
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -35,21 +36,22 @@ interface ApiErrorResponse {
   errors?: ValidationErrors;
 }
 
-const passwordRequirements = [
-  { id: "length", label: "At least 8 characters", test: (p: string) => p.length >= 8 },
-  { id: "uppercase", label: "One uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
-  { id: "lowercase", label: "One lowercase letter", test: (p: string) => /[a-z]/.test(p) },
-  { id: "number", label: "One number", test: (p: string) => /[0-9]/.test(p) },
-];
-
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useT();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+
+  const passwordRequirements = [
+    { id: "length", label: t("At least 8 characters"), test: (p: string) => p.length >= 8 },
+    { id: "uppercase", label: t("One uppercase letter"), test: (p: string) => /[A-Z]/.test(p) },
+    { id: "lowercase", label: t("One lowercase letter"), test: (p: string) => /[a-z]/.test(p) },
+    { id: "number", label: t("One number"), test: (p: string) => /[0-9]/.test(p) },
+  ];
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -64,11 +66,10 @@ export default function RegisterPage() {
   const password = form.watch("password");
 
   async function onSubmit(data: RegisterFormData) {
-    // Clear previous server errors
     setServerError(null);
 
     if (!acceptTerms) {
-      toast.error("Please accept the terms and conditions");
+      toast.error(t("Please accept the terms and conditions"));
       return;
     }
 
@@ -81,20 +82,17 @@ export default function RegisterPage() {
         confirmPassword: data.confirmPassword,
       });
       if (response.success && response.data) {
-        // Store auth state (auto login)
         setAuth(response.data.user, response.data.token);
-        toast.success("Welcome! Your account has been created. Check your email to verify your account.");
+        toast.success(t("Welcome! Your account has been created. Check your email to verify your account."));
         router.push("/dashboard");
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError && error.response?.data) {
         const errorData = error.response.data as ApiErrorResponse;
 
-        // If we have field-specific errors, set them on the form
         if (errorData.errors) {
           const fieldErrors = errorData.errors;
 
-          // Set errors for each field
           Object.entries(fieldErrors).forEach(([field, messages]) => {
             if (field === "name" || field === "email" || field === "password" || field === "confirmPassword") {
               form.setError(field as keyof RegisterFormData, {
@@ -104,16 +102,14 @@ export default function RegisterPage() {
             }
           });
 
-          // Show general error message
-          setServerError(errorData.error || "Please fix the errors below");
+          setServerError(errorData.error || t("Please fix the errors below"));
         } else {
-          // No field-specific errors, show the general error
-          setServerError(errorData.error || "Registration failed. Please try again.");
+          setServerError(errorData.error || t("Registration failed. Please try again."));
         }
       } else if (error instanceof Error) {
         setServerError(error.message);
       } else {
-        setServerError("An unexpected error occurred. Please try again.");
+        setServerError(t("An unexpected error occurred. Please try again."));
       }
     } finally {
       setIsLoading(false);
@@ -123,9 +119,9 @@ export default function RegisterPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
+        <h1 className="text-2xl font-bold tracking-tight"><T>Create an account</T></h1>
         <p className="text-muted-foreground">
-          Enter your details to get started with your learning journey
+          <T>Enter your details to get started with your learning journey</T>
         </p>
       </div>
 
@@ -143,10 +139,10 @@ export default function RegisterPage() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel><T>Full Name</T></FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="John Doe"
+                    placeholder={t("John Doe")}
                     autoComplete="name"
                     disabled={isLoading}
                     {...field}
@@ -162,7 +158,7 @@ export default function RegisterPage() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel><T>Email</T></FormLabel>
                 <FormControl>
                   <Input
                     type="email"
@@ -182,12 +178,12 @@ export default function RegisterPage() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel><T>Password</T></FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Create a password"
+                      placeholder={t("Create a password")}
                       autoComplete="new-password"
                       disabled={isLoading}
                       {...field}
@@ -241,12 +237,12 @@ export default function RegisterPage() {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel><T>Confirm Password</T></FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
+                      placeholder={t("Confirm your password")}
                       autoComplete="new-password"
                       disabled={isLoading}
                       {...field}
@@ -282,20 +278,20 @@ export default function RegisterPage() {
               htmlFor="terms"
               className="text-sm text-muted-foreground leading-tight"
             >
-              I agree to the{" "}
+              <T>I agree to the</T>{" "}
               <Link href="/terms" className="text-primary hover:underline">
-                Terms of Service
+                <T>Terms of Service</T>
               </Link>{" "}
-              and{" "}
+              <T>and</T>{" "}
               <Link href="/privacy" className="text-primary hover:underline">
-                Privacy Policy
+                <T>Privacy Policy</T>
               </Link>
             </label>
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading || !acceptTerms}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Create account
+            <T>Create account</T>
           </Button>
         </form>
       </Form>
@@ -306,7 +302,7 @@ export default function RegisterPage() {
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-background px-2 text-muted-foreground">
-            Or continue with
+            <T>Or continue with</T>
           </span>
         </div>
       </div>
@@ -342,9 +338,9 @@ export default function RegisterPage() {
       </div>
 
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        <T>Already have an account?</T>{" "}
         <Link href="/login" className="text-primary hover:underline font-medium">
-          Sign in
+          <T>Sign in</T>
         </Link>
       </p>
     </div>

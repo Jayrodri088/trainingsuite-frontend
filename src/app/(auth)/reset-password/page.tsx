@@ -20,6 +20,7 @@ import { resetPasswordSchema, type ResetPasswordFormData } from "@/lib/validatio
 import { authApi } from "@/lib/api";
 import { toast } from "sonner";
 import { cn, getErrorMessage } from "@/lib/utils";
+import { T, useT } from "@/components/t";
 
 const passwordRequirements = [
   { id: "length", label: "At least 8 characters", test: (p: string) => p.length >= 8 },
@@ -32,6 +33,7 @@ function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const { t } = useT();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -50,7 +52,7 @@ function ResetPasswordForm() {
 
   async function onSubmit(data: ResetPasswordFormData) {
     if (!token) {
-      toast.error("Invalid reset link");
+      toast.error(t("Invalid reset link"));
       return;
     }
 
@@ -74,14 +76,14 @@ function ResetPasswordForm() {
     return (
       <div className="space-y-6">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Invalid reset link</h1>
+          <h1 className="text-2xl font-bold tracking-tight"><T>Invalid reset link</T></h1>
           <p className="text-muted-foreground">
-            This password reset link is invalid or has expired.
+            <T>This password reset link is invalid or has expired.</T>
           </p>
         </div>
 
         <Button asChild className="w-full">
-          <Link href="/forgot-password">Request a new link</Link>
+          <Link href="/forgot-password"><T>Request a new link</T></Link>
         </Button>
       </div>
     );
@@ -95,14 +97,14 @@ function ResetPasswordForm() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Password reset successful</h1>
+          <h1 className="text-2xl font-bold tracking-tight"><T>Password reset successful</T></h1>
           <p className="text-muted-foreground">
-            Your password has been reset successfully. You can now sign in with your new password.
+            <T>Your password has been reset successfully. You can now sign in with your new password.</T>
           </p>
         </div>
 
         <Button asChild className="w-full">
-          <Link href="/login">Sign in</Link>
+          <Link href="/login"><T>Sign in</T></Link>
         </Button>
       </div>
     );
@@ -111,9 +113,9 @@ function ResetPasswordForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">Set new password</h1>
+        <h1 className="text-2xl font-bold tracking-tight"><T>Set new password</T></h1>
         <p className="text-muted-foreground">
-          Your new password must be different from previously used passwords.
+          <T>Your new password must be different from previously used passwords.</T>
         </p>
       </div>
 
@@ -124,12 +126,12 @@ function ResetPasswordForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>New Password</FormLabel>
+                <FormLabel><T>New Password</T></FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your new password"
+                      placeholder={t("Enter your new password")}
                       autoComplete="new-password"
                       disabled={isLoading}
                       {...field}
@@ -167,7 +169,7 @@ function ResetPasswordForm() {
                           ) : (
                             <X className="h-3 w-3" />
                           )}
-                          {req.label}
+                          {t(req.label)}
                         </div>
                       );
                     })}
@@ -183,12 +185,12 @@ function ResetPasswordForm() {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Confirm New Password</FormLabel>
+                <FormLabel><T>Confirm New Password</T></FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your new password"
+                      placeholder={t("Confirm your new password")}
                       autoComplete="new-password"
                       disabled={isLoading}
                       {...field}
@@ -216,13 +218,13 @@ function ResetPasswordForm() {
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Reset password
+            <T>Reset password</T>
           </Button>
         </form>
       </Form>
 
       <Button asChild variant="ghost" className="w-full">
-        <Link href="/login">Back to login</Link>
+        <Link href="/login"><T>Back to login</T></Link>
       </Button>
     </div>
   );

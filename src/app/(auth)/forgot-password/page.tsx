@@ -18,8 +18,10 @@ import {
 import { forgotPasswordSchema, type ForgotPasswordFormData } from "@/lib/validations/auth";
 import { authApi } from "@/lib/api";
 import { toast } from "sonner";
+import { T, useT } from "@/components/t";
 
 export default function ForgotPasswordPage() {
+  const { t } = useT();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
@@ -40,7 +42,6 @@ export default function ForgotPasswordPage() {
         setIsSubmitted(true);
       }
     } catch (error: unknown) {
-      // Don't reveal if email exists or not for security
       setSubmittedEmail(data.email);
       setIsSubmitted(true);
     } finally {
@@ -56,16 +57,16 @@ export default function ForgotPasswordPage() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Check your email</h1>
+          <h1 className="text-2xl font-bold tracking-tight"><T>Check your email</T></h1>
           <p className="text-muted-foreground">
-            We&apos;ve sent a password reset link to{" "}
+            <T>We've sent a password reset link to</T>{" "}
             <span className="font-medium text-foreground">{submittedEmail}</span>
           </p>
         </div>
 
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Didn&apos;t receive the email? Check your spam folder or{" "}
+            <T>Didn't receive the email? Check your spam folder or</T>{" "}
             <button
               onClick={() => {
                 setIsSubmitted(false);
@@ -73,14 +74,14 @@ export default function ForgotPasswordPage() {
               }}
               className="text-primary hover:underline font-medium"
             >
-              try another email address
+              <T>try another email address</T>
             </button>
           </p>
 
           <Button asChild variant="outline" className="w-full">
             <Link href="/login">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to login
+              <T>Back to login</T>
             </Link>
           </Button>
         </div>
@@ -91,9 +92,9 @@ export default function ForgotPasswordPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">Forgot password?</h1>
+        <h1 className="text-2xl font-bold tracking-tight"><T>Forgot password?</T></h1>
         <p className="text-muted-foreground">
-          No worries, we&apos;ll send you reset instructions.
+          <T>No worries, we'll send you reset instructions.</T>
         </p>
       </div>
 
@@ -104,11 +105,11 @@ export default function ForgotPasswordPage() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel><T>Email</T></FormLabel>
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="Enter your email address"
+                    placeholder={t("Enter your email address")}
                     autoComplete="email"
                     disabled={isLoading}
                     {...field}
@@ -121,7 +122,7 @@ export default function ForgotPasswordPage() {
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Reset password
+            <T>Reset password</T>
           </Button>
         </form>
       </Form>
@@ -129,7 +130,7 @@ export default function ForgotPasswordPage() {
       <Button asChild variant="ghost" className="w-full">
         <Link href="/login">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to login
+          <T>Back to login</T>
         </Link>
       </Button>
     </div>
