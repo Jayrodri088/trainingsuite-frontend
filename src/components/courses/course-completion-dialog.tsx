@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Award, Share2, Download, ArrowRight, PartyPopper, CheckCircle } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Award, Share2, Download, ArrowRight, PartyPopper, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,7 +15,7 @@ import {
 import { Confetti } from "@/components/ui/confetti";
 import { useToast } from "@/hooks/use-toast";
 import { certificatesApi } from "@/lib/api/certificates";
-import type { Course, Certificate } from "@/types";
+import type { Course, Certificate, CertificateWithDetails } from "@/types";
 
 interface CourseCompletionDialogProps {
   open: boolean;
@@ -33,40 +33,35 @@ export function CourseCompletionDialog({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showConfetti, setShowConfetti] = useState(false);
-  const [certificate, setCertificate] = useState<Certificate | null>(null);
+
+  // Fetch certificates when dialog opens to find the one for this course
+  const { data: certificatesResponse, isLoading: isLoadingCertificates } = useQuery({
+    queryKey: ["certificates"],
+    queryFn: () => certificatesApi.getAll(1, 50),
+    enabled: open && !!course,
+  });
+
+  // Find the certificate for this specific course
+  const certificate = certificatesResponse?.data?.find(
+    (cert: CertificateWithDetails) => {
+      const certCourseId = typeof cert.course === "object" ? cert.course._id : cert.course;
+      return certCourseId === course?._id;
+    }
+  ) || null;
 
   useEffect(() => {
     if (open) {
       setShowConfetti(true);
-    }
-  }, [open]);
-
-  const generateCertificateMutation = useMutation({
-    mutationFn: async () => {
-      // This would call the backend to generate a certificate
-      // For now, we'll simulate it
-      const response = await fetch(`/api/courses/${course?._id}/certificate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to generate certificate");
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      setCertificate(data.data);
-      onCertificateGenerated?.(data.data);
+      // Invalidate certificates query to fetch fresh data
       queryClient.invalidateQueries({ queryKey: ["certificates"] });
-      toast({ title: "Certificate generated!" });
-    },
-    onError: () => {
-      toast({ title: "Certificate generation failed", variant: "destructive" });
-    },
-  });
+    }
+  }, [open, queryClient]);
+
+  useEffect(() => {
+    if (certificate && onCertificateGenerated) {
+      onCertificateGenerated(certificate);
+    }
+  }, [certificate, onCertificateGenerated]);
 
   const handleShare = async () => {
     const shareText = `I just completed "${course?.title}" on Training Suite! 🎉`;
@@ -125,51 +120,44 @@ export function CourseCompletionDialog({
           </DialogHeader>
 
           <div className="space-y-3 mt-4">
-            {!certificate ? (
-              <Button
-                size="lg"
-                className="w-full"
-                onClick={() => generateCertificateMutation.mutate()}
-                disabled={generateCertificateMutation.isPending}
-              >
-                {generateCertificateMutation.isPending ? (
-                  "Generating..."
-                ) : (
-                  <>
-                    <Award className="h-5 w-5 mr-2" />
-                    Get Your Certificate
-                  </>
-                )}
+            {isLoadingCertificates ? (
+              <Button size="lg" className="w-full" disabled>
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                Loading Certificate...
               </Button>
-            ) : (
-              <div className="space-y-2">
+            ) : certificate ? (
+              <div className="space-y-3">
                 <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-900">
                   <p className="text-sm text-green-700 dark:text-green-400 font-medium">
-                    Certificate Generated!
+                    Certificate Ready!
                   </p>
                   <p className="text-xs text-green-600 dark:text-green-500 mt-1">
                     ID: {certificate.certificateNumber || certificate._id}
                   </p>
                 </div>
+                <Button size="lg" className="w-full" asChild>
+                  <Link href={`/certificates/${certificate._id}`}>
+                    <Award className="h-5 w-5 mr-2" />
+                    View Certificate
+                  </Link>
+                </Button>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1" asChild>
-                    <Link href={`/certificates/${certificate._id}`}>
-                      <Download className="h-4 w-4 mr-1" />
-                      View
-                    </Link>
-                  </Button>
                   <Button variant="outline" size="sm" className="flex-1" onClick={handleShare}>
                     <Share2 className="h-4 w-4 mr-1" />
                     Share
                   </Button>
                 </div>
               </div>
+            ) : (
+              <div className="p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-900">
+                <p className="text-sm text-amber-700 dark:text-amber-400 font-medium">
+                  Certificate is being generated...
+                </p>
+                <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
+                  Please check your certificates page in a moment.
+                </p>
+              </div>
             )}
-
-            <Button variant="outline" size="lg" className="w-full" onClick={handleShare}>
-              <Share2 className="h-5 w-5 mr-2" />
-              Share Achievement
-            </Button>
 
             <div className="pt-4 border-t">
               <Button variant="ghost" size="sm" asChild className="w-full">

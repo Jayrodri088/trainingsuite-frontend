@@ -175,6 +175,10 @@ function VideoPlayer({
         playerVars: {
           rel: 0,
           modestbranding: 1,
+          autoplay: 1,
+          disablekb: 1, // Disable keyboard controls (prevents seeking with arrow keys)
+          controls: 1,
+          fs: 0, // Disable fullscreen
         },
         events: {
           onStateChange: (event: { data: number }) => {
@@ -238,15 +242,12 @@ function VideoPlayer({
     return (
       <div className="aspect-video bg-slate-900">
         <iframe
-          src={`${embedUrl}?api=1`}
+          src={`${embedUrl}?api=1&autoplay=1`}
           className="w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           title={lesson.title}
         />
-        <p className="text-xs text-slate-500 text-center py-1">
-          Click "Mark as Complete" when you finish watching
-        </p>
       </div>
     );
   }
@@ -266,16 +267,56 @@ function VideoPlayer({
     );
   }
 
-  // Direct video file - use HTML5 video with onEnded
+  // Direct video file - use HTML5 video with onEnded (no seeking, autoplay)
+  // Toggle play/pause on click
+  const handleVideoClick = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  };
+
   return (
-    <div className="aspect-video bg-slate-900">
+    <div className="aspect-video bg-slate-900 relative">
+      <style jsx>{`
+        video::-webkit-media-controls-timeline {
+          display: none;
+        }
+        video::-webkit-media-controls-current-time-display,
+        video::-webkit-media-controls-time-remaining-display {
+          display: none;
+        }
+      `}</style>
       <video
         ref={videoRef}
-        className="w-full h-full"
+        className="w-full h-full cursor-pointer"
         controls
-        controlsList="nodownload"
+        controlsList="nodownload nofullscreen noplaybackrate"
+        disablePictureInPicture
         playsInline
+        autoPlay
+        onClick={handleVideoClick}
         onEnded={handleVideoEnd}
+        onLoadedData={(e) => {
+          // Prevent seeking by resetting currentTime when user tries to seek
+          const video = e.currentTarget;
+          let lastTime = 0;
+          video.addEventListener('timeupdate', () => {
+            if (!video.seeking) {
+              lastTime = video.currentTime;
+            }
+          });
+          video.addEventListener('seeking', () => {
+            // Only allow seeking backwards up to 5 seconds or forward if already watched
+            const delta = video.currentTime - lastTime;
+            if (delta > 1) {
+              video.currentTime = lastTime;
+            }
+          });
+        }}
         poster="/video-placeholder.jpg"
       >
         <source src={embedUrl} type="video/mp4" />
@@ -300,34 +341,34 @@ function LessonItem({
   onClick: () => void;
 }) {
   const getIcon = () => {
-    if (isCompleted) return <CheckCircle className="h-4 w-4 text-green-500" />;
-    if (isLocked) return <Lock className="h-4 w-4 text-muted-foreground" />;
-    if (lesson.type === "video") return <Video className="h-4 w-4" />;
-    if (lesson.type === "text") return <FileText className="h-4 w-4" />;
-    return <Circle className="h-4 w-4" />;
+    if (isCompleted) return <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />;
+    if (isLocked) return <Lock className="h-4 w-4 text-muted-foreground shrink-0" />;
+    if (lesson.type === "video") return <Video className="h-4 w-4 shrink-0" />;
+    if (lesson.type === "text") return <FileText className="h-4 w-4 shrink-0" />;
+    return <Circle className="h-4 w-4 shrink-0" />;
   };
 
   return (
     <button
       onClick={onClick}
       disabled={isLocked}
-      className={`w-full text-left p-3 rounded-lg transition-colors ${isActive
+      className={`w-full text-left p-2 sm:p-3 rounded-lg transition-colors ${isActive
         ? "bg-primary/10 border border-primary/30"
         : isLocked
           ? "opacity-50 cursor-not-allowed"
           : "hover:bg-muted"
         }`}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-2 sm:gap-3">
         <div className="mt-0.5">{getIcon()}</div>
         <div className="flex-1 min-w-0">
-          <p className={`text-sm font-medium line-clamp-2 ${isActive ? "text-primary" : ""}`}>
+          <p className={`text-sm font-medium line-clamp-2 break-words ${isActive ? "text-primary" : ""}`}>
             {lesson.title}
           </p>
           <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
             {lesson.duration && (
               <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
+                <Clock className="h-3 w-3 shrink-0" />
                 {lesson.duration} min
               </span>
             )}
@@ -359,9 +400,9 @@ function CurriculumSidebar({
   const defaultOpenModules = modules.map((m) => m._id);
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Progress header */}
-      <div className="p-4 border-b">
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Progress header - pt-14 on mobile to avoid sheet close button */}
+      <div className="p-3 sm:p-4 pt-14 lg:pt-4 border-b shrink-0">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium">Course Progress</span>
           <span className="text-sm text-muted-foreground">{courseProgress}%</span>
@@ -370,8 +411,8 @@ function CurriculumSidebar({
       </div>
 
       {/* Curriculum */}
-      <ScrollArea className="flex-1">
-        <div className="p-4">
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-3 sm:p-4">
           <Accordion type="multiple" defaultValue={defaultOpenModules} className="space-y-2">
             {modules.map((module, moduleIndex) => {
               const lessons = (module.lessons || []) as Lesson[];
@@ -381,24 +422,24 @@ function CurriculumSidebar({
                 <AccordionItem
                   key={module._id}
                   value={module._id}
-                  className="border rounded-lg"
+                  className="border rounded-lg overflow-hidden"
                 >
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                    <div className="flex items-center gap-3 text-left">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-medium">
+                  <AccordionTrigger className="px-3 sm:px-4 py-3 hover:no-underline">
+                    <div className="flex items-center gap-2 sm:gap-3 text-left min-w-0">
+                      <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-medium">
                         {moduleIndex + 1}
                       </div>
-                      <div>
-                        <p className="font-medium text-sm">{module.title}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm truncate">{module.title}</p>
                         <p className="text-xs text-muted-foreground">
                           {completedLessonsCount}/{lessons.length} lessons
                         </p>
                       </div>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
-                    <div className="space-y-1 ml-10">
-                      {lessons.map((lesson, lessonIndex) => (
+                  <AccordionContent className="px-2 sm:px-4 pb-3">
+                    <div className="space-y-1">
+                      {lessons.map((lesson) => (
                         <LessonItem
                           key={lesson._id}
                           lesson={lesson}
@@ -415,7 +456,7 @@ function CurriculumSidebar({
             })}
           </Accordion>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
@@ -665,26 +706,12 @@ export default function CourseLearnPage({
               Previous
             </Button>
 
-            <Button
-              variant="default"
-              size="sm"
-              disabled={!activeLesson || completedLessonIds.has(activeLesson._id) || markCompleteMutation.isPending}
-              onClick={() => activeLesson && markCompleteMutation.mutate(activeLesson._id)}
-            >
-              {completedLessonIds.has(activeLesson?._id || "") ? (
-                <>
-                  <CheckCircle className="h-4 w-4 mr-2 text-green-400" />
-                  Completed
-                </>
-              ) : markCompleteMutation.isPending ? (
-                "Marking..."
-              ) : (
-                <>
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Mark as Complete
-                </>
-              )}
-            </Button>
+            {completedLessonIds.has(activeLesson?._id || "") && (
+              <div className="flex items-center text-sm text-green-600">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Completed
+              </div>
+            )}
 
             <Button
               variant="ghost"
