@@ -20,7 +20,7 @@ export function Footer() {
     ],
     support: [
       { label: t("Help Center"), href: "/help" },
-      { label: t("Community"), href: "/community" },
+      { label: t("Community"), href: "/forums" },
     ],
     legal: [
       { label: t("Terms of Service"), href: "/terms" },
