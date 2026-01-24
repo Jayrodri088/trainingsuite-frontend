@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
   Video,
@@ -34,19 +34,23 @@ import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { getInitials } from "@/lib/utils";
 import { LivestreamPlayer, detectStreamType } from "@/components/livestream";
 import type { LiveSession } from "@/types";
-import { format, parseISO, differenceInMinutes, differenceInSeconds } from "date-fns";
+import { format, parseISO, differenceInSeconds, isPast } from "date-fns";
 
 export default function LiveSessionDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const sessionId = params.id as string;
   const [countdown, setCountdown] = useState<string | null>(null);
   const [hasJoined, setHasJoined] = useState(false);
+  const [shouldRefresh, setShouldRefresh] = useState(false);
 
-  const { data: sessionData, isLoading } = useQuery({
+  const { data: sessionData, isLoading, refetch } = useQuery({
     queryKey: ["live-session", sessionId],
     queryFn: () => liveSessionsApi.getById(sessionId),
+    // Refetch every 10 seconds if session is scheduled and time is close
+    refetchInterval: shouldRefresh ? 10000 : false,
   });
 
   const joinMutation = useMutation({
@@ -55,8 +59,14 @@ export default function LiveSessionDetailPage() {
       setHasJoined(true);
       toast({ title: "You've joined the session!" });
     },
-    onError: () => {
-      toast({ title: "Failed to join session", variant: "destructive" });
+    onError: (error: any) => {
+      // If session is not live yet, just mark as notified locally
+      if (error?.response?.status === 400) {
+        setHasJoined(true);
+        toast({ title: "You'll be notified when the session starts!" });
+      } else {
+        toast({ title: "Failed to join session", variant: "destructive" });
+      }
     },
   });
 
@@ -64,7 +74,16 @@ export default function LiveSessionDetailPage() {
 
   // Countdown timer for scheduled sessions
   useEffect(() => {
-    if (!session || session.status !== "scheduled") return;
+    if (!session) return;
+    
+    // If session is already live or ended, no need for countdown
+    if (session.status === "live" || session.status === "ended") {
+      setCountdown(null);
+      setShouldRefresh(false);
+      return;
+    }
+    
+    if (session.status !== "scheduled") return;
 
     const scheduledAt = parseISO(session.scheduledAt);
 
@@ -72,9 +91,18 @@ export default function LiveSessionDetailPage() {
       const now = new Date();
       const diffSeconds = differenceInSeconds(scheduledAt, now);
 
+      // If time has passed, trigger refetch to get updated status
       if (diffSeconds <= 0) {
         setCountdown(null);
+        setShouldRefresh(true);
+        // Immediately refetch to check if session is now live
+        refetch();
         return;
+      }
+
+      // Enable auto-refresh when within 2 minutes of start time
+      if (diffSeconds <= 120) {
+        setShouldRefresh(true);
       }
 
       const hours = Math.floor(diffSeconds / 3600);
@@ -151,9 +179,18 @@ export default function LiveSessionDetailPage() {
   };
 
   const renderVideoPlayer = () => {
-    // For live sessions or recordings
-    if (session.status === "live" || (session.status === "ended" && session.recordingUrl)) {
-      const videoUrl = session.status === "live" ? session.streamUrl : session.recordingUrl;
+    const scheduledAt = parseISO(session.scheduledAt);
+    const isScheduledTimePassed = isPast(scheduledAt);
+    
+    // Determine if we should show the player
+    // Show player if: session is live, OR (session is scheduled but time has passed and has stream URL)
+    const shouldShowPlayer = 
+      session.status === "live" || 
+      (session.status === "ended" && session.recordingUrl) ||
+      (session.status === "scheduled" && isScheduledTimePassed && session.streamUrl);
+
+    if (shouldShowPlayer) {
+      const videoUrl = session.status === "ended" ? session.recordingUrl : session.streamUrl;
 
       if (!videoUrl) {
         return (
@@ -167,7 +204,7 @@ export default function LiveSessionDetailPage() {
       }
 
       const streamType = detectStreamType(videoUrl);
-      const isLive = session.status === "live";
+      const isLive = session.status === "live" || (session.status === "scheduled" && isScheduledTimePassed);
 
       return (
         <div className="relative">
@@ -178,11 +215,17 @@ export default function LiveSessionDetailPage() {
             autoplay={isLive}
             muted={false}
             controls={true}
+            onReady={() => {
+              // If we're playing and status is still scheduled, it means auto-start worked
+              if (session.status === "scheduled" && isScheduledTimePassed) {
+                toast({ title: "Stream is now live!" });
+              }
+            }}
             onError={(err) => {
               console.error("Stream playback error:", err);
               toast({
                 title: "Playback Error",
-                description: "Failed to play the stream. Try opening externally.",
+                description: "Failed to play the stream. Try refreshing the page.",
                 variant: "destructive",
               });
             }}
@@ -198,8 +241,8 @@ export default function LiveSessionDetailPage() {
       );
     }
 
-    // For scheduled sessions - show countdown
-    if (session.status === "scheduled") {
+    // For scheduled sessions that haven't started yet - show countdown
+    if (session.status === "scheduled" && !isScheduledTimePassed) {
       return (
         <div className="aspect-video bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg flex items-center justify-center">
           <div className="text-center text-white">
@@ -209,7 +252,7 @@ export default function LiveSessionDetailPage() {
               <div className="text-4xl font-bold text-primary mb-4">{countdown}</div>
             )}
             <p className="text-white/70 mb-4">
-              {format(parseISO(session.scheduledAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}
+              {format(scheduledAt, "EEEE, MMMM d, yyyy 'at' h:mm a")}
             </p>
             {!hasJoined && (
               <Button
@@ -231,13 +274,19 @@ export default function LiveSessionDetailPage() {
       );
     }
 
-    // Ended without recording
+    // Ended without recording or scheduled without stream URL
     return (
       <div className="aspect-video bg-slate-900 rounded-lg flex items-center justify-center">
         <div className="text-center text-white">
           <Video className="h-16 w-16 mx-auto mb-4 opacity-50" />
-          <h3 className="text-xl font-medium mb-2">Session Ended</h3>
-          <p className="text-white/70">No recording is available for this session.</p>
+          <h3 className="text-xl font-medium mb-2">
+            {session.status === "ended" ? "Session Ended" : "Stream Not Available"}
+          </h3>
+          <p className="text-white/70">
+            {session.status === "ended" 
+              ? "No recording is available for this session."
+              : "The stream URL has not been configured yet."}
+          </p>
         </div>
       </div>
     );
