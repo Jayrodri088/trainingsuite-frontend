@@ -45,8 +45,10 @@ import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { getInitials } from "@/lib/utils";
 import type { LiveSession, LiveSessionStatus } from "@/types";
 import { format, parseISO, isAfter, isBefore, differenceInMinutes, formatDistanceToNow } from "date-fns";
+import { T, useT } from "@/components/t";
 
 export default function LiveSessionsPage() {
+  const { t } = useT();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
 
@@ -79,7 +81,7 @@ export default function LiveSessionsPage() {
       return (
         <Badge className="bg-red-600 animate-pulse">
           <span className="mr-1 h-2 w-2 rounded-full bg-white inline-block" />
-          Live Now
+          <T>Live Now</T>
         </Badge>
       );
     }
@@ -87,25 +89,25 @@ export default function LiveSessionsPage() {
       const scheduledAt = parseISO(session.scheduledAt);
       const minutesUntil = differenceInMinutes(scheduledAt, now);
       if (minutesUntil <= 30 && minutesUntil > 0) {
-        return <Badge className="bg-yellow-500">Starting Soon</Badge>;
+        return <Badge className="bg-yellow-500"><T>Starting Soon</T></Badge>;
       }
-      return <Badge className="bg-blue-600">Scheduled</Badge>;
+      return <Badge className="bg-blue-600"><T>Scheduled</T></Badge>;
     }
     if (session.status === "ended" && session.recordingUrl) {
-      return <Badge variant="secondary">Recording Available</Badge>;
+      return <Badge variant="secondary"><T>Recording Available</T></Badge>;
     }
-    return <Badge variant="secondary">Ended</Badge>;
+    return <Badge variant="secondary"><T>Ended</T></Badge>;
   };
 
   const getTimeDisplay = (session: LiveSession) => {
     const scheduledAt = parseISO(session.scheduledAt);
     if (session.status === "live") {
-      return "Happening now";
+      return t("Happening now");
     }
     if (session.status === "scheduled") {
       const minutesUntil = differenceInMinutes(scheduledAt, now);
       if (minutesUntil <= 60 && minutesUntil > 0) {
-        return `Starts in ${minutesUntil} minutes`;
+        return `${t("Starts in")} ${minutesUntil} ${t("minutes")}`;
       }
       return format(scheduledAt, "MMM d, yyyy 'at' h:mm a");
     }
@@ -116,9 +118,9 @@ export default function LiveSessionsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Live Sessions</h1>
+        <h1 className="text-2xl font-bold"><T>Live Sessions</T></h1>
         <p className="text-muted-foreground">
-          Join live sessions or watch recordings from your instructors.
+          <T>Join live sessions or watch recordings from your instructors.</T>
         </p>
       </div>
 
@@ -134,9 +136,9 @@ export default function LiveSessionsPage() {
                     <Video className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">Sessions are live now!</h3>
+                    <h3 className="font-semibold text-lg"><T>Sessions are live now!</T></h3>
                     <p className="text-red-100">
-                      {upcomingSessions.filter((s) => s.status === "live").length} session(s) currently streaming
+                      {upcomingSessions.filter((s) => s.status === "live").length} <T>session(s) currently streaming</T>
                     </p>
                   </div>
                 </div>
@@ -144,7 +146,7 @@ export default function LiveSessionsPage() {
                   <Button variant="secondary" asChild>
                     <Link href={`/live-sessions/${liveSession._id}`}>
                       <Play className="h-4 w-4 mr-2" />
-                      Join Now
+                      <T>Join Now</T>
                     </Link>
                   </Button>
                 )}
@@ -159,17 +161,17 @@ export default function LiveSessionsPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="upcoming">
-              Upcoming ({upcomingSessions.length})
+              <T>Upcoming</T> ({upcomingSessions.length})
             </TabsTrigger>
             <TabsTrigger value="past">
-              Past Sessions ({pastSessions.length})
+              <T>Past Sessions</T> ({pastSessions.length})
             </TabsTrigger>
           </TabsList>
         </Tabs>
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search sessions..."
+            placeholder={t("Search sessions...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -188,13 +190,13 @@ export default function LiveSessionsPage() {
         <Card className="py-12">
           <CardContent className="text-center">
             <Video className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium">No sessions found</h3>
+            <h3 className="text-lg font-medium"><T>No sessions found</T></h3>
             <p className="text-muted-foreground mt-1">
               {searchQuery
-                ? "Try adjusting your search"
+                ? <T>Try adjusting your search</T>
                 : activeTab === "upcoming"
-                ? "No upcoming sessions scheduled"
-                : "No past sessions in your history"}
+                ? <T>No upcoming sessions scheduled</T>
+                : <T>No past sessions in your history</T>}
             </p>
           </CardContent>
         </Card>
@@ -208,7 +210,7 @@ export default function LiveSessionsPage() {
                 {session.thumbnail ? (
                   <img
                     src={session.thumbnail}
-                    alt={session.title}
+                    alt={t(session.title)}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -224,7 +226,7 @@ export default function LiveSessionsPage() {
                     <Button size="lg" className="bg-red-600 hover:bg-red-700" asChild>
                       <Link href={`/live-sessions/${session._id}`}>
                         <Play className="h-5 w-5 mr-2" />
-                        Join Now
+                        <T>Join Now</T>
                       </Link>
                     </Button>
                   </div>
@@ -232,10 +234,10 @@ export default function LiveSessionsPage() {
               </div>
 
               <CardHeader className="pb-2">
-                <CardTitle className="line-clamp-1">{session.title}</CardTitle>
+                <CardTitle className="line-clamp-1">{t(session.title)}</CardTitle>
                 {session.description && (
                   <CardDescription className="line-clamp-2">
-                    {session.description}
+                    {t(session.description)}
                   </CardDescription>
                 )}
               </CardHeader>
@@ -250,9 +252,9 @@ export default function LiveSessionsPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="text-sm">
-                    <p className="font-medium">{session.instructor?.name || "Instructor"}</p>
+                    <p className="font-medium">{session.instructor?.name || t("Instructor")}</p>
                     {session.course && (
-                      <p className="text-muted-foreground text-xs">{session.course.title}</p>
+                      <p className="text-muted-foreground text-xs">{t(session.course.title)}</p>
                     )}
                   </div>
                 </div>
@@ -266,14 +268,14 @@ export default function LiveSessionsPage() {
                   {session.duration && (
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Clock className="h-4 w-4" />
-                      <span>{session.duration} minutes</span>
+                      <span>{session.duration} <T>minutes</T></span>
                     </div>
                   )}
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Users className="h-4 w-4" />
                     <span>
                       {session.attendeeCount || 0}
-                      {session.maxAttendees ? ` / ${session.maxAttendees}` : ""} attendees
+                      {session.maxAttendees ? ` / ${session.maxAttendees}` : ""} <T>attendees</T>
                     </span>
                   </div>
                 </div>
@@ -284,13 +286,13 @@ export default function LiveSessionsPage() {
                   <Button className="w-full bg-red-600 hover:bg-red-700" asChild>
                     <Link href={`/live-sessions/${session._id}`}>
                       <Play className="h-4 w-4 mr-2" />
-                      Join Live
+                      <T>Join Live</T>
                     </Link>
                   </Button>
                 ) : (
                   <Button className="w-full" variant="outline" asChild>
                     <Link href={`/live-sessions/${session._id}`}>
-                      View Details
+                      <T>View Details</T>
                     </Link>
                   </Button>
                 )}
@@ -304,10 +306,10 @@ export default function LiveSessionsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <History className="h-5 w-5" />
-              Session History
+              <T>Session History</T>
             </CardTitle>
             <CardDescription>
-              A record of past live sessions you attended or were available to you.
+              <T>A record of past live sessions you attended or were available to you.</T>
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
@@ -319,7 +321,7 @@ export default function LiveSessionsPage() {
                     {session.thumbnail ? (
                       <img
                         src={session.thumbnail}
-                        alt={session.title}
+                        alt={t(session.title)}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -333,7 +335,7 @@ export default function LiveSessionsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h4 className="font-medium truncate">{session.title}</h4>
+                        <h4 className="font-medium truncate">{t(session.title)}</h4>
                         <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
                           <Avatar className="h-5 w-5">
                             <AvatarImage src={session.instructor?.avatar} />
@@ -341,18 +343,18 @@ export default function LiveSessionsPage() {
                               {getInitials(session.instructor?.name || "?")}
                             </AvatarFallback>
                           </Avatar>
-                          <span>{session.instructor?.name || "Instructor"}</span>
+                          <span>{session.instructor?.name || t("Instructor")}</span>
                           {session.course && (
                             <>
                               <span className="text-muted-foreground/50">•</span>
-                              <span className="truncate">{session.course.title}</span>
+                              <span className="truncate">{t(session.course.title)}</span>
                             </>
                           )}
                         </div>
                       </div>
                       <Badge variant="secondary" className="flex-shrink-0">
                         <CheckCircle className="h-3 w-3 mr-1" />
-                        Ended
+                        <T>Ended</T>
                       </Badge>
                     </div>
 
@@ -370,7 +372,7 @@ export default function LiveSessionsPage() {
                       )}
                       <div className="flex items-center gap-1">
                         <Users className="h-3 w-3" />
-                        <span>{session.attendeeCount || 0} attended</span>
+                        <span>{session.attendeeCount || 0} <T>attended</T></span>
                       </div>
                       <div className="flex items-center gap-1 text-muted-foreground/70">
                         <History className="h-3 w-3" />

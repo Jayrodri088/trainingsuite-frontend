@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEnrollments } from "@/hooks";
 import type { Enrollment, Course } from "@/types";
+import { T, useT } from "@/components/t";
 
 const cardColors = [
   "bg-violet-500/10 border-violet-500/20 text-violet-600",
@@ -32,6 +33,7 @@ const cardColors = [
 ];
 
 function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: number }) {
+  const { t } = useT();
   const course = typeof enrollment.course === "object" ? enrollment.course : null;
   const progress = enrollment.progress || 0;
   const isCompleted = progress >= 100;
@@ -46,7 +48,7 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
           {course.thumbnail ? (
             <img
               src={course.thumbnail}
-              alt={course.title}
+              alt={t(course.title)}
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
@@ -54,26 +56,26 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
           )}
           <div className="absolute top-3 left-3">
             <Badge variant="secondary" className="rounded-none text-[10px] font-bold uppercase tracking-wider border-0 bg-background/80 backdrop-blur-sm">
-              {course.level}
+              {t(course.level || "beginner")}
             </Badge>
           </div>
           {isCompleted && (
             <div className="absolute top-3 right-3">
               <Badge className="rounded-none bg-green-600 hover:bg-green-600 text-[10px] font-bold uppercase tracking-wider border-0">
                 <CheckCircle className="h-3 w-3 mr-1" />
-                Completed
+                <T>Completed</T>
               </Badge>
             </div>
           )}
         </div>
         <CardContent className="p-5">
           <h3 className="font-heading font-bold uppercase text-sm line-clamp-2 min-h-[40px] group-hover:text-primary transition-colors">
-            {course.title}
+            {t(course.title)}
           </h3>
 
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs mb-2">
-              <span className="text-muted-foreground font-bold uppercase tracking-wider">Progress</span>
+              <span className="text-muted-foreground font-bold uppercase tracking-wider"><T>Progress</T></span>
               <span className="font-mono text-muted-foreground">{progress}%</span>
             </div>
             <Progress value={progress} className="h-1.5 rounded-none bg-muted" />
@@ -89,7 +91,7 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
               <div />
             )}
             <Button size="sm" className="h-8 rounded-none text-xs font-bold uppercase tracking-wider">
-              {isCompleted ? "Review" : "Continue"}
+              {isCompleted ? <T>Review</T> : <T>Continue</T>}
             </Button>
           </div>
         </CardContent>
@@ -99,6 +101,7 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
 }
 
 function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: number }) {
+  const { t } = useT();
   const course = typeof enrollment.course === "object" ? enrollment.course : null;
   const progress = enrollment.progress || 0;
   const isCompleted = progress >= 100;
@@ -115,7 +118,7 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
               {course.thumbnail ? (
                 <img
                   src={course.thumbnail}
-                  alt={course.title}
+                  alt={t(course.title)}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               ) : (
@@ -132,16 +135,16 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline" className="rounded-none text-[10px] font-bold uppercase tracking-wider border-border">
-                      {course.level}
+                      {t(course.level || "beginner")}
                     </Badge>
                     {isCompleted && (
-                      <Badge className="rounded-none bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-wider border-0">Completed</Badge>
+                      <Badge className="rounded-none bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-wider border-0"><T>Completed</T></Badge>
                     )}
                   </div>
-                  <h3 className="font-heading font-bold uppercase text-base line-clamp-1 group-hover:text-primary transition-colors">{course.title}</h3>
+                  <h3 className="font-heading font-bold uppercase text-base line-clamp-1 group-hover:text-primary transition-colors">{t(course.title)}</h3>
                 </div>
                 <Button size="sm" className="rounded-none uppercase text-xs font-bold tracking-wider h-8 w-full sm:w-auto">
-                  {isCompleted ? "Review" : "Continue"}
+                  {isCompleted ? <T>Review</T> : <T>Continue</T>}
                 </Button>
               </div>
               <div className="mt-4 flex items-center gap-4">
@@ -176,6 +179,7 @@ function CourseCardSkeleton() {
 }
 
 export default function MyCoursesPage() {
+  const { t } = useT();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const { data: enrollmentsResponse, isLoading } = useEnrollments();
@@ -200,9 +204,9 @@ export default function MyCoursesPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">My Courses</h1>
+        <h1 className="text-3xl font-heading font-bold uppercase tracking-tight"><T>My Courses</T></h1>
         <p className="text-muted-foreground mt-1">
-          Track your enrolled courses and continue learning
+          <T>Track your enrolled courses and continue learning</T>
         </p>
       </div>
 
@@ -211,7 +215,7 @@ export default function MyCoursesPage() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search your courses..."
+            placeholder={t("Search your courses...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 rounded-none border-border bg-muted/20 focus:bg-background transition-colors"
@@ -246,19 +250,19 @@ export default function MyCoursesPage() {
             value="all"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider shrink-0"
           >
-            All <Badge variant="secondary" className="ml-2 rounded-none text-[10px] bg-muted text-muted-foreground">{filteredEnrollments.length}</Badge>
+            <T>All</T> <Badge variant="secondary" className="ml-2 rounded-none text-[10px] bg-muted text-muted-foreground">{filteredEnrollments.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="in-progress"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider shrink-0"
           >
-            In Progress <Badge variant="secondary" className="ml-2 rounded-none text-[10px] bg-muted text-muted-foreground">{activeEnrollments.length}</Badge>
+            <T>In Progress</T> <Badge variant="secondary" className="ml-2 rounded-none text-[10px] bg-muted text-muted-foreground">{activeEnrollments.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="completed"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider shrink-0"
           >
-            Completed <Badge variant="secondary" className="ml-2 rounded-none text-[10px] bg-muted text-muted-foreground">{completedEnrollments.length}</Badge>
+            <T>Completed</T> <Badge variant="secondary" className="ml-2 rounded-none text-[10px] bg-muted text-muted-foreground">{completedEnrollments.length}</Badge>
           </TabsTrigger>
         </TabsList>
 
@@ -286,14 +290,14 @@ export default function MyCoursesPage() {
           ) : (
             <div className="text-center py-20 border border-dashed border-border bg-muted/5">
               <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-lg font-heading font-bold uppercase tracking-wide">No courses found</h3>
+              <h3 className="text-lg font-heading font-bold uppercase tracking-wide"><T>No courses found</T></h3>
               <p className="text-muted-foreground mt-2 text-sm">
                 {searchQuery
-                  ? "Try a different search term"
-                  : "You haven't enrolled in any courses yet"}
+                  ? <T>Try a different search term</T>
+                  : <T>You haven't enrolled in any courses yet</T>}
               </p>
               <Button className="mt-6 rounded-none font-bold uppercase tracking-wider" asChild>
-                <Link href="/courses">Browse Courses</Link>
+                <Link href="/courses"><T>Browse Courses</T></Link>
               </Button>
             </div>
           )}
@@ -323,12 +327,12 @@ export default function MyCoursesPage() {
           ) : (
             <div className="text-center py-20 border border-dashed border-border bg-muted/5">
               <Clock className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-lg font-heading font-bold uppercase tracking-wide">No courses in progress</h3>
+              <h3 className="text-lg font-heading font-bold uppercase tracking-wide"><T>No courses in progress</T></h3>
               <p className="text-muted-foreground mt-2 text-sm">
-                Start a new course or resume a completed one
+                <T>Start a new course or resume a completed one</T>
               </p>
               <Button className="mt-6 rounded-none font-bold uppercase tracking-wider" asChild>
-                <Link href="/courses">Browse Courses</Link>
+                <Link href="/courses"><T>Browse Courses</T></Link>
               </Button>
             </div>
           )}
@@ -358,9 +362,9 @@ export default function MyCoursesPage() {
           ) : (
             <div className="text-center py-20 border border-dashed border-border bg-muted/5">
               <CheckCircle className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-lg font-heading font-bold uppercase tracking-wide">No completed courses</h3>
+              <h3 className="text-lg font-heading font-bold uppercase tracking-wide"><T>No completed courses</T></h3>
               <p className="text-muted-foreground mt-2 text-sm">
-                Keep learning and complete your first course!
+                <T>Keep learning and complete your first course!</T>
               </p>
             </div>
           )}

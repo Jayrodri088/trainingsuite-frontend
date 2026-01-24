@@ -22,9 +22,11 @@ import { useAuthStore } from "@/stores";
 import { authApi } from "@/lib/api";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/utils";
+import { T, useT } from "@/components/t";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useT();
   const { setAuth } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +45,7 @@ export default function LoginPage() {
       const response = await authApi.login(data);
       if (response.success && response.data) {
         setAuth(response.data.user, response.data.token);
-        toast.success("Login successful");
+        toast.success(t("Login successful"));
         router.push("/dashboard");
       }
     } catch (error: unknown) {
@@ -56,9 +58,9 @@ export default function LoginPage() {
   return (
     <div className="space-y-8">
       <div className="space-y-2 text-center md:text-left">
-        <h1 className="font-heading text-3xl font-bold tracking-tight">Missionary Login</h1>
+        <h1 className="font-heading text-3xl font-bold tracking-tight"><T>Missionary Login</T></h1>
         <p className="text-muted-foreground text-sm">
-          Enter your ministry credentials to access the portal.
+          <T>Enter your ministry credentials to access the portal.</T>
         </p>
       </div>
 
@@ -69,7 +71,7 @@ export default function LoginPage() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email Address</FormLabel>
+                <FormLabel><T>Email Address</T></FormLabel>
                 <FormControl>
                   <Input
                     type="email"
@@ -91,7 +93,7 @@ export default function LoginPage() {
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center justify-between">
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel><T>Password</T></FormLabel>
                 </div>
                 <FormControl>
                   <div className="relative">
@@ -117,7 +119,7 @@ export default function LoginPage() {
                         <Eye className="h-4 w-4" />
                       )}
                       <span className="sr-only">
-                        {showPassword ? "Hide password" : "Show password"}
+                        {showPassword ? t("Hide password") : t("Show password")}
                       </span>
                     </Button>
                   </div>
@@ -134,28 +136,28 @@ export default function LoginPage() {
                 htmlFor="remember"
                 className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium"
               >
-                Remember me
+                <T>Remember me</T>
               </label>
             </div>
             <Link
               href="/forgot-password"
               className="text-sm font-medium text-foreground hover:underline underline-offset-4"
             >
-              Forgot password?
+              <T>Forgot password?</T>
             </Link>
           </div>
 
           <Button type="submit" className="w-full h-11 rounded-none uppercase tracking-widest font-bold" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Access Portal
+            <T>Access Portal</T>
           </Button>
         </form>
       </Form>
 
       <p className="text-center text-xs uppercase tracking-widest text-muted-foreground pt-4">
-        Not yet registered?{" "}
+        <T>Not yet registered?</T>{" "}
         <Link href="/register" className="text-foreground hover:underline font-bold">
-          Apply Here
+          <T>Apply Here</T>
         </Link>
       </p>
     </div>

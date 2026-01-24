@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth, useEnrollments, useCertificates, useNotifications } from "@/hooks";
 import { formatDistanceToNow } from "date-fns";
 import type { Enrollment, Course } from "@/types";
+import { T, useT } from "@/components/t";
 
 function StatCard({
   title,
@@ -54,6 +55,7 @@ function StatCard({
 }
 
 function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
+  const { t } = useT();
   const course = typeof enrollment.course === "object" ? enrollment.course : null;
   const progress = enrollment.progress || 0;
 
@@ -65,7 +67,7 @@ function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
         {course.thumbnail ? (
           <img
             src={course.thumbnail}
-            alt={course.title}
+            alt={t(course.title)}
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
@@ -75,12 +77,12 @@ function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
           </>
         )}
         <Badge className="absolute top-2 left-2 rounded-none text-[10px] font-bold uppercase tracking-wider border-0 bg-background/80 text-foreground backdrop-blur-sm" variant="secondary">
-          {course.level}
+          {t(course.level || "beginner")}
         </Badge>
       </div>
       <div className="flex-1 min-w-0">
-        <Badge variant="outline" className="mb-2 rounded-none text-[10px] font-bold uppercase tracking-wider border-primary/20 text-primary">Course</Badge>
-        <h4 className="font-heading font-bold uppercase text-sm truncate">{course.title}</h4>
+        <Badge variant="outline" className="mb-2 rounded-none text-[10px] font-bold uppercase tracking-wider border-primary/20 text-primary"><T>Course</T></Badge>
+        <h4 className="font-heading font-bold uppercase text-sm truncate">{t(course.title)}</h4>
         <div className="mt-3 flex items-center gap-3">
           <Progress value={progress} className="h-1.5 flex-1 rounded-none bg-muted" />
           <span className="text-xs font-mono text-muted-foreground whitespace-nowrap">
@@ -89,7 +91,7 @@ function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
         </div>
       </div>
       <Button asChild className="rounded-none uppercase text-xs font-bold tracking-wider h-9 w-full sm:w-auto">
-        <Link href={`/courses/${course.slug || course._id}/learn`}>Continue</Link>
+        <Link href={`/courses/${course.slug || course._id}/learn`}><T>Continue</T></Link>
       </Button>
     </div>
   );
@@ -168,6 +170,7 @@ function DashboardSkeleton() {
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { t } = useT();
   const { data: enrollmentsResponse, isLoading: enrollmentsLoading } = useEnrollments();
   const { data: certificatesResponse, isLoading: certificatesLoading } = useCertificates();
   const { data: notificationsResponse, isLoading: notificationsLoading } = useNotifications();
@@ -198,10 +201,10 @@ export default function DashboardPage() {
     : 0;
 
   const stats = [
-    { label: "Enrolled Courses", value: enrollments.length.toString(), icon: BookOpen, color: "text-blue-600 border-blue-200 bg-blue-50" },
-    { label: "Minutes Learned", value: totalLearningMinutes > 0 ? totalLearningMinutes.toString() : "-", icon: Clock, color: "text-green-600 border-green-200 bg-green-50" },
-    { label: "Certificates", value: certificates.length.toString(), icon: Award, color: "text-amber-600 border-amber-200 bg-amber-50" },
-    { label: "Avg. Progress", value: `${avgProgress}%`, icon: TrendingUp, color: "text-violet-600 border-violet-200 bg-violet-50" },
+    { label: t("Enrolled Courses"), value: enrollments.length.toString(), icon: BookOpen, color: "text-blue-600 border-blue-200 bg-blue-50" },
+    { label: t("Minutes Learned"), value: totalLearningMinutes > 0 ? totalLearningMinutes.toString() : "-", icon: Clock, color: "text-green-600 border-green-200 bg-green-50" },
+    { label: t("Certificates"), value: certificates.length.toString(), icon: Award, color: "text-amber-600 border-amber-200 bg-amber-50" },
+    { label: t("Avg. Progress"), value: `${avgProgress}%`, icon: TrendingUp, color: "text-violet-600 border-violet-200 bg-violet-50" },
   ];
 
   return (
@@ -209,12 +212,12 @@ export default function DashboardPage() {
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">
-          Welcome back, <span className="text-primary">{user?.name?.split(" ")[0] || "Learner"}</span>
+          <T>Welcome back,</T> <span className="text-primary">{user?.name?.split(" ")[0] || t("Learner")}</span>
         </h1>
         <p className="text-muted-foreground mt-1">
           {activeEnrollments.length > 0
-            ? "Continue your learning journey. You're making great progress!"
-            : "Start your learning journey today by enrolling in a course."}
+            ? <T>Continue your learning journey. You're making great progress!</T>
+            : <T>Start your learning journey today by enrolling in a course.</T>}
         </p>
       </div>
 
@@ -237,12 +240,12 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-heading font-bold uppercase tracking-wide">Continue Learning</h2>
-              <p className="text-sm text-muted-foreground">Pick up where you left off</p>
+              <h2 className="text-xl font-heading font-bold uppercase tracking-wide"><T>Continue Learning</T></h2>
+              <p className="text-sm text-muted-foreground"><T>Pick up where you left off</T></p>
             </div>
             <Button variant="outline" size="sm" asChild className="rounded-none border-primary/20 hover:bg-primary/5 hover:text-primary uppercase text-xs font-bold tracking-wider">
               <Link href="/my-courses">
-                View all <ArrowRight className="ml-1 h-3 w-3" />
+                <T>View all</T> <ArrowRight className="ml-1 h-3 w-3" />
               </Link>
             </Button>
           </div>
@@ -258,10 +261,10 @@ export default function DashboardPage() {
                   <div className="h-12 w-12 rounded-none border border-border bg-background flex items-center justify-center mb-4">
                     <BookOpen className="h-6 w-6 text-muted-foreground" />
                   </div>
-                  <h3 className="font-heading font-bold uppercase text-lg mb-1">No courses in progress</h3>
-                  <p className="text-muted-foreground text-sm max-w-xs mb-6">Start your journey by exploring our available courses.</p>
+                  <h3 className="font-heading font-bold uppercase text-lg mb-1"><T>No courses in progress</T></h3>
+                  <p className="text-muted-foreground text-sm max-w-xs mb-6"><T>Start your journey by exploring our available courses.</T></p>
                   <Button className="rounded-none font-bold uppercase tracking-wider" asChild>
-                    <Link href="/courses">Browse Courses</Link>
+                    <Link href="/courses"><T>Browse Courses</T></Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -274,11 +277,11 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-heading font-bold uppercase tracking-wide flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              Notifications
+              <T>Notifications</T>
             </h2>
             <Button variant="ghost" size="sm" asChild className="hover:bg-transparent hover:text-primary uppercase text-xs font-bold tracking-wider p-0 h-auto">
               <Link href="/notifications">
-                View All
+                <T>View All</T>
               </Link>
             </Button>
           </div>
@@ -304,7 +307,7 @@ export default function DashboardPage() {
                   <div className="h-10 w-10 rounded-none border border-border bg-muted/20 flex items-center justify-center mb-3">
                     <Bell className="h-5 w-5 text-muted-foreground" />
                   </div>
-                  <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">No notifications yet</p>
+                  <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground"><T>No notifications yet</T></p>
                 </div>
               )}
             </CardContent>
@@ -316,10 +319,10 @@ export default function DashboardPage() {
       {certificates.length > 0 && (
         <div className="space-y-6 pt-4 border-t border-border">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-heading font-bold uppercase tracking-wide">Recent Certificates</h2>
+            <h2 className="text-xl font-heading font-bold uppercase tracking-wide"><T>Recent Certificates</T></h2>
             <Button variant="outline" size="sm" asChild className="rounded-none border-primary/20 hover:bg-primary/5 hover:text-primary uppercase text-xs font-bold tracking-wider">
               <Link href="/certificates">
-                View All <ArrowRight className="ml-1 h-3 w-3" />
+                <T>View All</T> <ArrowRight className="ml-1 h-3 w-3" />
               </Link>
             </Button>
           </div>
@@ -336,13 +339,13 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-heading font-bold uppercase text-sm line-clamp-1 group-hover:text-primary transition-colors">
-                          {course?.title || "Course Certificate"}
+                          {course?.title || t("Course Certificate")}
                         </h4>
                         <p className="text-xs font-mono text-muted-foreground mt-1 uppercase">
-                          Issued {formatDistanceToNow(new Date(cert.issuedAt || cert.createdAt), { addSuffix: true })}
+                          <T>Issued</T> {formatDistanceToNow(new Date(cert.issuedAt || cert.createdAt), { addSuffix: true })}
                         </p>
                         <Button variant="link" className="h-auto p-0 text-xs font-bold uppercase tracking-wider text-amber-600 mt-3 group-hover:translate-x-1 transition-transform" asChild>
-                          <Link href={`/certificates/${cert._id}`}>View Certificate <ArrowRight className="ml-1 h-3 w-3" /></Link>
+                          <Link href={`/certificates/${cert._id}`}><T>View Certificate</T> <ArrowRight className="ml-1 h-3 w-3" /></Link>
                         </Button>
                       </div>
                     </div>

@@ -34,6 +34,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useCourses, useCategories, useEnrollments } from "@/hooks";
 import { normalizeUploadUrl } from "@/lib/utils";
 import type { Course, CourseFilters, Enrollment } from "@/types";
+import { T, useT } from "@/components/t";
 
 const cardGradients = [
   "bg-gradient-to-br from-violet-500 to-purple-600",
@@ -44,20 +45,8 @@ const cardGradients = [
   "bg-gradient-to-br from-cyan-500 to-blue-600",
 ];
 
-const levels = [
-  { value: "beginner", label: "Beginner" },
-  { value: "intermediate", label: "Intermediate" },
-  { value: "advanced", label: "Advanced" },
-];
-
-const sortOptions = [
-  { value: "enrollmentCount", label: "Most Popular" },
-  { value: "rating", label: "Highest Rated" },
-  { value: "createdAt", label: "Newest" },
-  { value: "title", label: "Title" },
-];
-
 function CourseCard({ course, index, enrollment }: { course: Course; index: number; enrollment?: Enrollment }) {
+  const { t } = useT();
   const gradient = cardGradients[index % cardGradients.length];
   const isEnrolled = !!enrollment;
   const progress = enrollment?.progress || 0;
@@ -66,13 +55,13 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
 
   const getEnrollmentBadge = () => {
     if (isCompleted) {
-      return <Badge className="bg-green-600 hover:bg-green-600 text-xs">Completed</Badge>;
+      return <Badge className="bg-green-600 hover:bg-green-600 text-xs"><T>Completed</T></Badge>;
     }
     if (isInProgress) {
-      return <Badge className="bg-blue-600 hover:bg-blue-600 text-xs">In Progress</Badge>;
+      return <Badge className="bg-blue-600 hover:bg-blue-600 text-xs"><T>In Progress</T></Badge>;
     }
     if (isEnrolled) {
-      return <Badge className="bg-slate-600 hover:bg-slate-600 text-xs">Enrolled</Badge>;
+      return <Badge className="bg-slate-600 hover:bg-slate-600 text-xs"><T>Enrolled</T></Badge>;
     }
     return null;
   };
@@ -84,21 +73,21 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
           {normalizeUploadUrl(course.thumbnail) && (
             <img
               src={normalizeUploadUrl(course.thumbnail)}
-              alt={course.title}
+              alt={t(course.title)}
               className="absolute inset-0 w-full h-full object-cover"
             />
           )}
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
           <div className="absolute top-3 left-3 flex gap-2">
             <Badge variant="secondary" className="text-xs capitalize">
-              {course.level}
+              {t(course.level || "beginner")}
             </Badge>
             {getEnrollmentBadge()}
           </div>
         </div>
         <CardContent className="p-4">
           <h3 className="font-semibold text-sm line-clamp-2 min-h-[40px] group-hover:text-primary transition-colors">
-            {course.title}
+            {t(course.title)}
           </h3>
           <div className="flex items-center gap-2 mt-2">
             {course.rating && course.rating > 0 ? (
@@ -108,14 +97,14 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
               </div>
             ) : null}
             <span className="text-xs text-muted-foreground">
-              {(course.enrollmentCount || 0).toLocaleString()} enrolled
+              {(course.enrollmentCount || 0).toLocaleString()} <T>enrolled</T>
             </span>
           </div>
           {isEnrolled ? (
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs text-muted-foreground">
-                  {isCompleted ? "Completed" : `${progress}% complete`}
+                  {isCompleted ? <T>Completed</T> : <>{progress}% <T>complete</T></>}
                 </span>
               </div>
               <div className="w-full bg-muted rounded-full h-1.5">
@@ -125,12 +114,12 @@ function CourseCard({ course, index, enrollment }: { course: Course; index: numb
                 />
               </div>
               <Button size="sm" className={`h-7 text-xs w-full mt-2 ${isCompleted ? "bg-green-600 hover:bg-green-700" : ""}`}>
-                {isCompleted ? "Review Course" : "Continue"}
+                {isCompleted ? <T>Review Course</T> : <T>Continue</T>}
               </Button>
             </div>
           ) : (
             <div className="mt-3">
-              <Button size="sm" className="h-7 text-xs w-full">Start Training</Button>
+              <Button size="sm" className="h-7 text-xs w-full"><T>Start Training</T></Button>
             </div>
           )}
         </CardContent>
@@ -165,11 +154,19 @@ function FilterSidebar({
   setFilters: (filters: CourseFilters) => void;
   categories: { _id: string; name: string }[];
 }) {
+  const { t } = useT();
+  
+  const levels = [
+    { value: "beginner", label: t("Beginner") },
+    { value: "intermediate", label: t("Intermediate") },
+    { value: "advanced", label: t("Advanced") },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Categories */}
       <div>
-        <h4 className="font-semibold text-sm mb-3">Category</h4>
+        <h4 className="font-semibold text-sm mb-3"><T>Category</T></h4>
         <div className="space-y-2">
           {categories.map((category) => (
             <label
@@ -185,7 +182,7 @@ function FilterSidebar({
                   });
                 }}
               />
-              <span className="text-sm">{category.name}</span>
+              <span className="text-sm">{t(category.name)}</span>
             </label>
           ))}
         </div>
@@ -193,7 +190,7 @@ function FilterSidebar({
 
       {/* Level */}
       <div>
-        <h4 className="font-semibold text-sm mb-3">Level</h4>
+        <h4 className="font-semibold text-sm mb-3"><T>Level</T></h4>
         <div className="space-y-2">
           {levels.map((level) => (
             <label
@@ -222,7 +219,7 @@ function FilterSidebar({
         className="w-full"
         onClick={() => setFilters({ status: "published" })}
       >
-        Clear Filters
+        <T>Clear Filters</T>
       </Button>
     </div>
   );
@@ -257,6 +254,7 @@ function CoursesLoading() {
 
 function CoursesContent() {
   const searchParams = useSearchParams();
+  const { t } = useT();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [filters, setFilters] = useState<CourseFilters>({
@@ -265,6 +263,13 @@ function CoursesContent() {
     order: "desc",
     limit: 50,
   });
+
+  const sortOptions = [
+    { value: "enrollmentCount", label: t("Most Popular") },
+    { value: "rating", label: t("Highest Rated") },
+    { value: "createdAt", label: t("Newest") },
+    { value: "title", label: t("Title") },
+  ];
 
   const { data: coursesResponse, isLoading } = useCourses({
     ...filters,
@@ -294,9 +299,9 @@ function CoursesContent() {
     <div className="container max-w-6xl py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Training Materials</h1>
+        <h1 className="text-2xl font-bold tracking-tight"><T>Training Materials</T></h1>
         <p className="text-muted-foreground mt-1">
-          Browse our training resources and start your preparation
+          <T>Browse our training resources and start your preparation</T>
         </p>
       </div>
 
@@ -306,7 +311,7 @@ function CoursesContent() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search training materials..."
+            placeholder={t("Search training materials...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -328,7 +333,7 @@ function CoursesContent() {
           <SheetTrigger asChild>
             <Button variant="outline" className="lg:hidden">
               <Filter className="h-4 w-4 mr-2" />
-              Filters
+              <T>Filters</T>
               {activeFiltersCount > 0 && (
                 <Badge variant="secondary" className="ml-2">
                   {activeFiltersCount}
@@ -338,7 +343,7 @@ function CoursesContent() {
           </SheetTrigger>
           <SheetContent side="left">
             <SheetHeader>
-              <SheetTitle>Filters</SheetTitle>
+              <SheetTitle><T>Filters</T></SheetTitle>
             </SheetHeader>
             <div className="mt-6">
               <FilterSidebar
@@ -358,7 +363,7 @@ function CoursesContent() {
           }
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Sort by" />
+            <SelectValue placeholder={t("Sort by")} />
           </SelectTrigger>
           <SelectContent>
             {sortOptions.map((option) => (
@@ -395,7 +400,7 @@ function CoursesContent() {
         <aside className="hidden lg:block w-[200px] shrink-0">
           <div className="sticky top-20">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Filters</h3>
+              <h3 className="font-semibold"><T>Filters</T></h3>
               {activeFiltersCount > 0 && (
                 <Badge variant="secondary">{activeFiltersCount}</Badge>
               )}
@@ -413,17 +418,17 @@ function CoursesContent() {
           {/* Results count */}
           <p className="text-sm text-muted-foreground mb-4">
             {isLoading ? (
-              "Loading..."
+              <T>Loading...</T>
             ) : (
               <>
-                Showing{" "}
+                <T>Showing</T>{" "}
                 <span className="font-medium text-foreground">
                   {courses.length}
                 </span>{" "}
                 {coursesResponse?.pagination?.total
-                  ? `of ${coursesResponse.pagination.total}`
+                  ? <>{t("of")} {coursesResponse.pagination.total}</>
                   : ""}{" "}
-                training materials
+                <T>training materials</T>
               </>
             )}
           </p>
@@ -453,9 +458,9 @@ function CoursesContent() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No training materials found.</p>
+              <p className="text-muted-foreground"><T>No training materials found.</T></p>
               <p className="text-sm text-muted-foreground mt-1">
-                Try adjusting your search or filters.
+                <T>Try adjusting your search or filters.</T>
               </p>
               <Button
                 variant="outline"
@@ -465,7 +470,7 @@ function CoursesContent() {
                   setFilters({ status: "published" });
                 }}
               >
-                Clear all filters
+                <T>Clear all filters</T>
               </Button>
             </div>
           )}
@@ -474,7 +479,7 @@ function CoursesContent() {
           {coursesResponse?.pagination && coursesResponse.pagination.totalPages > 1 && (
             <div className="flex justify-center mt-8">
               <p className="text-sm text-muted-foreground">
-                Page {coursesResponse.pagination.page} of{" "}
+                <T>Page</T> {coursesResponse.pagination.page} <T>of</T>{" "}
                 {coursesResponse.pagination.totalPages}
               </p>
             </div>

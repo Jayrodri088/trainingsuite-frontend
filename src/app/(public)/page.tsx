@@ -38,7 +38,7 @@ function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrol
           {normalizeUploadUrl(course.thumbnail) ? (
             <img
               src={normalizeUploadUrl(course.thumbnail)}
-              alt={course.title}
+              alt={t(course.title)}
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
@@ -47,7 +47,7 @@ function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrol
 
           <div className="absolute top-3 right-3 z-10">
             <Badge variant="outline" className="bg-background text-foreground font-medium rounded-none border-foreground/10 capitalize text-xs tracking-wide">
-              {course.level}
+              {t(course.level || "beginner")}
             </Badge>
           </div>
         </div>
@@ -66,7 +66,7 @@ function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrol
           </div>
 
           <h3 className="text-xl font-heading font-bold text-foreground mb-3 leading-tight group-hover:underline decoration-1 underline-offset-4">
-            {course.title}
+            {t(course.title)}
           </h3>
 
           <div className="mt-auto pt-6">
@@ -133,7 +133,7 @@ function LiveSessionCard({ session }: { session: LiveSession }) {
           {normalizeUploadUrl(session.thumbnail) ? (
             <img
               src={normalizeUploadUrl(session.thumbnail)}
-              alt={session.title}
+              alt={t(session.title)}
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
@@ -179,12 +179,12 @@ function LiveSessionCard({ session }: { session: LiveSession }) {
           </div>
 
           <h3 className="text-xl font-heading font-bold text-foreground mb-3 leading-tight group-hover:underline decoration-1 underline-offset-4">
-            {session.title}
+            {t(session.title)}
           </h3>
 
           {session.description && (
             <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-              {session.description}
+              {t(session.description)}
             </p>
           )}
 
