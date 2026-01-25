@@ -78,16 +78,16 @@ function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrol
                 </div>
                 <div className="h-1 w-full bg-secondary">
                   <div
-                    className="h-full bg-foreground"
+                    className="h-full bg-primary"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
-                <Button variant="outline" className="w-full rounded-none h-9 text-xs uppercase tracking-wide border-foreground/20 hover:bg-foreground hover:text-background transition-colors">
+                <Button variant="outline" className="w-full rounded-none h-9 text-xs uppercase tracking-wide border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
                   {isCompleted ? <T>Review</T> : <T>Continue</T>}
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center text-sm font-medium text-foreground/70 group-hover:text-foreground transition-colors">
+              <div className="flex items-center text-sm font-medium text-primary group-hover:text-primary/80 transition-colors">
                 <T>Start Learning</T>
                 <ArrowRight className="ml-2 h-4 w-4" />
               </div>
@@ -326,15 +326,15 @@ export default function HomePage() {
 
             <div className="flex flex-wrap gap-4">
               {isAuthenticated ? (
-                <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none bg-foreground text-background hover:bg-foreground/90 transition-colors uppercase tracking-wider font-medium" asChild>
+                <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none bg-primary text-primary-foreground hover:bg-primary/90 transition-colors uppercase tracking-wider font-medium" asChild>
                   <Link href="/dashboard"><T>Access Dashboard</T></Link>
                 </Button>
               ) : (
-                <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none bg-foreground text-background hover:bg-foreground/90 transition-colors uppercase tracking-wider font-medium" asChild>
+                <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none bg-primary text-primary-foreground hover:bg-primary/90 transition-colors uppercase tracking-wider font-medium" asChild>
                   <Link href="/register"><T>Begin Training</T></Link>
                 </Button>
               )}
-              <Button variant="outline" size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none border-border hover:bg-secondary transition-colors uppercase tracking-wider font-medium" asChild>
+              <Button variant="outline" size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none border-primary/30 text-primary hover:bg-primary/5 transition-colors uppercase tracking-wider font-medium" asChild>
                 <Link href="/courses"><T>View Curriculum</T></Link>
               </Button>
             </div>
@@ -433,7 +433,7 @@ export default function HomePage() {
       )}
 
       {/* Statement Section */}
-      <section className="py-32 bg-foreground text-background border-t border-border">
+      <section className="py-32 bg-primary text-primary-foreground border-t border-border">
         <div className="container max-w-7xl px-4 md:px-8">
           <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             <div>
@@ -442,24 +442,24 @@ export default function HomePage() {
               </h2>
             </div>
             <div className="space-y-8">
-              <p className="text-xl text-background/80 font-light leading-relaxed">
+              <p className="text-xl text-primary-foreground/80 font-light leading-relaxed">
                 <T>Join a global network of ministers equipping themselves for the next level of impact through the Rhapsody Global Missionaries Portal.</T>
               </p>
-              <ul className="space-y-4 text-background/80">
+              <ul className="space-y-4 text-primary-foreground/80">
                 {statementItems.map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
-                    <Check className="h-5 w-5 opacity-50" />
+                    <Check className="h-5 w-5 text-amber-400" />
                     <span className="text-base">{item}</span>
                   </li>
                 ))}
               </ul>
               <div className="pt-4">
                 {isAuthenticated ? (
-                  <Button size="lg" className="w-full sm:w-auto h-16 px-12 rounded-none bg-background text-foreground hover:bg-background/90 text-sm uppercase tracking-widest font-bold" asChild>
+                  <Button size="lg" className="w-full sm:w-auto h-16 px-12 rounded-none bg-white text-primary hover:bg-white/90 text-sm uppercase tracking-widest font-bold" asChild>
                     <Link href="/dashboard"><T>Continue Learning</T></Link>
                   </Button>
                 ) : (
-                  <Button size="lg" className="w-full sm:w-auto h-16 px-12 rounded-none bg-background text-foreground hover:bg-background/90 text-sm uppercase tracking-widest font-bold" asChild>
+                  <Button size="lg" className="w-full sm:w-auto h-16 px-12 rounded-none bg-white text-primary hover:bg-white/90 text-sm uppercase tracking-widest font-bold" asChild>
                     <Link href="/register"><T>Register Now</T></Link>
                   </Button>
                 )}

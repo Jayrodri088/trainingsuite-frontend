@@ -288,39 +288,41 @@ function FilterSidebar({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-4">
       {/* Categories */}
-      <div>
-        <h4 className="font-semibold text-sm mb-3"><T>Category</T></h4>
-        <div className="space-y-2">
-          {categories.map((category) => (
-            <label
-              key={category._id}
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <Checkbox
-                checked={filters.category === category._id}
-                onCheckedChange={(checked) => {
-                  setFilters({
-                    ...filters,
-                    category: checked ? category._id : undefined,
-                  });
-                }}
-              />
-              <span className="text-sm">{t(category.name)}</span>
-            </label>
-          ))}
+      {categories.length > 0 && (
+        <div>
+          <h4 className="font-semibold text-sm mb-3 text-foreground"><T>Category</T></h4>
+          <div className="space-y-3">
+            {categories.map((category) => (
+              <label
+                key={category._id}
+                className="flex items-center gap-3 cursor-pointer py-1"
+              >
+                <Checkbox
+                  checked={filters.category === category._id}
+                  onCheckedChange={(checked) => {
+                    setFilters({
+                      ...filters,
+                      category: checked ? category._id : undefined,
+                    });
+                  }}
+                />
+                <span className="text-sm">{t(category.name)}</span>
+              </label>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Level */}
       <div>
-        <h4 className="font-semibold text-sm mb-3"><T>Level</T></h4>
-        <div className="space-y-2">
+        <h4 className="font-semibold text-sm mb-3 text-foreground"><T>Level</T></h4>
+        <div className="space-y-3">
           {levels.map((level) => (
             <label
               key={level.value}
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-3 cursor-pointer py-1"
             >
               <Checkbox
                 checked={filters.level === level.value}
@@ -339,12 +341,12 @@ function FilterSidebar({
 
       {/* Language */}
       <div>
-        <h4 className="font-semibold text-sm mb-3"><T>Language</T></h4>
-        <div className="space-y-2 max-h-48 overflow-y-auto">
+        <h4 className="font-semibold text-sm mb-3 text-foreground"><T>Language</T></h4>
+        <div className="space-y-3 max-h-52 overflow-y-auto pr-2">
           {COURSE_LANGUAGES.slice(0, 10).map((lang) => (
             <label
               key={lang.code}
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-3 cursor-pointer py-1"
             >
               <Checkbox
                 checked={filters.language === lang.code}
@@ -362,14 +364,17 @@ function FilterSidebar({
       </div>
 
       {/* Clear Filters */}
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full"
-        onClick={() => setFilters({ status: "published" })}
-      >
-        <T>Clear Filters</T>
-      </Button>
+      <div className="pt-2">
+        <Button
+          variant="outline"
+          size="default"
+          className="w-full"
+          onClick={() => setFilters({ status: "published" })}
+        >
+          <X className="h-4 w-4 mr-2" />
+          <T>Clear Filters</T>
+        </Button>
+      </div>
     </div>
   );
 }
@@ -477,15 +482,15 @@ function CoursesContent() {
       </div>
 
       {/* Search & Filters Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        {/* Search */}
-        <div className="relative flex-1 max-w-md">
+      <div className="space-y-3 mb-6">
+        {/* Search - Full width on mobile */}
+        <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("Search training materials...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
+            className="pl-9 w-full"
           />
           {searchQuery && (
             <Button
@@ -499,70 +504,73 @@ function CoursesContent() {
           )}
         </div>
 
-        {/* Mobile Filters */}
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" className="lg:hidden">
-              <Filter className="h-4 w-4 mr-2" />
-              <T>Filters</T>
-              {activeFiltersCount > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {activeFiltersCount}
-                </Badge>
-              )}
+        {/* Filter controls row */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Mobile Filters */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="lg:hidden h-9">
+                <Filter className="h-4 w-4 mr-2" />
+                <T>Filters</T>
+                {activeFiltersCount > 0 && (
+                  <Badge variant="secondary" className="ml-2 h-5 px-1.5">
+                    {activeFiltersCount}
+                  </Badge>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[280px] sm:w-[320px]">
+              <SheetHeader>
+                <SheetTitle><T>Filters</T></SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 overflow-y-auto max-h-[calc(100vh-120px)]">
+                <FilterSidebar
+                  filters={filters}
+                  setFilters={setFilters}
+                  categories={categories}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* Sort */}
+          <Select
+            value={filters.sort}
+            onValueChange={(value) =>
+              setFilters({ ...filters, sort: value as CourseFilters["sort"] })
+            }
+          >
+            <SelectTrigger className="w-[140px] sm:w-[180px] h-9">
+              <SelectValue placeholder={t("Sort by")} />
+            </SelectTrigger>
+            <SelectContent>
+              {sortOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* View Mode - Push to right */}
+          <div className="flex border rounded-md ml-auto">
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="icon"
+              className="rounded-r-none h-9 w-9"
+              onClick={() => setViewMode("grid")}
+            >
+              <Grid3X3 className="h-4 w-4" />
             </Button>
-          </SheetTrigger>
-          <SheetContent side="left">
-            <SheetHeader>
-              <SheetTitle><T>Filters</T></SheetTitle>
-            </SheetHeader>
-            <div className="mt-6">
-              <FilterSidebar
-                filters={filters}
-                setFilters={setFilters}
-                categories={categories}
-              />
-            </div>
-          </SheetContent>
-        </Sheet>
-
-        {/* Sort */}
-        <Select
-          value={filters.sort}
-          onValueChange={(value) =>
-            setFilters({ ...filters, sort: value as CourseFilters["sort"] })
-          }
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={t("Sort by")} />
-          </SelectTrigger>
-          <SelectContent>
-            {sortOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* View Mode */}
-        <div className="flex border rounded-md">
-          <Button
-            variant={viewMode === "grid" ? "secondary" : "ghost"}
-            size="icon"
-            className="rounded-r-none"
-            onClick={() => setViewMode("grid")}
-          >
-            <Grid3X3 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={viewMode === "list" ? "secondary" : "ghost"}
-            size="icon"
-            className="rounded-l-none"
-            onClick={() => setViewMode("list")}
-          >
-            <List className="h-4 w-4" />
-          </Button>
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="icon"
+              className="rounded-l-none h-9 w-9"
+              onClick={() => setViewMode("list")}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
