@@ -71,12 +71,12 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#FAFAFA] border-b border-gray-200 shadow-sm">
-      <div className="container max-w-7xl flex h-16 items-center justify-between px-4 md:px-8">
-        {/* Left: Logo + Nav (nav closer to logo than to search bar) */}
-        <div className="flex items-center gap-8">
+      <div className="container max-w-7xl flex h-14 sm:h-16 items-center justify-between px-4 sm:px-6 lg:px-8 gap-4 min-w-0">
+        {/* Left: Logo + Nav on desktop (lg+) */}
+        <div className="flex items-center gap-4 lg:gap-8 min-w-0 shrink">
           <Logo reload />
-          {/* Desktop Nav – grouped with logo, blue underline for active */}
-          <nav className="hidden md:flex items-center gap-6">
+          {/* Desktop Nav – show from lg so tablet uses hamburger */}
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-6 shrink-0">
             {navItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
               return (
@@ -95,14 +95,14 @@ export function Header() {
           </nav>
         </div>
 
-        {/* Right: Search + Actions (clear gap from logo/nav) */}
-        <div className="flex items-center gap-4">
-          {/* Desktop Search – white bg, no border radius */}
-          <form onSubmit={handleSearch} className="hidden md:flex relative shrink-0">
+        {/* Right: Search + Actions – show from lg */}
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          {/* Desktop Search – from lg; tablet uses menu */}
+          <form onSubmit={handleSearch} className="hidden lg:flex relative shrink-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder={t("Search...")}
-              className="w-[280px] min-w-[240px] pl-9 h-9 bg-white! border-0 rounded-[10px] text-gray-900 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-blue-500/30"
+              className="w-[200px] xl:w-[260px] 2xl:w-[280px] min-w-0 pl-9 h-9 bg-white! border-0 rounded-[10px] text-gray-900 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-blue-500/30"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -202,24 +202,24 @@ export function Header() {
               </DropdownMenu>
             </>
           ) : (
-            <div className="hidden md:flex items-center gap-4">
-              <Button asChild variant="ghost" className="rounded-[10px] h-9 px-5 text-sm font-medium bg-[#F5F5F5] text-gray-700 hover:text-gray-900 hover:bg-transparent">
+            <div className="hidden lg:flex items-center gap-3 xl:gap-4">
+              <Button asChild variant="ghost" className="rounded-[10px] h-9 px-4 xl:px-5 text-sm font-medium bg-[#F5F5F5] text-gray-700 hover:text-gray-900 hover:bg-transparent">
                 <Link href="/login"><T>Sign In</T></Link>
               </Button>
-              <Button asChild className="rounded-[10px] h-9 px-6 text-sm font-bold bg-[#0052CC] hover:bg-[#0052CC]/90 text-white border-0">
+              <Button asChild className="rounded-[10px] h-9 px-4 xl:px-6 text-sm font-bold bg-[#0052CC] hover:bg-[#0052CC]/90 text-white border-0">
                 <Link href="/register"><T>Get Started</T></Link>
               </Button>
             </div>
           )}
 
-          {/* Mobile Menu Trigger */}
+          {/* Mobile + Tablet Menu (below lg) */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 -mr-2 text-gray-700 hover:bg-gray-100">
+              <Button variant="ghost" size="icon" className="lg:hidden h-9 w-9 -mr-2 text-gray-700 hover:bg-gray-100 shrink-0" aria-label={t("Open menu")}>
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:w-[350px] p-0 border-l border-border bg-background">
+            <SheetContent side="right" className="w-full max-w-[85vw] sm:w-[380px] md:w-[420px] lg:w-[420px] p-0 border-l border-border bg-background">
               <div className="flex flex-col h-full">
                 <div className="p-6 border-b border-border">
                   <Logo reload />

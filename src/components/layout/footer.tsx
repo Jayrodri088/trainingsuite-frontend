@@ -31,19 +31,19 @@ export function Footer() {
 
   return (
     <footer className="bg-white border-t border-gray-200">
-      <div className="container max-w-7xl px-4 md:px-8 py-16 lg:py-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 text-left">
+      <div className="container max-w-7xl px-4 sm:px-6 lg:px-8 py-14 sm:py-16 lg:py-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 md:gap-10 lg:gap-12 text-left">
           {/* Column 1: Logo + description */}
           <div className="lg:col-span-1">
             <Logo className="mb-4" />
             <p className="text-sm text-gray-500 max-w-[260px] leading-relaxed">
-              <T>Equipping ministers worldwide with world-class training materials and live mentorship for global impact.</T>
+              <T>Equipping ministers worldwide with dedicated training modules and live mentorship for global impact.</T>
             </p>
           </div>
 
-          {/* Column 2: Training */}
+          {/* Column 2: Training – bold blue title on mobile per design */}
           <div>
-            <h4 className="font-sans font-bold text-black text-base mb-4">
+            <h4 className="font-sans font-bold text-[#0052CC] md:text-black text-base mb-3 md:mb-4">
               <T>Training</T>
             </h4>
             <ul className="space-y-3">
@@ -62,7 +62,7 @@ export function Footer() {
 
           {/* Column 3: Legal (About, Contact, FAQ) */}
           <div>
-            <h4 className="font-sans font-bold text-black text-base mb-4">
+            <h4 className="font-sans font-bold text-[#0052CC] md:text-black text-base mb-3 md:mb-4">
               <T>Legal</T>
             </h4>
             <ul className="space-y-3">
@@ -100,7 +100,7 @@ export function Footer() {
 
           {/* Column 5: Legal (Terms, Privacy) */}
           <div>
-            <h4 className="font-sans font-bold text-black text-base mb-4">
+            <h4 className="font-sans font-bold text-[#0052CC] md:text-black text-base mb-3 md:mb-4">
               <T>Legal</T>
             </h4>
             <ul className="space-y-3">

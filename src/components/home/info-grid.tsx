@@ -19,13 +19,13 @@ export function InfoGrid() {
   }));
 
   return (
-    <section className="border-b border-gray-200 bg-white pt-2 pb-12 md:pt-4 md:pb-16">
-      <div className="container max-w-7xl px-4 md:px-8">
+    <section className="border-b border-gray-200 bg-white pt-6 sm:pt-8 pb-12 md:pb-16">
+      <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {infoItems.map((item, idx) => (
             <div
               key={idx}
-              className="group flex flex-col h-full min-h-[280px] min-w-[220px] max-w-[280px] mx-auto w-full bg-white rounded-[12px] border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
+              className="group flex flex-col h-full min-h-[260px] sm:min-h-[280px] min-w-0 w-full max-w-[280px] mx-auto sm:max-w-none sm:mx-0 bg-white rounded-[12px] border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
             >
               <div className="p-6 pb-6 flex flex-col flex-1 min-h-0 justify-start">
                 <h3 className="font-sans font-bold text-lg mb-3 text-[#1D4ED8]">

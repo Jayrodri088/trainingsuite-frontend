@@ -61,7 +61,7 @@ function TestimonialCard({
   role: string;
 }) {
   return (
-    <div className="flex flex-col w-[320px] sm:w-[360px] shrink-0 bg-white rounded-[12px] shadow-sm p-6">
+    <div className="flex flex-col w-[280px] sm:w-[320px] md:w-[360px] shrink-0 bg-white rounded-[12px] shadow-sm p-5 md:p-6">
       {/* Blue quote icon */}
       <div className="mb-4">
         <Image
@@ -145,28 +145,33 @@ export function TestimoniesSection() {
   }));
 
   return (
-    <section className="py-16 md:py-20 bg-[#f5f5f5] overflow-hidden">
-      <div className="container max-w-7xl px-4 md:px-8">
-        <div className="flex flex-col items-center text-center mb-12">
+    <section className="py-12 sm:py-16 md:py-20 bg-[#f5f5f5] overflow-hidden">
+      <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center text-center mb-8 md:mb-12">
           {/* Pill-shaped tag */}
-          <div className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 mb-6 shadow-sm">
-            <span className="text-sm md:text-base text-gray-600 font-medium">
+          <div className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 md:px-5 md:py-2.5 mb-4 md:mb-6 shadow-sm">
+            <span className="text-xs md:text-base text-gray-600 font-medium">
               <T>On a mandate to reach the last man!</T>
             </span>
           </div>
 
           {/* Main heading – two lines, large bold black, centered */}
-          <h2 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-black leading-tight text-center max-w-2xl">
+          <h2 className="font-sans text-2xl sm:text-4xl md:text-5xl font-bold text-black leading-tight text-center max-w-2xl">
             <span className="block"><T>Testimonies from</T></span>
             <span className="block"><T>Global Ministers</T></span>
           </h2>
         </div>
       </div>
 
-      {/* Sliding testimonial rows – full width overflow */}
-      <div className="flex flex-col gap-6">
-        <MarqueeRow testimonials={row1} direction="left" />
-        <MarqueeRow testimonials={row2} direction="right" />
+      {/* Sliding testimonial rows – on mobile: single row with peek; desktop: two rows */}
+      <div className="flex flex-col gap-4 md:gap-6 px-0">
+        <div className="md:hidden overflow-hidden">
+          <MarqueeRow testimonials={row1} direction="left" />
+        </div>
+        <div className="hidden md:flex flex-col gap-6">
+          <MarqueeRow testimonials={row1} direction="left" />
+          <MarqueeRow testimonials={row2} direction="right" />
+        </div>
       </div>
     </section>
   );

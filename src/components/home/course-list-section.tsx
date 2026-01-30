@@ -22,47 +22,52 @@ export function CourseListSection({
   const showSkeletons = !useMockCoursesOnly && isLoading;
 
   return (
-    <section className="py-24 md:py-32 bg-white">
-      <div className="container max-w-7xl px-4 md:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
+    <section className="py-16 sm:py-20 md:py-24 lg:py-32 bg-white">
+      <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div id="training-programs" className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 lg:mb-16 gap-4 md:gap-6">
           <div className="max-w-2xl">
-            <h2 className="font-sans text-3xl md:text-4xl font-bold mb-3 text-black">
+            <h2 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-3 text-black">
               <T>Training Programs</T>
             </h2>
-            <p className="text-base md:text-lg text-black font-normal">
+            <p className="text-sm md:text-lg text-gray-600 md:text-black font-normal">
               <T>Select a comprehensive module to begin your preparation journey.</T>
             </p>
           </div>
           <Link
             href="/courses"
-            className="hidden md:flex items-center gap-2 text-base font-medium text-[#0052CC] hover:text-[#0052CC]/80 transition-colors"
+            className="flex items-center gap-2 text-sm md:text-base font-medium text-[#0052CC] hover:text-[#0052CC]/80 transition-colors self-start md:self-auto"
           >
             <T>Full Curriculum</T>
-            <ArrowRight className="h-5 w-5 shrink-0" />
+            <ArrowRight className="h-4 w-4 md:h-5 md:w-5 shrink-0" />
           </Link>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center sm:justify-items-stretch">
           {showSkeletons ? (
-            Array.from({ length: 4 }).map((_, i) => <CourseCardSkeleton key={i} />)
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="w-full max-w-[280px] sm:max-w-none">
+                <CourseCardSkeleton />
+              </div>
+            ))
           ) : (
             courses.map((course) => (
-              <CourseCard
-                key={course._id}
-                course={course}
-                enrollment={enrollmentMap.get(course._id)}
-              />
+              <div key={course._id} className="w-full max-w-[280px] sm:max-w-none md:max-w-none">
+                <CourseCard
+                  course={course}
+                  enrollment={enrollmentMap.get(course._id)}
+                />
+              </div>
             ))
           )}
         </div>
 
-        <Link
+        {/* <Link
           href="/courses"
-          className="md:hidden mt-8 flex items-center justify-center h-12 border border-border text-sm font-bold uppercase tracking-widest hover:bg-secondary transition-colors"
+          className="md:hidden mt-6 flex items-center justify-center gap-2 h-12 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <T>Full Curriculum</T>
-          <ArrowRight className="ml-3 h-4 w-4" />
-        </Link>
+          <ArrowRight className="h-4 w-4" />
+        </Link> */}
       </div>
     </section>
   );
