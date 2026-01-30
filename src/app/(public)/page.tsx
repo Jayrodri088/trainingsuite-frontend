@@ -1,259 +1,48 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowRight,
-  BookOpen,
-  Users,
-  Award,
-  Star,
-  Check,
-  Radio,
-  Calendar,
-  Clock,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useCourses, useAuth, useEnrollments } from "@/hooks";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
-import type { Course, Enrollment, LiveSession } from "@/types";
-import { cn, normalizeUploadUrl } from "@/lib/utils";
-import { format, parseISO } from "date-fns";
-import { T, useT } from "@/components/t";
-
-function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrollment }) {
-  const { t } = useT();
-  const isEnrolled = !!enrollment;
-  const progress = enrollment?.progress || 0;
-  const isCompleted = enrollment?.status === "completed" || progress >= 100;
-
-  return (
-    <Link href={`/courses/${course.slug || course._id}`} className="block h-full group">
-      <div className="h-full flex flex-col border border-border bg-card transition-colors hover:border-foreground/50">
-        {/* Minimal Course Header */}
-        <div className="relative aspect-video bg-muted border-b border-border flex items-center justify-center overflow-hidden">
-          {/* Thumbnail or placeholder */}
-          {normalizeUploadUrl(course.thumbnail) ? (
-            <img
-              src={normalizeUploadUrl(course.thumbnail)}
-              alt={t(course.title)}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-neutral-100 dark:bg-neutral-800" />
-          )}
-
-          <div className="absolute top-3 right-3 z-10">
-            <Badge variant="outline" className="bg-background text-foreground font-medium rounded-none border-foreground/10 capitalize text-xs tracking-wide">
-              {t(course.level || "beginner")}
-            </Badge>
-          </div>
-        </div>
-
-        <div className="flex flex-col flex-1 p-6">
-          <div className="flex justify-between items-start mb-4">
-            {course.rating && course.rating > 0 ? (
-              <div className="flex items-center gap-1">
-                <Star className="h-3 w-3 fill-current text-foreground" />
-                <span className="text-xs font-semibold">{course.rating.toFixed(1)}</span>
-              </div>
-            ) : (
-              <span className="text-xs text-muted-foreground">{course.ratingCount || 0} <T>ratings</T></span>
-            )}
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold ml-auto"><T>Video Course</T></span>
-          </div>
-
-          <h3 className="text-xl font-heading font-bold text-foreground mb-3 leading-tight group-hover:underline decoration-1 underline-offset-4">
-            {t(course.title)}
-          </h3>
-
-          <div className="mt-auto pt-6">
-            {isEnrolled ? (
-              <div className="space-y-3">
-                <div className="flex justify-between text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                  <T>Progress</T>
-                  <span>{progress}%</span>
-                </div>
-                <div className="h-1 w-full bg-secondary">
-                  <div
-                    className="h-full bg-primary"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                <Button variant="outline" className="w-full rounded-none h-9 text-xs uppercase tracking-wide border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
-                  {isCompleted ? <T>Review</T> : <T>Continue</T>}
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center text-sm font-medium text-primary group-hover:text-primary/80 transition-colors">
-                <T>Start Learning</T>
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-function CourseCardSkeleton() {
-  return (
-    <div className="border border-border h-full bg-card">
-      <Skeleton className="h-48 w-full rounded-none" />
-      <div className="p-6 space-y-4">
-        <Skeleton className="h-4 w-20 rounded-none" />
-        <Skeleton className="h-6 w-full rounded-none" />
-        <Skeleton className="h-6 w-3/4 rounded-none" />
-        <div className="pt-4 mt-auto">
-          <Skeleton className="h-9 w-full rounded-none" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function LiveSessionCard({ session }: { session: LiveSession }) {
-  const { t } = useT();
-  const isLive = session.status === "live";
-  const isScheduled = session.status === "scheduled";
-
-  return (
-    <Link href={`/live-sessions/${session._id}`} className="block h-full group">
-      <div className="h-full flex flex-col border border-border bg-card transition-colors hover:border-foreground/50 relative overflow-hidden">
-        {/* Live indicator */}
-        {isLive && (
-          <div className="absolute top-0 left-0 right-0 h-1 bg-red-600 animate-pulse" />
-        )}
-
-        {/* Thumbnail or placeholder */}
-        <div className="relative aspect-video bg-muted border-b border-border flex items-center justify-center overflow-hidden">
-          {normalizeUploadUrl(session.thumbnail) ? (
-            <img
-              src={normalizeUploadUrl(session.thumbnail)}
-              alt={t(session.title)}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 to-neutral-800 flex items-center justify-center">
-              <Radio className="h-12 w-12 text-white/20" />
-            </div>
-          )}
-
-          {/* Status badge */}
-          <div className="absolute top-3 right-3 z-10">
-            {isLive ? (
-              <Badge className="bg-red-600 text-white font-bold rounded-none border-0 uppercase text-[10px] tracking-wider animate-pulse">
-                <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block animate-pulse" />
-                <T>Live Now</T>
-              </Badge>
-            ) : isScheduled ? (
-              <Badge variant="outline" className="bg-background text-foreground font-medium rounded-none border-foreground/10 text-xs tracking-wide">
-                <T>Upcoming</T>
-              </Badge>
-            ) : null}
-          </div>
-
-          {/* Attendee count for live sessions */}
-          {isLive && session.attendeeCount > 0 && (
-            <div className="absolute bottom-3 left-3 z-10">
-              <Badge variant="secondary" className="bg-black/60 text-white rounded-none border-0 text-xs">
-                <Users className="h-3 w-3 mr-1" />
-                {session.attendeeCount} <T>watching</T>
-              </Badge>
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col flex-1 p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Calendar className="h-3 w-3" />
-              <span>{format(parseISO(session.scheduledAt), "MMM d, yyyy")}</span>
-            </div>
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
-              {isLive ? <T>Live Stream</T> : <T>Live Session</T>}
-            </span>
-          </div>
-
-          <h3 className="text-xl font-heading font-bold text-foreground mb-3 leading-tight group-hover:underline decoration-1 underline-offset-4">
-            {t(session.title)}
-          </h3>
-
-          {session.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-              {t(session.description)}
-            </p>
-          )}
-
-          <div className="mt-auto pt-4">
-            {isLive ? (
-              <Button className="w-full rounded-none h-9 text-xs uppercase tracking-wide bg-red-600 hover:bg-red-700 text-white">
-                <Radio className="h-3 w-3 mr-2 animate-pulse" />
-                <T>Join Live</T>
-              </Button>
-            ) : isScheduled ? (
-              <div className="flex items-center text-sm font-medium text-foreground/70 group-hover:text-foreground transition-colors">
-                <Clock className="h-4 w-4 mr-2" />
-                <span>{format(parseISO(session.scheduledAt), "h:mm a")}</span>
-                <ArrowRight className="ml-auto h-4 w-4" />
-              </div>
-            ) : (
-              <div className="flex items-center text-sm font-medium text-muted-foreground">
-                <T>View Recording</T>
-                <ArrowRight className="ml-auto h-4 w-4" />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-function LiveSessionCardSkeleton() {
-  return (
-    <div className="border border-border h-full bg-card">
-      <Skeleton className="aspect-video w-full rounded-none" />
-      <div className="p-6 space-y-4">
-        <Skeleton className="h-4 w-24 rounded-none" />
-        <Skeleton className="h-6 w-full rounded-none" />
-        <Skeleton className="h-4 w-3/4 rounded-none" />
-        <div className="pt-4 mt-auto">
-          <Skeleton className="h-9 w-full rounded-none" />
-        </div>
-      </div>
-    </div>
-  );
-}
+import type { Course, Enrollment } from "@/types";
+import { useT } from "@/components/t";
+import {
+  HeroSection,
+  InfoGrid,
+  CourseListSection,
+  TestimoniesSection,
+  LiveSessionsSection,
+  StatementSection,
+  getMockCourses,
+} from "@/components/home";
 
 export default function HomePage() {
   const { isAuthenticated } = useAuth();
   const { t } = useT();
-  const { data: coursesResponse, isLoading } = useCourses({
-    status: "published",
-    sort: "enrollmentCount",
-    order: "desc",
-    limit: 50,
-  });
+
+  const USE_MOCK_COURSES_ONLY = true;
+  const { data: coursesResponse, isLoading } = useCourses(
+    {
+      status: "published",
+      sort: "enrollmentCount",
+      order: "desc",
+      limit: 50,
+    },
+    { enabled: !USE_MOCK_COURSES_ONLY }
+  );
   const { data: enrollmentsResponse } = useEnrollments();
 
-  // Fetch live sessions (live first, then scheduled)
   const { data: liveSessionsResponse, isLoading: isLoadingLiveSessions } = useQuery({
     queryKey: ["home-live-sessions"],
     queryFn: () => liveSessionsApi.getAll(1, 10),
-    refetchInterval: 30000, // Refetch every 30 seconds to catch new live sessions
+    refetchInterval: 30000,
   });
 
-  const courses = coursesResponse?.data || [];
+  const courses = USE_MOCK_COURSES_ONLY ? [] : (coursesResponse?.data || []);
   const enrollments = enrollmentsResponse?.data || [];
   const liveSessions = liveSessionsResponse?.data || [];
 
-  // Sort live sessions: live first, then scheduled by date
   const sortedLiveSessions = [...liveSessions]
-    .filter(s => s.status === "live" || s.status === "scheduled")
+    .filter((s) => s.status === "live" || s.status === "scheduled")
     .sort((a, b) => {
       if (a.status === "live" && b.status !== "live") return -1;
       if (a.status !== "live" && b.status === "live") return 1;
@@ -262,39 +51,20 @@ export default function HomePage() {
     .slice(0, 4);
 
   const hasLiveSessions = sortedLiveSessions.length > 0;
-  const hasLiveNow = sortedLiveSessions.some(s => s.status === "live");
+  const hasLiveNow = sortedLiveSessions.some((s) => s.status === "live");
 
   const enrollmentMap = new Map<string, Enrollment>();
-
   if (enrollments) {
     enrollments.forEach((enrollment) => {
       if (!enrollment.course) return;
-      const courseId = typeof enrollment.course === "object" ? enrollment.course._id : enrollment.course;
+      const courseId =
+        typeof enrollment.course === "object" ? enrollment.course._id : enrollment.course;
       enrollmentMap.set(courseId, enrollment);
     });
   }
 
-  // Info grid items with translations
-  const infoItems = [
-    {
-      title: t("Structured Curriculum"),
-      desc: t("Theological and practical training materials curated for depth."),
-    },
-    {
-      title: t("HD Video Lessons"),
-      desc: t("On-demand high-definition content from senior leadership."),
-    },
-    {
-      title: t("Live Mentorship"),
-      desc: t("Real-time interactive sessions and spiritual guidance."),
-    },
-    {
-      title: t("Official Certification"),
-      desc: t("Recognized validation of completed ministry training."),
-    },
-  ];
+  const coursesToShow: Course[] = courses.length > 0 ? courses : getMockCourses();
 
-  // Statement section list items
   const statementItems = [
     t("Global Networking"),
     t("Resource Library Access"),
@@ -303,171 +73,26 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
-
-      {/* Hero Section */}
-      <section className="pt-24 pb-20 md:pt-40 md:pb-32 border-b border-border">
-        <div className="container max-w-7xl px-4 md:px-8">
-          <div className="max-w-5xl">
-            <div className="flex items-center gap-3 mb-8">
-              <span className="h-px w-8 bg-foreground/20"></span>
-              <p className="text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground">
-                <T>Rhapsody Global Missionaries</T>
-              </p>
-            </div>
-
-            <h1 className="font-heading text-5xl sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight text-foreground mb-10 leading-[0.95] text-balance">
-              <T>Equipping Ministers for</T> <br />
-              <span className="text-muted-foreground/40"><T>Global Impact.</T></span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl leading-relaxed mb-12 font-light">
-              <T>A professional training portal designed for the rigorous spiritual and practical development of ministers worldwide.</T>
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              {isAuthenticated ? (
-                <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none bg-primary text-primary-foreground hover:bg-primary/90 transition-colors uppercase tracking-wider font-medium" asChild>
-                  <Link href="/dashboard"><T>Access Dashboard</T></Link>
-                </Button>
-              ) : (
-                <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none bg-primary text-primary-foreground hover:bg-primary/90 transition-colors uppercase tracking-wider font-medium" asChild>
-                  <Link href="/register"><T>Begin Training</T></Link>
-                </Button>
-              )}
-              <Button variant="outline" size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-none border-primary/30 text-primary hover:bg-primary/5 transition-colors uppercase tracking-wider font-medium" asChild>
-                <Link href="/courses"><T>View Curriculum</T></Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Info Grid - Brutalist/Grid Style */}
-      <section className="border-b border-border">
-        <div className="container max-w-7xl px-0">
-          <div className="grid md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border">
-            {infoItems.map((item, idx) => (
-              <div key={idx} className="p-8 md:p-12 hover:bg-secondary/20 transition-colors">
-                <h3 className="font-heading font-bold text-xl mb-3">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Course List */}
-      <section className="py-24 md:py-32">
-        <div className="container max-w-7xl px-4 md:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-            <div className="max-w-2xl">
-              <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6"><T>Training Programs</T></h2>
-              <p className="text-lg text-muted-foreground font-light"><T>Select a comprehensive module to begin your preparation journey.</T></p>
-            </div>
-            <Link href="/courses" className="hidden md:flex items-center text-sm font-bold uppercase tracking-widest hover:text-muted-foreground transition-colors">
-              <T>Full Curriculum</T> <ArrowRight className="ml-3 h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {isLoading ? (
-              Array.from({ length: 4 }).map((_, i) => <CourseCardSkeleton key={i} />)
-            ) : courses.length > 0 ? (
-              courses.map((course) => (
-                <CourseCard
-                  key={course._id}
-                  course={course}
-                  enrollment={enrollmentMap.get(course._id)}
-                />
-              ))
-            ) : (
-              <div className="col-span-full py-32 text-center border border-border bg-muted/10">
-                <p className="text-muted-foreground uppercase tracking-widest text-sm font-medium"><T>No courses available</T></p>
-              </div>
-            )}
-          </div>
-
-          <Link href="/courses" className="md:hidden mt-8 flex items-center justify-center h-12 border border-border text-sm font-bold uppercase tracking-widest hover:bg-secondary transition-colors">
-            <T>Full Curriculum</T> <ArrowRight className="ml-3 h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Live Sessions Section - Only show if there are live or upcoming sessions */}
-      {(hasLiveSessions || isLoadingLiveSessions) && (
-        <section className="py-24 md:py-32 border-t border-border bg-muted/5">
-          <div className="container max-w-7xl px-4 md:px-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-              <div className="max-w-2xl">
-                <div className="flex items-center gap-3 mb-4">
-                  {hasLiveNow && (
-                    <Badge className="bg-red-600 text-white font-bold rounded-none border-0 uppercase text-[10px] tracking-wider animate-pulse">
-                      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block animate-pulse" />
-                      <T>Live Now</T>
-                    </Badge>
-                  )}
-                </div>
-                <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6"><T>Live Sessions</T></h2>
-                <p className="text-lg text-muted-foreground font-light"><T>Join real-time interactive sessions with our leadership and ministry team.</T></p>
-              </div>
-              <Link href="/live-sessions" className="hidden md:flex items-center text-sm font-bold uppercase tracking-widest hover:text-muted-foreground transition-colors">
-                <T>All Sessions</T> <ArrowRight className="ml-3 h-4 w-4" />
-              </Link>
-            </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {isLoadingLiveSessions ? (
-                Array.from({ length: 4 }).map((_, i) => <LiveSessionCardSkeleton key={i} />)
-              ) : sortedLiveSessions.length > 0 ? (
-                sortedLiveSessions.map((session) => (
-                  <LiveSessionCard key={session._id} session={session} />
-                ))
-              ) : null}
-            </div>
-
-            <Link href="/live-sessions" className="md:hidden mt-8 flex items-center justify-center h-12 border border-border text-sm font-bold uppercase tracking-widest hover:bg-secondary transition-colors">
-              <T>All Sessions</T> <ArrowRight className="ml-3 h-4 w-4" />
-            </Link>
-          </div>
-        </section>
-      )}
-
-      {/* Statement Section */}
-      <section className="py-32 bg-primary text-primary-foreground border-t border-border">
-        <div className="container max-w-7xl px-4 md:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-            <div>
-              <h2 className="font-heading text-4xl md:text-6xl font-bold leading-[1.1] mb-8">
-                <T>Ready to answer the call to service?</T>
-              </h2>
-            </div>
-            <div className="space-y-8">
-              <p className="text-xl text-primary-foreground/80 font-light leading-relaxed">
-                <T>Join a global network of ministers equipping themselves for the next level of impact through the Rhapsody Global Missionaries Portal.</T>
-              </p>
-              <ul className="space-y-4 text-primary-foreground/80">
-                {statementItems.map((item, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-amber-400" />
-                    <span className="text-base">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="pt-4">
-                {isAuthenticated ? (
-                  <Button size="lg" className="w-full sm:w-auto h-16 px-12 rounded-none bg-white text-primary hover:bg-white/90 text-sm uppercase tracking-widest font-bold" asChild>
-                    <Link href="/dashboard"><T>Continue Learning</T></Link>
-                  </Button>
-                ) : (
-                  <Button size="lg" className="w-full sm:w-auto h-16 px-12 rounded-none bg-white text-primary hover:bg-white/90 text-sm uppercase tracking-widest font-bold" asChild>
-                    <Link href="/register"><T>Register Now</T></Link>
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSection isAuthenticated={!!isAuthenticated} />
+      <InfoGrid />
+      <CourseListSection
+        courses={coursesToShow}
+        enrollmentMap={enrollmentMap}
+        isLoading={isLoading}
+        useMockCoursesOnly={USE_MOCK_COURSES_ONLY}
+      />
+      <TestimoniesSection />
+      {/* {(hasLiveSessions || isLoadingLiveSessions) && (
+        <LiveSessionsSection
+          sessions={sortedLiveSessions}
+          isLoading={isLoadingLiveSessions}
+          hasLiveNow={hasLiveNow}
+        />
+      )} */}
+      <StatementSection
+        isAuthenticated={!!isAuthenticated}
+        statementItems={statementItems}
+      />
     </div>
   );
 }

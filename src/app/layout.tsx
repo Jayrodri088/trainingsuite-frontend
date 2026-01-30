@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono, Libre_Baskerville } from "next/font/google";
+import { Roboto, Geist_Mono, Libre_Baskerville } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
   display: "swap",
 });
 
@@ -48,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${libreBaskerville.variable} ${geistMono.variable} font-sans antialiased`}
+        className={`${roboto.variable} ${libreBaskerville.variable} ${geistMono.variable} font-sans antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -11,21 +12,20 @@ interface LogoProps {
 export function Logo({ className, iconOnly = false, variant = "default", reload = false }: LogoProps) {
   const handleClick = (e: React.MouseEvent) => {
     if (reload) {
-      // Full page reload
-      window.location.href = "/";
       e.preventDefault();
+      window.location.href = "/";
     }
   };
 
   return (
-    <a 
-      href="/" 
+    <Link
+      href="/"
       onClick={handleClick}
       className={cn("flex items-center gap-3", className)}
     >
       <Image
         src="/logo.webp"
-        alt="Rhapsody Global Missionaries"
+        alt="Rhapsody Global Missionary Portal"
         width={36}
         height={36}
         className="h-9 w-auto shrink-0"
@@ -34,8 +34,8 @@ export function Logo({ className, iconOnly = false, variant = "default", reload 
         <div className="flex flex-col min-w-0">
           <span
             className={cn(
-              "text-base font-heading font-bold leading-tight tracking-tight",
-              variant === "light" ? "text-white" : "text-foreground"
+              "text-sm font-heading font-bold leading-tight tracking-tight",
+              variant === "light" ? "text-white" : "text-gray-900"
             )}
           >
             Rhapsody Global
@@ -43,13 +43,13 @@ export function Logo({ className, iconOnly = false, variant = "default", reload 
           <span 
             className={cn(
               "text-xs font-medium",
-              variant === "light" ? "text-white/80" : "text-muted-foreground"
+              variant === "light" ? "text-white/80" : "text-gray-600"
             )}
           >
-            Missionaries Portal
+            Missionary Portal
           </span>
         </div>
       )}
-    </a>
+    </Link>
   );
 }

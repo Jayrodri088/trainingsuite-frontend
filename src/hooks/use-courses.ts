@@ -4,10 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { coursesApi } from "@/lib/api";
 import type { CourseFilters } from "@/types";
 
-export function useCourses(filters?: CourseFilters) {
+export function useCourses(
+  filters?: CourseFilters,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: ["courses", filters],
     queryFn: () => coursesApi.getAll(filters),
+    enabled: options?.enabled !== false,
   });
 }
 

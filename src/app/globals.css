@@ -7,7 +7,7 @@
   --color-foreground: var(--foreground);
 
   /* Typography */
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-roboto);
   --font-heading: var(--font-heading);
   --font-mono: var(--font-geist-mono);
 
@@ -178,10 +178,50 @@
   }
 }
 
-/* Custom utility classes */
+/* Hero carousel – infinite horizontal scroll (rotating, seamless loop) */
+@keyframes hero-carousel {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Testimonials marquee – slow horizontal slide */
+@keyframes marquee-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-33.333%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .animate-hero-carousel {
+    animation: hero-carousel 30s linear infinite;
+  }
+
+  .animate-marquee-left {
+    animation: marquee-left 60s linear infinite;
+  }
+
+  .animate-marquee-right {
+    animation: marquee-right 60s linear infinite;
   }
 
   /* Minimalist Utilities */

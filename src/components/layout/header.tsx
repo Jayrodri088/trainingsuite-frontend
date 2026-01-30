@@ -7,13 +7,9 @@ import {
   Search,
   Bell,
   Menu,
-  ChevronDown,
-  User,
   Users,
-  Settings,
   LogOut,
   BookOpen,
-  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +23,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
 import { Logo } from "./logo";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications, useMarkAsRead } from "@/hooks";
@@ -69,29 +64,28 @@ export function Header() {
   };
 
   const navItems = [
+    { label: t("Home"), href: "/", icon: null },
     { label: t("Curriculum"), href: "/courses", icon: BookOpen },
     { label: t("Mentorship"), href: "/live-sessions", icon: Users },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
-      <div className="container max-w-7xl flex h-16 items-center justify-between gap-4 px-4 md:px-8">
-
-        {/* Left: Logo */}
+    <header className="sticky top-0 z-50 w-full bg-[#FAFAFA] border-b border-gray-200 shadow-sm">
+      <div className="container max-w-7xl flex h-16 items-center justify-between px-4 md:px-8">
+        {/* Left: Logo + Nav (nav closer to logo than to search bar) */}
         <div className="flex items-center gap-8">
           <Logo reload />
-
-          {/* Desktop Nav - Minimal */}
+          {/* Desktop Nav – grouped with logo, blue underline for active */}
           <nav className="hidden md:flex items-center gap-6">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "text-sm font-medium transition-colors hover:text-foreground",
-                    isActive ? "text-foreground font-semibold" : "text-muted-foreground"
+                    "text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors pb-0.5 border-b-2 border-transparent",
+                    isActive && "text-gray-900 border-[#3498DB] font-semibold"
                   )}
                 >
                   {item.label}
@@ -101,21 +95,21 @@ export function Header() {
           </nav>
         </div>
 
-        {/* Right: Actions */}
-        <div className="flex items-center gap-3">
-          {/* Desktop Search */}
-          <form onSubmit={handleSearch} className="hidden md:flex relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        {/* Right: Search + Actions (clear gap from logo/nav) */}
+        <div className="flex items-center gap-4">
+          {/* Desktop Search – white bg, no border radius */}
+          <form onSubmit={handleSearch} className="hidden md:flex relative shrink-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder={t("Search...")}
-              className="w-[200px] pl-9 h-9 bg-muted/30 border-transparent focus:bg-background focus:border-border transition-all"
+              className="w-[280px] min-w-[240px] pl-9 h-9 bg-white! border-0 rounded-[10px] text-gray-900 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-blue-500/30"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </form>
 
-          {/* Language Selector */}
-          <div className="hidden sm:block">
+          {/* Language Selector - in mobile only to match header design */}
+          <div className="hidden">
             <LanguageSelector />
           </div>
 
@@ -124,7 +118,7 @@ export function Header() {
               {/* Notifications */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative h-9 w-9 text-muted-foreground hover:text-foreground">
+                  <Button variant="ghost" size="icon" className="relative h-9 w-9 text-gray-700 hover:text-gray-900 hover:bg-gray-100">
                     <Bell className="h-4 w-4" />
                     {unreadCount > 0 && (
                       <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-600 ring-2 ring-background" />
@@ -173,8 +167,8 @@ export function Header() {
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                    <Avatar className="h-9 w-9 border border-border">
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:bg-gray-100">
+                    <Avatar className="h-9 w-9 border-2 border-gray-200">
                       <AvatarImage src={user.avatar} alt={user.name} />
                       <AvatarFallback className="bg-muted text-muted-foreground text-xs font-medium">
                         {getInitials(user.name)}
@@ -208,11 +202,11 @@ export function Header() {
               </DropdownMenu>
             </>
           ) : (
-            <div className="hidden md:flex items-center gap-3">
-              <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                <T>Sign in</T>
-              </Link>
-              <Button asChild className="rounded-none h-9 px-6 text-sm uppercase tracking-wide font-bold">
+            <div className="hidden md:flex items-center gap-4">
+              <Button asChild variant="ghost" className="rounded-[10px] h-9 px-5 text-sm font-medium bg-[#F5F5F5] text-gray-700 hover:text-gray-900 hover:bg-transparent">
+                <Link href="/login"><T>Sign In</T></Link>
+              </Button>
+              <Button asChild className="rounded-[10px] h-9 px-6 text-sm font-bold bg-[#0052CC] hover:bg-[#0052CC]/90 text-white border-0">
                 <Link href="/register"><T>Get Started</T></Link>
               </Button>
             </div>
@@ -221,7 +215,7 @@ export function Header() {
           {/* Mobile Menu Trigger */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 -mr-2 text-foreground">
+              <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 -mr-2 text-gray-700 hover:bg-gray-100">
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
@@ -258,7 +252,7 @@ export function Header() {
                                 : "text-muted-foreground hover:text-foreground"
                             )}
                           >
-                            <item.icon className="h-5 w-5" />
+                            {item.icon ? <item.icon className="h-5 w-5" /> : <span className="h-5 w-5" />}
                             <span className="text-lg">{item.label}</span>
                           </Link>
                         ))}
