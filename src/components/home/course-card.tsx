@@ -64,7 +64,7 @@ export function CourseCard({ course, enrollment }: { course: Course; enrollment?
               </div>
             ) : (
               <span
-                className="inline-flex w-full justify-center rounded-[12px] border border-[#D4D4D4] bg-white py-2.5 text-sm font-medium text-gray-800 shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.1),0px_1px_3px_0px_rgba(0,0,0,0.1)] outline outline-1 outline-white/10 outline-offset-0 group-hover:bg-gray-50 transition-colors"
+                className="inline-flex w-full justify-center rounded-[12px] border border-[#D4D4D4] bg-white py-2.5 text-sm font-medium text-gray-800 shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.1),0px_1px_3px_0px_rgba(0,0,0,0.1)] outline-1 outline-white/10 outline-offset-0 group-hover:bg-gray-50 transition-colors"
               >
                 <T>Start Learning</T>
               </span>
