@@ -584,7 +584,7 @@ export default function CoursesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="font-heading">Delete Course</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <span className="font-semibold text-foreground">"{courseToDelete?.title}"</span>?
+              Are you sure you want to delete <span className="font-semibold text-foreground">&quot;{courseToDelete?.title}&quot;</span>?
               <br /><br />
               This action cannot be undone. It will permanently remove all associated material, including enrollments and student progress.
             </AlertDialogDescription>

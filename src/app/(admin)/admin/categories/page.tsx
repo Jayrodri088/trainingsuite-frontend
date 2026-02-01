@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Search,
@@ -368,7 +368,7 @@ export default function CategoriesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="font-sans font-bold text-black">Delete Category</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <span className="font-semibold text-foreground">"{categoryToDelete?.name}"</span>?
+              Are you sure you want to delete <span className="font-semibold text-foreground">{'"'}{categoryToDelete?.name}{'"'}</span>?
               <br />This action cannot be undone.
               {(categoryToDelete?.courseCount || 0) > 0 && (
                 <div className="mt-4 p-3 border border-amber-200 bg-amber-50 text-amber-800 text-xs font-medium uppercase tracking-wide flex items-center gap-2">
@@ -441,33 +441,21 @@ function CategoriesTableSkeleton() {
   );
 }
 
-function CategoryDialog({
+function CategoryDialogForm({
   category,
-  open,
   onOpenChange,
   onSuccess,
 }: {
   category?: Category | null;
-  open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }) {
   const { toast } = useToast();
   const isEdit = !!category;
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [icon, setIcon] = useState("");
-  const [isActive, setIsActive] = useState(true);
-
-  // Reset form when dialog opens
-  useEffect(() => {
-    if (open) {
-      setName(category?.name || "");
-      setDescription(category?.description || "");
-      setIcon(category?.icon || "");
-      setIsActive(category?.isActive !== false);
-    }
-  }, [open, category]);
+  const [name, setName] = useState(category?.name || "");
+  const [description, setDescription] = useState(category?.description || "");
+  const [icon, setIcon] = useState(category?.icon || "");
+  const [isActive, setIsActive] = useState(category?.isActive !== false);
 
   const createMutation = useMutation({
     mutationFn: (data: { name: string; description?: string; icon?: string }) =>
@@ -514,17 +502,16 @@ function CategoryDialog({
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] rounded-[12px] border-gray-200 bg-white shadow-sm">
-        <DialogHeader>
-          <DialogTitle className="font-sans font-bold text-black uppercase tracking-wide">{isEdit ? "Edit Category" : "Add Category"}</DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? "Update the category details below."
-              : "Create a new category to organize courses."}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-6 py-4">
+    <>
+      <DialogHeader>
+        <DialogTitle className="font-sans font-bold text-black uppercase tracking-wide">{isEdit ? "Edit Category" : "Add Category"}</DialogTitle>
+        <DialogDescription>
+          {isEdit
+            ? "Update the category details below."
+            : "Create a new category to organize courses."}
+        </DialogDescription>
+      </DialogHeader>
+      <div className="grid gap-6 py-4">
           <div className="grid gap-2">
             <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-gray-600">Name *</Label>
             <Input
@@ -579,7 +566,33 @@ function CategoryDialog({
             {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
             {isEdit ? "Save Changes" : "Create Category"}
           </Button>
-        </DialogFooter>
+      </DialogFooter>
+    </>
+  );
+}
+
+function CategoryDialog({
+  category,
+  open,
+  onOpenChange,
+  onSuccess,
+}: {
+  category?: Category | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px] rounded-[12px] border-gray-200 bg-white shadow-sm">
+        {open && (
+          <CategoryDialogForm
+            key={category?._id ?? "new"}
+            category={category}
+            onOpenChange={onOpenChange}
+            onSuccess={onSuccess}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

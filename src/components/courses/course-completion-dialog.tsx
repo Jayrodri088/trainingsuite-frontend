@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Award, Share2, Download, ArrowRight, PartyPopper, CheckCircle, Loader2 } from "lucide-react";
@@ -34,7 +34,6 @@ export function CourseCompletionDialog({
   const { toast } = useToast();
   const { t } = useT();
   const queryClient = useQueryClient();
-  const [showConfetti, setShowConfetti] = useState(false);
 
   // Fetch certificates when dialog opens to find the one for this course
   const { data: certificatesResponse, isLoading: isLoadingCertificates } = useQuery({
@@ -51,10 +50,9 @@ export function CourseCompletionDialog({
     }
   ) || null;
 
+  // Invalidate certificates when dialog opens so we fetch fresh data
   useEffect(() => {
     if (open) {
-      setShowConfetti(true);
-      // Invalidate certificates query to fetch fresh data
       queryClient.invalidateQueries({ queryKey: ["certificates"] });
     }
   }, [open, queryClient]);
@@ -90,7 +88,7 @@ export function CourseCompletionDialog({
 
   return (
     <>
-      <Confetti active={showConfetti} duration={4000} />
+      <Confetti active={open} duration={4000} />
 
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-md text-center">

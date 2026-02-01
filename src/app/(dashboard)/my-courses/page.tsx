@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   BookOpen,
   PlayCircle,
@@ -46,10 +47,12 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
       <Card className="rounded-[12px] border-gray-200 group cursor-pointer h-full hover:border-gray-300 transition-colors bg-white shadow-sm overflow-hidden">
         <div className={`h-32 ${colorClass} border-b border-gray-200 relative flex items-center justify-center overflow-hidden rounded-t-[12px]`}>
           {course.thumbnail ? (
-            <img
+            <Image
               src={course.thumbnail}
               alt={t(course.title)}
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
             />
           ) : (
             <PlayCircle className="h-10 w-10 opacity-50 group-hover:scale-110 group-hover:opacity-100 transition-all" />
@@ -116,10 +119,12 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
             <div className={`h-32 sm:h-24 w-full sm:w-36 ${colorClass} border border-gray-200 relative shrink-0 flex items-center justify-center overflow-hidden rounded-[10px]`}>
               {course.thumbnail ? (
-                <img
+                <Image
                   src={course.thumbnail}
                   alt={t(course.title)}
-                  className="absolute inset-0 w-full h-full object-cover rounded-[10px]"
+                  fill
+                  className="object-cover rounded-[10px]"
+                  sizes="(min-width: 640px) 9rem, 100vw"
                 />
               ) : (
                 <PlayCircle className="h-8 w-8 opacity-50 group-hover:scale-110 group-hover:opacity-100 transition-all" />
@@ -248,19 +253,19 @@ export default function MyCoursesPage() {
         <TabsList className="bg-transparent border-b border-gray-200 w-full justify-start rounded-none h-auto p-0 gap-4 sm:gap-6 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="all"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black shrink-0"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-2 -mb-px font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black shrink-0"
           >
             <T>All</T> <Badge variant="secondary" className="ml-2 rounded-[8px] text-[10px] bg-gray-100 text-gray-600">{filteredEnrollments.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="in-progress"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black shrink-0"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-2 -mb-px font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black shrink-0"
           >
             <T>In Progress</T> <Badge variant="secondary" className="ml-2 rounded-[8px] text-[10px] bg-gray-100 text-gray-600">{activeEnrollments.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="completed"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black shrink-0"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-2 -mb-px font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black shrink-0"
           >
             <T>Completed</T> <Badge variant="secondary" className="ml-2 rounded-[8px] text-[10px] bg-gray-100 text-gray-600">{completedEnrollments.length}</Badge>
           </TabsTrigger>
@@ -294,7 +299,7 @@ export default function MyCoursesPage() {
               <p className="font-sans text-gray-600 mt-2 text-sm">
                 {searchQuery
                   ? <T>Try a different search term</T>
-                  : <T>You haven't enrolled in any courses yet</T>}
+                  : <T>You haven&apos;t enrolled in any courses yet</T>}
               </p>
               <Button className="mt-6 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" asChild>
                 <Link href="/courses"><T>Browse Courses</T></Link>
@@ -305,7 +310,11 @@ export default function MyCoursesPage() {
 
         <TabsContent value="in-progress" className="mt-8">
           {isLoading ? (
-            <PageLoader />
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3, 4].map((i) => (
+                <CourseCardSkeleton key={i} />
+              ))}
+            </div>
           ) : activeEnrollments.length > 0 ? (
             viewMode === "grid" ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

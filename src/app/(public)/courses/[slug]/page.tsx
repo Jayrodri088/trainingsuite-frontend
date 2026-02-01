@@ -2,6 +2,7 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -11,7 +12,6 @@ import {
   Award,
   BookOpen,
   CheckCircle,
-  ChevronDown,
   ChevronRight,
   Globe,
   Calendar,
@@ -25,8 +25,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { PageLoader } from "@/components/ui/page-loader";
+import { CourseCardPublicSkeleton } from "@/components/courses/course-card-public";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
@@ -330,7 +330,7 @@ export default function CourseDetailPage({
         router.push(`/courses/${course.slug}/learn`);
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string }; status?: number } }) => {
       const message = error?.response?.data?.message || t("Failed to enroll");
       const status = error?.response?.status;
 
@@ -386,7 +386,7 @@ export default function CourseDetailPage({
       <div className="container max-w-6xl py-12 sm:py-16 px-4 sm:px-6 text-center">
         <h1 className="text-xl sm:text-2xl font-bold"><T>Course not found</T></h1>
         <p className="text-sm sm:text-base text-muted-foreground mt-2">
-          <T>The course you're looking for doesn't exist or has been removed.</T>
+          <T>The course you are looking for does not exist or has been removed.</T>
         </p>
         <Button className="mt-4 sm:mt-6" onClick={() => router.push("/courses")}>
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -441,7 +441,7 @@ export default function CourseDetailPage({
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+      <div className="bg-linear-to-br from-slate-900 to-slate-800 text-white">
         <div className="container max-w-6xl py-6 sm:py-12 px-4 sm:px-6">
           <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
             <div className="lg:col-span-2 order-2 lg:order-1">
@@ -509,12 +509,14 @@ export default function CourseDetailPage({
             <div className="lg:row-span-2 order-1 lg:order-2">
               <Card className="lg:sticky lg:top-24 shadow-lg">
                 {/* Preview Image */}
-                <div className="aspect-video bg-gradient-to-br from-violet-500 to-purple-600 rounded-t-lg relative overflow-hidden">
+                <div className="aspect-video bg-linear-to-br from-violet-500 to-purple-600 rounded-t-lg relative overflow-hidden">
                   {normalizeUploadUrl(course.thumbnail) && (
-                    <img
-                      src={normalizeUploadUrl(course.thumbnail)}
+                    <Image
+                      src={normalizeUploadUrl(course.thumbnail)!}
                       alt={t(course.title)}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 1024px) 33vw, 100vw"
                     />
                   )}
                 </div>
@@ -825,18 +827,24 @@ function RelatedCourses({
       <div className="container max-w-6xl py-8 sm:py-12 px-4 sm:px-6">
         <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6"><T>Related Courses</T></h2>
         {isLoading ? (
-          <PageLoader />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <CourseCardPublicSkeleton key={i} />
+            ))}
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {relatedCourses.map((course: Course) => (
               <Link key={course._id} href={`/courses/${course.slug}`}>
                 <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
-                  <div className="aspect-video bg-gradient-to-br from-violet-500 to-purple-600 relative">
+                  <div className="aspect-video bg-linear-to-br from-violet-500 to-purple-600 relative">
                     {normalizeUploadUrl(course.thumbnail) ? (
-                      <img
-                        src={normalizeUploadUrl(course.thumbnail)}
+                      <Image
+                        src={normalizeUploadUrl(course.thumbnail)!}
                         alt={t(course.title)}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
