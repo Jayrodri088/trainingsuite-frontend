@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Award, Share2, Download, ArrowRight, PartyPopper, CheckCircle, Loader2 } from "lucide-react";
+import { Award, Share2, ArrowRight, PartyPopper, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -95,7 +95,7 @@ export function CourseCompletionDialog({
           <DialogHeader className="space-y-4">
             <div className="mx-auto">
               <div className="relative">
-                <div className="h-24 w-24 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center mx-auto shadow-lg">
+                <div className="h-24 w-24 rounded-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center mx-auto shadow-lg">
                   <Award className="h-12 w-12 text-white" />
                 </div>
                 <div className="absolute -top-2 -right-2 h-10 w-10 rounded-full bg-green-500 flex items-center justify-center border-4 border-white shadow-md">
