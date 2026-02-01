@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import { useAuthStore } from "@/stores";
 import { useAuth } from "@/hooks/use-auth";
+import { PageLoader } from "@/components/ui/page-loader";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -34,14 +34,7 @@ export function ProtectedRoute({
   }, [isLoading, isAuthenticated, user, allowedRoles, router, redirectTo]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!isAuthenticated) {

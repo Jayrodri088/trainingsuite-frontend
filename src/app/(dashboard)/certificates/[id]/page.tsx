@@ -6,7 +6,7 @@ import { Award, Download, Calendar, ArrowLeft, Loader2, CheckCircle } from "luci
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageLoader } from "@/components/ui/page-loader";
 import { useToast } from "@/hooks/use-toast";
 import { certificatesApi } from "@/lib/api/certificates";
 import { format } from "date-fns";
@@ -69,33 +69,16 @@ export default function CertificateDetailPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Skeleton className="h-10 w-10" />
-          <Skeleton className="h-8 w-48" />
-        </div>
-        <Card>
-          <CardContent className="p-8">
-            <div className="flex flex-col items-center justify-center space-y-6">
-              <Skeleton className="h-32 w-32 rounded-full" />
-              <Skeleton className="h-8 w-64" />
-              <Skeleton className="h-4 w-96" />
-              <Skeleton className="h-10 w-40" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!certificate) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <Award className="h-16 w-16 text-muted-foreground" />
-        <h2 className="text-xl font-semibold"><T>Certificate not found</T></h2>
-        <p className="text-muted-foreground"><T>The certificate you're looking for doesn't exist.</T></p>
-        <Button asChild>
+        <Award className="h-16 w-16 text-gray-500" />
+        <h2 className="text-xl font-sans font-bold text-black"><T>Certificate not found</T></h2>
+        <p className="font-sans text-gray-600"><T>The certificate you're looking for doesn't exist.</T></p>
+        <Button asChild className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
           <Link href="/certificates">
             <ArrowLeft className="h-4 w-4 mr-2" />
             <T>Back to Certificates</T>
@@ -124,7 +107,7 @@ export default function CertificateDetailPage() {
       </div>
 
       {/* Certificate Card */}
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden rounded-[12px] border-gray-200 bg-white shadow-sm">
         <div className="bg-gradient-to-br from-amber-100 via-amber-50 to-orange-100 p-8 border-b">
           <div className="flex flex-col items-center justify-center space-y-6">
             <div className="relative">
@@ -159,19 +142,19 @@ export default function CertificateDetailPage() {
           {/* Certificate Details */}
           <div className="space-y-4">
             <div className="flex items-center justify-between py-3 border-b">
-              <span className="text-sm text-muted-foreground"><T>Certificate Number</T></span>
+              <span className="text-sm font-sans text-gray-600"><T>Certificate Number</T></span>
               <span className="font-mono text-sm font-medium">
                 {certificate.certificateNumber || certificate.certificateId || "N/A"}
               </span>
             </div>
             <div className="flex items-center justify-between py-3 border-b">
-              <span className="text-sm text-muted-foreground"><T>Issued Date</T></span>
+              <span className="text-sm font-sans text-gray-600"><T>Issued Date</T></span>
               <span className="text-sm font-medium">
                 {format(new Date(certificate.issuedAt || certificate.createdAt), "MMMM d, yyyy")}
               </span>
             </div>
             <div className="flex items-center justify-between py-3 border-b">
-              <span className="text-sm text-muted-foreground"><T>Course</T></span>
+              <span className="text-sm font-sans text-gray-600"><T>Course</T></span>
               <span className="text-sm font-medium text-right">
                 {t(course?.title || "N/A")}
               </span>
@@ -182,7 +165,7 @@ export default function CertificateDetailPage() {
           <Button
             onClick={handleDownload}
             disabled={isDownloading}
-            className="w-full"
+            className="w-full rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold"
             size="lg"
           >
             {isDownloading ? (

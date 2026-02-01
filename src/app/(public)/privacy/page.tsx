@@ -5,12 +5,14 @@ import { T } from "@/components/t";
 
 export default function PrivacyPage() {
   return (
-    <div className="container max-w-4xl py-12">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl"><T>Privacy Policy</T></CardTitle>
-        </CardHeader>
-        <CardContent className="prose prose-sm dark:prose-invert max-w-none">
+    <div className="min-h-screen bg-white py-14 sm:py-20">
+      <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <Card className="border-gray-200 rounded-[12px] shadow-sm">
+            <CardHeader>
+              <CardTitle className="font-sans text-2xl md:text-3xl font-bold text-black"><T>Privacy Policy</T></CardTitle>
+            </CardHeader>
+            <CardContent className="font-sans prose prose-sm max-w-none text-gray-600 prose-headings:text-black prose-headings:font-bold">
           <p className="text-muted-foreground"><T>Last updated: January 2026</T></p>
 
           <h2><T>1. Information We Collect</T></h2>
@@ -52,8 +54,10 @@ export default function PrivacyPage() {
           <p>
             <T>If you have any questions about this Privacy Policy, please contact us.</T>
           </p>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

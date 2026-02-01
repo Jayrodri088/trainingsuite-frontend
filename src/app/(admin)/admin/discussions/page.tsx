@@ -57,7 +57,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageLoader } from "@/components/ui/page-loader";
 import { useToast } from "@/hooks/use-toast";
 import { forumsApi } from "@/lib/api/forums";
 import { coursesApi } from "@/lib/api/courses";
@@ -180,12 +180,12 @@ export default function AdminDiscussionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">Discussions</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-3xl font-sans font-bold text-black font-bold uppercase tracking-tight">Discussions</h1>
+          <p className="text-gray-600 mt-1">
             Manage discussion forums across the platform.
           </p>
         </div>
-        <Button onClick={() => { resetForm(); setSelectedForum(null); setDialogOpen(true); }} className="rounded-none">
+        <Button onClick={() => { resetForm(); setSelectedForum(null); setDialogOpen(true); }} className="rounded-[10px]">
           <Plus className="h-4 w-4 mr-2" />
           Create Forum
         </Button>
@@ -193,7 +193,7 @@ export default function AdminDiscussionsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="rounded-none border-border bg-card">
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-primary/20 bg-primary/5 text-primary">
@@ -201,12 +201,12 @@ export default function AdminDiscussionsPage() {
               </div>
               <div>
                 <div className="text-3xl font-light text-foreground">{stats.total}</div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Total Forums</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-600 mt-1">Total Forums</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-none border-border bg-card">
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-blue-200 bg-blue-50 text-blue-600">
@@ -214,12 +214,12 @@ export default function AdminDiscussionsPage() {
               </div>
               <div>
                 <div className="text-3xl font-light text-foreground">{stats.general}</div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">General Forums</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-600 mt-1">General Forums</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-none border-border bg-card">
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-green-200 bg-green-50 text-green-600">
@@ -227,12 +227,12 @@ export default function AdminDiscussionsPage() {
               </div>
               <div>
                 <div className="text-3xl font-light text-foreground">{stats.courseSpecific}</div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Course Forums</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-600 mt-1">Course Forums</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-none border-border bg-card">
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-amber-200 bg-amber-50 text-amber-600">
@@ -240,7 +240,7 @@ export default function AdminDiscussionsPage() {
               </div>
               <div>
                 <div className="text-3xl font-light text-foreground">{stats.totalPosts}</div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Total Posts</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-600 mt-1">Total Posts</p>
               </div>
             </div>
           </CardContent>
@@ -248,30 +248,30 @@ export default function AdminDiscussionsPage() {
       </div>
 
       {/* Forums Table */}
-      <Card className="rounded-none border-border">
-        <CardHeader className="pb-4 border-b border-border bg-muted/5">
+      <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <CardHeader className="pb-4 border-b border-gray-200 bg-muted/5">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <CardTitle className="font-heading font-bold uppercase tracking-wide text-lg">All Forums</CardTitle>
+              <CardTitle className="font-sans font-bold text-black font-bold uppercase tracking-wide text-lg">All Forums</CardTitle>
               <CardDescription>
                 {filteredForums.length} forum{filteredForums.length !== 1 ? "s" : ""}
               </CardDescription>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" />
                 <Input
                   placeholder="Search forums..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 rounded-none border-border bg-muted/20 focus:bg-background"
+                  className="pl-9 rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
                 />
               </div>
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-36 rounded-none border-border">
+                <SelectTrigger className="w-36 rounded-[12px] border-gray-200 bg-white shadow-sm">
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
-                <SelectContent className="rounded-none border-border">
+                <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="general">General</SelectItem>
                   <SelectItem value="course">Course</SelectItem>
@@ -282,32 +282,28 @@ export default function AdminDiscussionsPage() {
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="space-y-4 p-6">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Skeleton key={i} className="h-16 w-full rounded-none" />
-              ))}
-            </div>
+            <PageLoader />
           ) : filteredForums.length === 0 ? (
             <div className="text-center py-12">
-              <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+              <MessageSquare className="h-12 w-12 mx-auto text-gray-600/30 mb-4" />
               <h3 className="text-lg font-medium">No forums found</h3>
-              <p className="text-muted-foreground mt-1">
+              <p className="text-gray-600 mt-1">
                 {searchQuery || typeFilter !== "all"
                   ? "Try adjusting your filters"
                   : "Create your first discussion forum"}
               </p>
               {!searchQuery && typeFilter === "all" && (
-                <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="mt-4 rounded-none">
+                <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="mt-4 rounded-[10px]">
                   <Plus className="h-4 w-4 mr-2" />
                   Create Forum
                 </Button>
               )}
             </div>
           ) : (
-            <div className="border-t border-border">
+            <div className="border-t border-gray-200">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/30 border-border hover:bg-muted/30">
+                  <TableRow className="bg-muted/30 border-gray-200 hover:bg-muted/30">
                     <TableHead className="font-bold uppercase text-xs tracking-wider pl-6">Forum</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider">Type</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider">Posts</TableHead>
@@ -318,12 +314,12 @@ export default function AdminDiscussionsPage() {
                 </TableHeader>
                 <TableBody>
                   {filteredForums.map((forum) => (
-                    <TableRow key={forum._id} className="border-border hover:bg-muted/10 transition-colors">
+                    <TableRow key={forum._id} className="border-gray-200 hover:bg-muted/10 transition-colors">
                       <TableCell className="pl-6">
                         <div>
                           <p className="font-semibold text-sm">{forum.title}</p>
                           {forum.description && (
-                            <p className="text-sm text-muted-foreground truncate max-w-[300px] font-mono mt-0.5">
+                            <p className="text-sm text-gray-600 truncate max-w-[300px] font-mono mt-0.5">
                               {forum.description}
                             </p>
                           )}
@@ -331,35 +327,35 @@ export default function AdminDiscussionsPage() {
                       </TableCell>
                       <TableCell>
                         {forum.isGeneral ? (
-                          <Badge variant="outline" className="rounded-none border-blue-200 bg-blue-50 text-blue-700 font-bold uppercase text-[10px] tracking-wide">General</Badge>
+                          <Badge variant="outline" className="rounded-[10px] border-blue-200 bg-blue-50 text-blue-700 font-bold uppercase text-[10px] tracking-wide">General</Badge>
                         ) : (
-                          <Badge variant="outline" className="rounded-none border-green-200 bg-green-50 text-green-700 font-bold uppercase text-[10px] tracking-wide">Course</Badge>
+                          <Badge variant="outline" className="rounded-[10px] border-green-200 bg-green-50 text-green-700 font-bold uppercase text-[10px] tracking-wide">Course</Badge>
                         )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1.5 font-mono text-sm">
-                          <MessagesSquare className="h-3.5 w-3.5 text-muted-foreground" />
+                          <MessagesSquare className="h-3.5 w-3.5 text-gray-600" />
                           {forum.postCount || 0}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1.5 font-mono text-sm">
-                          <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                          <Users className="h-3.5 w-3.5 text-gray-600" />
                           {(forum as unknown as { memberCount?: number }).memberCount || 0}
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground font-mono">
+                      <TableCell className="text-sm text-gray-600 font-mono">
                         {forum.createdAt && format(parseISO(forum.createdAt), "MMM d, yyyy")}
                       </TableCell>
                       <TableCell className="text-right pr-6">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-none hover:bg-muted">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-[10px] hover:bg-muted">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="rounded-none border-border">
-                            <DropdownMenuItem onClick={() => handleEdit(forum)} className="rounded-none cursor-pointer">
+                          <DropdownMenuContent align="end" className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                            <DropdownMenuItem onClick={() => handleEdit(forum)} className="rounded-[10px] cursor-pointer">
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
@@ -369,7 +365,7 @@ export default function AdminDiscussionsPage() {
                                 setSelectedForum(forum);
                                 setDeleteDialogOpen(true);
                               }}
-                              className="text-destructive focus:text-destructive rounded-none cursor-pointer"
+                              className="text-destructive focus:text-destructive rounded-[10px] cursor-pointer"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete
@@ -388,9 +384,9 @@ export default function AdminDiscussionsPage() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg rounded-none border-border">
+        <DialogContent className="max-w-lg rounded-[12px] border-gray-200 bg-white shadow-sm">
           <DialogHeader>
-            <DialogTitle className="font-heading uppercase tracking-wide">
+            <DialogTitle className="font-sans font-bold text-black uppercase tracking-wide">
               {selectedForum ? "Edit Forum" : "Create Forum"}
             </DialogTitle>
             <DialogDescription>
@@ -402,33 +398,33 @@ export default function AdminDiscussionsPage() {
           <form onSubmit={handleSubmit}>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Title *</Label>
+                <Label htmlFor="title" className="text-xs font-bold uppercase tracking-wider text-gray-600">Title *</Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Forum title"
                   required
-                  className="rounded-none border-border"
+                  className="rounded-[12px] border-gray-200 bg-white shadow-sm"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Description</Label>
+                <Label htmlFor="description" className="text-xs font-bold uppercase tracking-wider text-gray-600">Description</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Forum description..."
                   rows={3}
-                  className="rounded-none border-border resize-none"
+                  className="rounded-[12px] border-gray-200 bg-white shadow-sm resize-none"
                 />
               </div>
               {!selectedForum && (
                 <>
-                  <div className="flex items-center justify-between p-4 border border-border bg-muted/5">
+                  <div className="flex items-center justify-between p-4 border border-gray-200 bg-muted/5">
                     <div>
                       <Label htmlFor="isGeneral" className="text-xs font-bold uppercase tracking-wider">General Forum</Label>
-                      <p className="text-xs text-muted-foreground mt-1">Platform-wide discussion topic</p>
+                      <p className="text-xs text-gray-600 mt-1">Platform-wide discussion topic</p>
                     </div>
                     <Switch
                       id="isGeneral"
@@ -438,15 +434,15 @@ export default function AdminDiscussionsPage() {
                   </div>
                   {!formData.isGeneral && (
                     <div className="space-y-2">
-                      <Label htmlFor="course" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Related Course</Label>
+                      <Label htmlFor="course" className="text-xs font-bold uppercase tracking-wider text-gray-600">Related Course</Label>
                       <Select
                         value={formData.course}
                         onValueChange={(value) => setFormData({ ...formData, course: value })}
                       >
-                        <SelectTrigger className="rounded-none border-border">
+                        <SelectTrigger className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                           <SelectValue placeholder="Select a course" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-none border-border">
+                        <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                           {courses.map((course) => (
                             <SelectItem key={course._id} value={course._id}>
                               {course.title}
@@ -460,13 +456,13 @@ export default function AdminDiscussionsPage() {
               )}
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="rounded-none border-border">
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="rounded-none"
+                className="rounded-[10px]"
               >
                 {createMutation.isPending || updateMutation.isPending
                   ? "Saving..."
@@ -481,20 +477,20 @@ export default function AdminDiscussionsPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="rounded-none border-border">
+        <DialogContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
           <DialogHeader>
-            <DialogTitle className="font-heading uppercase tracking-wide">Delete Forum</DialogTitle>
+            <DialogTitle className="font-sans font-bold text-black uppercase tracking-wide">Delete Forum</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete <span className="font-semibold text-foreground">&quot;{selectedForum?.title}&quot;</span>?
               <br />This will also delete all posts and comments. This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="rounded-none border-border">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="rounded-[12px] border-gray-200 bg-white shadow-sm">
               Cancel
             </Button>
             <Button
-              className="bg-destructive hover:bg-destructive/90 rounded-none text-destructive-foreground"
+              className="bg-destructive hover:bg-destructive/90 rounded-[10px] text-destructive-foreground"
               onClick={() => {
                 setDeleteDialogOpen(false);
                 setSelectedForum(null);

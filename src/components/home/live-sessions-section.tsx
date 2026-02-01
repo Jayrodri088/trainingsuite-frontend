@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { LiveSessionCard, LiveSessionCardSkeleton } from "./live-session-card";
+import { LiveSessionCard } from "./live-session-card";
+import { LiveSessionCardSkeleton } from "./live-session-card";
 import type { LiveSession } from "@/types";
 import { T } from "@/components/t";
 
@@ -51,7 +52,7 @@ export function LiveSessionsSection({
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => <LiveSessionCardSkeleton key={i} />)
+            [...Array(4)].map((_, i) => <LiveSessionCardSkeleton key={i} />)
           ) : (
             sessions.map((session) => (
               <LiveSessionCard key={session._id} session={session} />

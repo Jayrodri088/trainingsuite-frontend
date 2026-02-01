@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageLoader } from "@/components/ui/page-loader";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth, useEnrollments, useCertificates, useNotifications } from "@/hooks";
@@ -38,15 +38,15 @@ function StatCard({
   description?: string;
 }) {
   return (
-    <Card className="rounded-none border-border bg-card">
+    <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
       <CardContent className="p-6">
         <div className="flex items-center gap-4">
-          <div className={`flex h-12 w-12 items-center justify-center border ${color}`}>
+          <div className={`flex h-12 w-12 items-center justify-center rounded-[12px] ${color}`}>
             <Icon className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-3xl font-light text-foreground">{value}</p>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">{title}</p>
+            <p className="text-3xl font-sans font-bold text-black">{value}</p>
+            <p className="text-sm font-sans text-gray-600 mt-1">{title}</p>
           </div>
         </div>
       </CardContent>
@@ -62,35 +62,35 @@ function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
   if (!course) return null;
 
   return (
-    <div className="group flex flex-col sm:flex-row sm:items-center gap-4 p-4 border border-border bg-card hover:bg-muted/30 transition-colors">
-      <div className="relative h-20 w-full sm:w-32 bg-muted flex items-center justify-center overflow-hidden shrink-0 group-hover:opacity-90 transition-opacity">
+    <div className="group flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-[12px] border border-gray-200 bg-white shadow-sm hover:border-gray-300 transition-colors">
+      <div className="relative h-20 w-full sm:w-32 bg-gray-100 rounded-[10px] flex items-center justify-center overflow-hidden shrink-0 group-hover:opacity-90 transition-opacity">
         {course.thumbnail ? (
           <img
             src={course.thumbnail}
             alt={t(course.title)}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover rounded-[10px]"
           />
         ) : (
           <>
-            <div className="absolute inset-0 bg-primary/10" />
-            <PlayCircle className="h-8 w-8 text-primary relative z-10 group-hover:scale-110 transition-transform" />
+            <div className="absolute inset-0 bg-[#0052CC]/10 rounded-[10px]" />
+            <PlayCircle className="h-8 w-8 text-[#0052CC] relative z-10 group-hover:scale-110 transition-transform" />
           </>
         )}
-        <Badge className="absolute top-2 left-2 rounded-none text-[10px] font-bold uppercase tracking-wider border-0 bg-background/80 text-foreground backdrop-blur-sm" variant="secondary">
+        <Badge className="absolute top-2 left-2 rounded-[8px] text-[10px] font-semibold border-0 bg-white/90 text-gray-800 backdrop-blur-sm" variant="secondary">
           {t(course.level || "beginner")}
         </Badge>
       </div>
       <div className="flex-1 min-w-0">
-        <Badge variant="outline" className="mb-2 rounded-none text-[10px] font-bold uppercase tracking-wider border-primary/20 text-primary"><T>Course</T></Badge>
-        <h4 className="font-heading font-bold uppercase text-sm truncate">{t(course.title)}</h4>
+        <span className="text-xs font-sans font-medium text-[#0052CC]"><T>Course</T></span>
+        <h4 className="font-sans font-bold text-black text-sm truncate mt-0.5">{t(course.title)}</h4>
         <div className="mt-3 flex items-center gap-3">
-          <Progress value={progress} className="h-1.5 flex-1 rounded-none bg-muted" />
-          <span className="text-xs font-mono text-muted-foreground whitespace-nowrap">
+          <Progress value={progress} className="h-1.5 flex-1 rounded-full bg-gray-200 [&>div]:bg-[#0052CC]" />
+          <span className="text-xs font-sans text-gray-600 whitespace-nowrap">
             {progress}%
           </span>
         </div>
       </div>
-      <Button asChild className="rounded-none uppercase text-xs font-bold tracking-wider h-9 w-full sm:w-auto">
+      <Button asChild className="rounded-[10px] text-xs font-semibold h-9 w-full sm:w-auto bg-[#0052CC] hover:bg-[#003d99] text-white">
         <Link href={`/courses/${course.slug || course._id}/learn`}><T>Continue</T></Link>
       </Button>
     </div>
@@ -109,59 +109,16 @@ function NotificationItem({
   isUnread?: boolean;
 }) {
   return (
-    <div className={`p-4 transition-colors hover:bg-muted/30 ${isUnread ? "bg-primary/5" : ""}`}>
+    <div className={`p-4 transition-colors hover:bg-gray-50 rounded-[10px] ${isUnread ? "bg-[#0052CC]/5" : ""}`}>
       <div className="flex items-start gap-3">
         <div
-          className={`h-2 w-2 mt-2 shrink-0 ${isUnread ? "bg-primary" : "bg-transparent"
+          className={`h-2 w-2 mt-2 shrink-0 rounded-full ${isUnread ? "bg-[#0052CC]" : "bg-transparent"
             }`}
         />
         <div className="flex-1 min-w-0">
-          <p className={`text-sm ${isUnread ? "font-bold" : "font-medium"} uppercase tracking-wide`}><T>{title}</T></p>
-          <p className="text-sm text-muted-foreground line-clamp-2 mt-1"><T>{message}</T></p>
-          <p className="text-xs font-mono text-muted-foreground mt-2">{time}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DashboardSkeleton() {
-  return (
-    <div className="space-y-8 p-6">
-      <div>
-        <Skeleton className="h-10 w-64 mb-2 rounded-none" />
-        <Skeleton className="h-5 w-96 rounded-none" />
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i} className="rounded-none border-border">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <Skeleton className="h-12 w-12 rounded-none" />
-                <div>
-                  <Skeleton className="h-8 w-12 mb-1 rounded-none" />
-                  <Skeleton className="h-3 w-24 rounded-none" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <div className="grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-8 w-48 rounded-none" />
-            <Skeleton className="h-8 w-24 rounded-none" />
-          </div>
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-none" />
-            ))}
-          </div>
-        </div>
-        <div className="space-y-6">
-          <Skeleton className="h-8 w-32 rounded-none" />
-          <Skeleton className="h-96 w-full rounded-none" />
+          <p className={`text-sm font-sans ${isUnread ? "font-bold text-black" : "font-medium text-gray-900"}`}><T>{title}</T></p>
+          <p className="text-sm font-sans text-gray-600 line-clamp-2 mt-1"><T>{message}</T></p>
+          <p className="text-xs font-sans text-gray-500 mt-2">{time}</p>
         </div>
       </div>
     </div>
@@ -178,7 +135,7 @@ export default function DashboardPage() {
   const isLoading = enrollmentsLoading;
 
   if (isLoading) {
-    return <DashboardSkeleton />;
+    return <PageLoader />;
   }
 
   const enrollments = (enrollmentsResponse?.data || []) as Enrollment[];
@@ -211,10 +168,10 @@ export default function DashboardPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">
-          <T>Welcome back,</T> <span className="text-primary">{user?.name?.split(" ")[0] || t("Learner")}</span>
+        <h1 className="text-2xl sm:text-3xl font-sans font-bold text-black tracking-tight">
+          <T>Welcome back,</T> <span className="text-[#0052CC]">{user?.name?.split(" ")[0] || t("Learner")}</span>
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="font-sans text-gray-600 mt-1">
           {activeEnrollments.length > 0
             ? <T>Continue your learning journey. You're making great progress!</T>
             : <T>Start your learning journey today by enrolling in a course.</T>}
@@ -240,10 +197,10 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-heading font-bold uppercase tracking-wide"><T>Continue Learning</T></h2>
-              <p className="text-sm text-muted-foreground"><T>Pick up where you left off</T></p>
+              <h2 className="text-xl font-sans font-bold text-black"><T>Continue Learning</T></h2>
+              <p className="text-sm font-sans text-gray-600"><T>Pick up where you left off</T></p>
             </div>
-            <Button variant="outline" size="sm" asChild className="rounded-none border-primary/20 hover:bg-primary/5 hover:text-primary uppercase text-xs font-bold tracking-wider">
+            <Button variant="outline" size="sm" asChild className="rounded-[10px] border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold">
               <Link href="/my-courses">
                 <T>View all</T> <ArrowRight className="ml-1 h-3 w-3" />
               </Link>
@@ -256,14 +213,14 @@ export default function DashboardPage() {
                 <CourseProgressCard key={enrollment._id} enrollment={enrollment} />
               ))
             ) : (
-              <Card className="rounded-none border-border bg-muted/5 border-dashed">
+              <Card className="rounded-[12px] border-gray-200 border-dashed bg-white shadow-sm">
                 <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="h-12 w-12 rounded-none border border-border bg-background flex items-center justify-center mb-4">
-                    <BookOpen className="h-6 w-6 text-muted-foreground" />
+                  <div className="h-12 w-12 rounded-[12px] border border-gray-200 bg-gray-50 flex items-center justify-center mb-4">
+                    <BookOpen className="h-6 w-6 text-gray-500" />
                   </div>
-                  <h3 className="font-heading font-bold uppercase text-lg mb-1"><T>No courses in progress</T></h3>
-                  <p className="text-muted-foreground text-sm max-w-xs mb-6"><T>Start your journey by exploring our available courses.</T></p>
-                  <Button className="rounded-none font-bold uppercase tracking-wider" asChild>
+                  <h3 className="font-sans font-bold text-black text-lg mb-1"><T>No courses in progress</T></h3>
+                  <p className="font-sans text-gray-600 text-sm max-w-xs mb-6"><T>Start your journey by exploring our available courses.</T></p>
+                  <Button className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" asChild>
                     <Link href="/courses"><T>Browse Courses</T></Link>
                   </Button>
                 </CardContent>
@@ -275,21 +232,21 @@ export default function DashboardPage() {
         {/* Notifications / Activity */}
         <div className="space-y-6">
           <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg sm:text-xl font-heading font-bold uppercase tracking-wide flex items-center gap-2 shrink-0">
-              <Bell className="h-5 w-5" />
+            <h2 className="text-lg sm:text-xl font-sans font-bold text-black flex items-center gap-2 shrink-0">
+              <Bell className="h-5 w-5 text-[#0052CC]" />
               <T>Notifications</T>
             </h2>
-            <Button variant="ghost" size="sm" asChild className="hover:bg-transparent hover:text-primary uppercase text-xs font-bold tracking-wider p-0 h-auto shrink-0">
+            <Button variant="ghost" size="sm" asChild className="hover:bg-transparent hover:text-[#0052CC] text-sm font-semibold p-0 h-auto shrink-0">
               <Link href="/notifications">
                 <T>View All</T>
               </Link>
             </Button>
           </div>
 
-          <Card className="rounded-none border-border bg-card h-[calc(100%-3rem)]">
+          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm h-[calc(100%-3rem)]">
             <CardContent className="p-0">
               {notifications.length > 0 ? (
-                <div className="divide-y divide-border">
+                <div className="divide-y divide-gray-200">
                   {notifications.slice(0, 5).map((notification: any) => (
                     <NotificationItem
                       key={notification._id}
@@ -304,10 +261,10 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center h-full min-h-[300px]">
-                  <div className="h-10 w-10 rounded-none border border-border bg-muted/20 flex items-center justify-center mb-3">
-                    <Bell className="h-5 w-5 text-muted-foreground" />
+                  <div className="h-10 w-10 rounded-[10px] border border-gray-200 bg-gray-50 flex items-center justify-center mb-3">
+                    <Bell className="h-5 w-5 text-gray-500" />
                   </div>
-                  <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground"><T>No notifications yet</T></p>
+                  <p className="text-sm font-sans font-medium text-gray-600"><T>No notifications yet</T></p>
                 </div>
               )}
             </CardContent>
@@ -317,10 +274,10 @@ export default function DashboardPage() {
 
       {/* Certificates Section */}
       {certificates.length > 0 && (
-        <div className="space-y-6 pt-4 border-t border-border">
+        <div className="space-y-6 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-heading font-bold uppercase tracking-wide"><T>Recent Certificates</T></h2>
-            <Button variant="outline" size="sm" asChild className="rounded-none border-primary/20 hover:bg-primary/5 hover:text-primary uppercase text-xs font-bold tracking-wider">
+            <h2 className="text-xl font-sans font-bold text-black"><T>Recent Certificates</T></h2>
+            <Button variant="outline" size="sm" asChild className="rounded-[10px] border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold">
               <Link href="/certificates">
                 <T>View All</T> <ArrowRight className="ml-1 h-3 w-3" />
               </Link>
@@ -331,20 +288,20 @@ export default function DashboardPage() {
             {certificates.slice(0, 3).map((cert: any) => {
               const course = typeof cert.course === "object" ? cert.course : null;
               return (
-                <Card key={cert._id} className="rounded-none border-amber-200/50 bg-amber-50/30 hover:bg-amber-50/50 transition-colors group">
+                <Card key={cert._id} className="rounded-[12px] border-amber-200 bg-amber-50/50 hover:border-amber-300 transition-colors group shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="h-12 w-12 border border-amber-200 bg-amber-100/50 text-amber-600 flex items-center justify-center shrink-0">
+                      <div className="h-12 w-12 rounded-[12px] border border-amber-200 bg-amber-100/80 text-amber-600 flex items-center justify-center shrink-0">
                         <Award className="h-6 w-6" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-heading font-bold uppercase text-sm line-clamp-1 group-hover:text-primary transition-colors">
+                        <h4 className="font-sans font-bold text-black text-sm line-clamp-1 group-hover:text-[#0052CC] transition-colors">
                           {course?.title || t("Course Certificate")}
                         </h4>
-                        <p className="text-xs font-mono text-muted-foreground mt-1 uppercase">
+                        <p className="text-xs font-sans text-gray-600 mt-1">
                           <T>Issued</T> {formatDistanceToNow(new Date(cert.issuedAt || cert.createdAt), { addSuffix: true })}
                         </p>
-                        <Button variant="link" className="h-auto p-0 text-xs font-bold uppercase tracking-wider text-amber-600 mt-3 group-hover:translate-x-1 transition-transform" asChild>
+                        <Button variant="link" className="h-auto p-0 text-xs font-semibold text-[#0052CC] mt-3 group-hover:underline" asChild>
                           <Link href={`/certificates/${cert._id}`}><T>View Certificate</T> <ArrowRight className="ml-1 h-3 w-3" /></Link>
                         </Button>
                       </div>

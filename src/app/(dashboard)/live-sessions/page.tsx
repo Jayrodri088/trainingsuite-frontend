@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Video,
   Calendar,
@@ -10,7 +11,6 @@ import {
   Users,
   Play,
   Search,
-  Filter,
   History,
   CheckCircle,
 } from "lucide-react";
@@ -26,25 +26,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Tabs,
-  TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
+import { PageLoader } from "@/components/ui/page-loader";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
-import { getInitials } from "@/lib/utils";
-import type { LiveSession, LiveSessionStatus } from "@/types";
-import { format, parseISO, isAfter, isBefore, differenceInMinutes, formatDistanceToNow } from "date-fns";
+import { getInitials, normalizeUploadUrl } from "@/lib/utils";
+import type { LiveSession } from "@/types";
+import { format, parseISO, differenceInMinutes, formatDistanceToNow } from "date-fns";
 import { T, useT } from "@/components/t";
 
 export default function LiveSessionsPage() {
@@ -69,9 +60,6 @@ export default function LiveSessionsPage() {
   const upcomingSessions = upcomingData?.data || [];
   const pastSessions = pastData?.data || [];
   const now = new Date();
-
-  // All sessions for the live now banner
-  const allSessions = [...upcomingSessions, ...pastSessions];
 
   const filteredSessions = (activeTab === "upcoming" ? upcomingSessions : pastSessions)
     .filter((s) => s.title.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -118,8 +106,8 @@ export default function LiveSessionsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold"><T>Live Sessions</T></h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-sans font-bold text-black"><T>Live Sessions</T></h1>
+        <p className="font-sans text-gray-600 mt-1">
           <T>Join live sessions or watch recordings from your instructors.</T>
         </p>
       </div>
@@ -128,7 +116,7 @@ export default function LiveSessionsPage() {
       {upcomingSessions.some((s) => s.status === "live") && (() => {
         const liveSession = upcomingSessions.find((s) => s.status === "live");
         return (
-          <Card className="bg-gradient-to-r from-red-600 to-red-500 text-white border-0">
+          <Card className="rounded-[12px] bg-linear-to-r from-red-600 to-red-500 text-white border-0 shadow-sm overflow-hidden">
             <CardContent className="py-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -157,7 +145,7 @@ export default function LiveSessionsPage() {
       })()}
 
       {/* Tabs and Search */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-[12px]">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="upcoming">
@@ -168,7 +156,7 @@ export default function LiveSessionsPage() {
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        <div className="relative w-full sm:w-64">
+        <div className="relative w-full sm:w-64 rounded-[12px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("Search sessions...")}
@@ -181,17 +169,13 @@ export default function LiveSessionsPage() {
 
       {/* Sessions Content */}
       {isLoading ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-64" />
-          ))}
-        </div>
+        <PageLoader />
       ) : filteredSessions.length === 0 ? (
-        <Card className="py-12">
+        <Card className="py-12 rounded-[12px] border-gray-200 bg-white shadow-sm">
           <CardContent className="text-center">
-            <Video className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium"><T>No sessions found</T></h3>
-            <p className="text-muted-foreground mt-1">
+            <Video className="h-12 w-12 mx-auto text-gray-500 mb-4" />
+            <h3 className="text-lg font-sans font-bold text-black"><T>No sessions found</T></h3>
+            <p className="font-sans text-gray-600 mt-1">
               {searchQuery
                 ? <T>Try adjusting your search</T>
                 : activeTab === "upcoming"
@@ -204,20 +188,25 @@ export default function LiveSessionsPage() {
         /* Upcoming Sessions Grid */
         <div id="live-sessions" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredSessions.map((session) => (
-            <Card key={session._id} className="flex flex-col overflow-hidden">
+            <Card key={session._id} className="flex flex-col overflow-hidden rounded-[12px] border-gray-200 bg-white shadow-sm">
               {/* Thumbnail */}
-              <div className="relative aspect-video bg-muted">
-                {session.thumbnail ? (
-                  <img
-                    src={session.thumbnail}
-                    alt={t(session.title)}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+              <div className="relative aspect-video bg-muted overflow-hidden">
+                {(() => {
+                  const thumbSrc = normalizeUploadUrl(session.thumbnail);
+                  return thumbSrc ? (
+                    <Image
+                      src={thumbSrc}
+                      alt={t(session.title)}
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    />
+                  ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-primary/20 to-primary/5">
                     <Video className="h-12 w-12 text-primary/50" />
                   </div>
-                )}
+                  );
+                })()}
                 <div className="absolute top-3 left-3">
                   {getStatusBadge(session)}
                 </div>
@@ -290,7 +279,7 @@ export default function LiveSessionsPage() {
                     </Link>
                   </Button>
                 ) : (
-                  <Button className="w-full" variant="outline" asChild>
+                  <Button className="w-full rounded-[10px] border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] font-semibold" variant="outline" asChild>
                     <Link href={`/live-sessions/${session._id}`}>
                       <T>View Details</T>
                     </Link>
@@ -302,13 +291,13 @@ export default function LiveSessionsPage() {
         </div>
       ) : (
         /* Past Sessions History List */
-        <Card>
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 font-sans font-bold text-black">
               <History className="h-5 w-5" />
               <T>Session History</T>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="font-sans text-gray-600">
               <T>A record of past live sessions you attended or were available to you.</T>
             </CardDescription>
           </CardHeader>
@@ -317,18 +306,23 @@ export default function LiveSessionsPage() {
               {filteredSessions.map((session) => (
                 <div key={session._id} className="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors">
                   {/* Thumbnail */}
-                  <div className="hidden sm:block h-16 w-24 rounded bg-muted flex-shrink-0 overflow-hidden">
-                    {session.thumbnail ? (
-                      <img
-                        src={session.thumbnail}
-                        alt={t(session.title)}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                        <Video className="h-6 w-6 text-muted-foreground" />
-                      </div>
-                    )}
+                  <div className="hidden sm:block relative h-16 w-24 rounded bg-muted shrink-0 overflow-hidden">
+                    {(() => {
+                      const thumbSrc = normalizeUploadUrl(session.thumbnail);
+                      return thumbSrc ? (
+                        <Image
+                          src={thumbSrc}
+                          alt={t(session.title)}
+                          fill
+                          className="object-cover"
+                          sizes="96px"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-muted to-muted/50">
+                          <Video className="h-6 w-6 text-muted-foreground" />
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Session Info */}
@@ -352,7 +346,7 @@ export default function LiveSessionsPage() {
                           )}
                         </div>
                       </div>
-                      <Badge variant="secondary" className="flex-shrink-0">
+                      <Badge variant="secondary" className="shrink-0">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         <T>Ended</T>
                       </Badge>

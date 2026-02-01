@@ -206,7 +206,7 @@ export default function AdminCreateCoursePage() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold">Create New Course</h1>
-          <p className="text-muted-foreground">
+          <p className="text-gray-600">
             Fill in the details to create a new course.
           </p>
         </div>
@@ -234,7 +234,7 @@ export default function AdminCreateCoursePage() {
                     placeholder="Enter course title"
                     required
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-600">
                     Minimum 3 characters ({formData.title.length}/3)
                   </p>
                 </div>
@@ -248,7 +248,7 @@ export default function AdminCreateCoursePage() {
                     rows={5}
                     required
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-600">
                     Minimum 20 characters ({formData.description.length}/20)
                   </p>
                 </div>
@@ -290,7 +290,7 @@ export default function AdminCreateCoursePage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Course Duration</Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-gray-600">
                     Duration is automatically calculated from the video lengths of all lessons in the course.
                   </p>
                 </div>
@@ -415,9 +415,9 @@ export default function AdminCreateCoursePage() {
                       htmlFor="thumbnail-upload"
                       className="flex flex-col items-center justify-center aspect-video border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
                     >
-                      <ImageIcon className="h-10 w-10 text-muted-foreground mb-2" />
-                      <span className="text-sm text-muted-foreground">Click to upload</span>
-                      <span className="text-xs text-muted-foreground mt-1">PNG, JPG up to 5MB</span>
+                      <ImageIcon className="h-10 w-10 text-gray-600 mb-2" />
+                      <span className="text-sm text-gray-600">Click to upload</span>
+                      <span className="text-xs text-gray-600 mt-1">PNG, JPG up to 5MB</span>
                     </label>
                   )}
                   <input
@@ -438,7 +438,7 @@ export default function AdminCreateCoursePage() {
                       Upload Thumbnail
                     </Button>
                   )}
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-600">
                     Recommended: 1280x720px (16:9 ratio)
                   </p>
                 </div>
@@ -511,7 +511,7 @@ export default function AdminCreateCoursePage() {
                     </>
                   )}
                 </Button>
-                <p className="text-xs text-muted-foreground text-center mt-3">
+                <p className="text-xs text-gray-600 text-center mt-3">
                   You can add modules and lessons after creating the course.
                 </p>
               </CardContent>

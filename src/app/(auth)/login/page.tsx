@@ -57,9 +57,9 @@ export default function LoginPage() {
 
   return (
     <div className="space-y-8">
-      <div className="space-y-2 text-center md:text-left">
-        <h1 className="font-heading text-3xl font-bold tracking-tight"><T>Missionary Login</T></h1>
-        <p className="text-muted-foreground text-sm">
+      <div className="space-y-2 text-center">
+        <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-black"><T>Missionary Login</T></h1>
+        <p className="text-gray-600 text-sm">
           <T>Enter your ministry credentials to access the portal.</T>
         </p>
       </div>
@@ -78,7 +78,7 @@ export default function LoginPage() {
                     placeholder="name@rhapsodyofrealities.org"
                     autoComplete="email"
                     disabled={isLoading}
-                    className="rounded-none h-11"
+                    className="rounded-[10px] h-11 border-gray-200"
                     {...field}
                   />
                 </FormControl>
@@ -102,14 +102,14 @@ export default function LoginPage() {
                       placeholder="••••••••"
                       autoComplete="current-password"
                       disabled={isLoading}
-                      className="rounded-none h-11 pr-10"
+                      className="rounded-[10px] h-11 pr-10 border-gray-200"
                       {...field}
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-0 top-0 h-11 w-11 hover:bg-transparent text-muted-foreground hover:text-foreground"
+                      className="absolute right-0 top-0 h-11 w-11 rounded-[10px] hover:bg-transparent text-gray-500 hover:text-gray-900"
                       onClick={() => setShowPassword(!showPassword)}
                       disabled={isLoading}
                     >
@@ -131,32 +131,32 @@ export default function LoginPage() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Checkbox id="remember" className="rounded-none" />
+              <Checkbox id="remember" className="rounded-[6px] border-gray-300" />
               <label
                 htmlFor="remember"
-                className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium"
+                className="text-sm font-sans text-gray-600 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium"
               >
                 <T>Remember me</T>
               </label>
             </div>
             <Link
               href="/forgot-password"
-              className="text-sm font-medium text-foreground hover:underline underline-offset-4"
+              className="text-sm font-semibold text-[#0052CC] hover:underline underline-offset-4"
             >
               <T>Forgot password?</T>
             </Link>
           </div>
 
-          <Button type="submit" className="w-full h-11 rounded-none uppercase tracking-widest font-bold" disabled={isLoading}>
+          <Button type="submit" className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <T>Access Portal</T>
           </Button>
         </form>
       </Form>
 
-      <p className="text-center text-xs uppercase tracking-widest text-muted-foreground pt-4">
+      <p className="text-center text-sm text-gray-600 pt-4">
         <T>Not yet registered?</T>{" "}
-        <Link href="/register" className="text-foreground hover:underline font-bold">
+        <Link href="/register" className="text-[#0052CC] hover:underline font-semibold">
           <T>Apply Here</T>
         </Link>
       </p>

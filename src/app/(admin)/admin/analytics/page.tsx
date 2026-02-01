@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageLoader } from "@/components/ui/page-loader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AreaChart,
@@ -106,7 +106,6 @@ interface StatCardProps {
   value: string | number;
   icon: React.ElementType;
   color: string;
-  isLoading?: boolean;
 }
 
 export default function AnalyticsPage() {
@@ -189,25 +188,25 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <div>
-          <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">Analytics</h1>
+          <h1 className="text-3xl font-sans font-bold text-black tracking-tight">Analytics</h1>
           <p className="text-muted-foreground mt-1">
             Track metrics and platform growth
           </p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-[180px] rounded-none border-border">
+            <SelectTrigger className="w-[180px] rounded-[12px] border-gray-200 bg-white shadow-sm">
               <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
               <SelectValue placeholder="Select range" />
             </SelectTrigger>
-            <SelectContent className="rounded-none border-border">
+            <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
               <SelectItem value="7">Last 7 days</SelectItem>
               <SelectItem value="30">Last 30 days</SelectItem>
               <SelectItem value="90">Last 3 months</SelectItem>
               <SelectItem value="365">Last 12 months</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" className="rounded-none border-border">
+          <Button variant="outline" className="rounded-[12px] border-gray-200 bg-white shadow-sm">
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
@@ -223,29 +222,28 @@ export default function AnalyticsPage() {
             value={stat.value}
             icon={stat.icon}
             color={stat.color}
-            isLoading={isLoading}
           />
         ))}
       </div>
 
       {/* Charts */}
       <Tabs defaultValue="revenue" className="space-y-8">
-        <TabsList className="w-full justify-start rounded-none bg-transparent p-0 h-auto border-b border-border gap-4 sm:gap-6 overflow-x-auto flex-nowrap">
+        <TabsList className="w-full justify-start rounded-[10px] bg-transparent p-0 h-auto border-b border-gray-200 gap-4 sm:gap-6 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="revenue"
-            className="shrink-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-bold uppercase tracking-wide text-xs text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
+            className="shrink-0 rounded-[10px] border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-sans font-semibold text-sm text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
           >
             Revenue
           </TabsTrigger>
           <TabsTrigger
             value="enrollments"
-            className="shrink-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-bold uppercase tracking-wide text-xs text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
+            className="shrink-0 rounded-[10px] border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-sans font-semibold text-sm text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
           >
             Enrollments
           </TabsTrigger>
           <TabsTrigger
             value="courses"
-            className="shrink-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-bold uppercase tracking-wide text-xs text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
+            className="shrink-0 rounded-[10px] border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 font-sans font-semibold text-sm text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground"
           >
             Course Performance
           </TabsTrigger>
@@ -254,18 +252,16 @@ export default function AnalyticsPage() {
         <TabsContent value="revenue" className="space-y-8 mt-0 pt-6">
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Revenue Chart */}
-            <Card className="lg:col-span-2 rounded-none border-border shadow-none">
-              <CardHeader className="p-6 border-b border-border bg-muted/5">
+            <Card className="lg:col-span-2 rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none">
+              <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
                 <CardTitle className="font-heading text-lg">Revenue Over Time</CardTitle>
                 <CardDescription>
                   Daily revenue for the selected period
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                {revenueLoading ? (
-                  <Skeleton className="h-[350px] w-full rounded-none" />
-                ) : revenueChartData.length === 0 ? (
-                  <div className="h-[350px] flex items-center justify-center text-muted-foreground border border-dashed border-border bg-muted/5">
+                {revenueChartData.length === 0 ? (
+                  <div className="h-[350px] flex items-center justify-center text-muted-foreground border border-dashed border-gray-200 bg-gray-50">
                     No revenue data available
                   </div>
                 ) : (
@@ -297,7 +293,7 @@ export default function AnalyticsPage() {
                           content={({ active, payload }) => {
                             if (active && payload && payload.length) {
                               return (
-                                <div className="bg-popover border border-border shadow-none p-3 rounded-none">
+                                <div className="bg-popover border border-gray-200 shadow-none p-3 rounded-[10px]">
                                   <p className="font-mono text-xs text-muted-foreground mb-1">{payload[0].payload.date}</p>
                                   <p className="font-bold text-foreground">
                                     {formatCurrency(payload[0].value as number, "USD")}
@@ -325,16 +321,14 @@ export default function AnalyticsPage() {
             </Card>
 
             {/* Enrollment Status Distribution */}
-            <Card className="rounded-none border-border shadow-none">
-              <CardHeader className="p-6 border-b border-border bg-muted/5">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none">
+              <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
                 <CardTitle className="font-heading text-lg">Enrollment Status</CardTitle>
                 <CardDescription>Distribution by status</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                {enrollmentLoading ? (
-                  <Skeleton className="h-[250px] w-full rounded-none" />
-                ) : statusChartData.length === 0 ? (
-                  <div className="h-[250px] flex items-center justify-center text-muted-foreground border border-dashed border-border bg-muted/5">
+                {statusChartData.length === 0 ? (
+                  <div className="h-[250px] flex items-center justify-center text-muted-foreground border border-dashed border-gray-200 bg-gray-50">
                     No data available
                   </div>
                 ) : (
@@ -361,7 +355,7 @@ export default function AnalyticsPage() {
                             content={({ active, payload }) => {
                               if (active && payload && payload.length) {
                                 return (
-                                  <div className="bg-popover border border-border shadow-none p-3 rounded-none">
+                                  <div className="bg-popover border border-gray-200 shadow-none p-3 rounded-[10px]">
                                     <p className="font-medium text-sm">{payload[0].name}</p>
                                     <p className="font-mono text-xs text-muted-foreground">
                                       {payload[0].value} enrollments
@@ -379,7 +373,7 @@ export default function AnalyticsPage() {
                       {statusChartData.map((item, index) => (
                         <div key={item.name} className="flex items-center gap-2">
                           <div
-                            className="h-2 w-2 rounded-none"
+                            className="h-2 w-2 rounded-[10px]"
                             style={{ backgroundColor: COLORS[index % COLORS.length] }}
                           />
                           <span className="text-xs text-muted-foreground uppercase tracking-wide truncate">
@@ -396,62 +390,48 @@ export default function AnalyticsPage() {
 
           {/* Revenue summary cards */}
           <div className="grid gap-4 md:grid-cols-3">
-            <Card className="rounded-none border-border shadow-none bg-muted/5">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none bg-gray-50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Revenue</CardTitle>
               </CardHeader>
               <CardContent>
-                {revenueLoading ? (
-                  <Skeleton className="h-8 w-24 rounded-none" />
-                ) : (
-                  <div className="text-3xl font-light text-foreground">
-                    {formatCurrency(revenueData?.totals?.totalRevenue || 0, "USD")}
-                  </div>
-                )}
+                <div className="text-3xl font-light text-foreground">
+                  {formatCurrency(revenueData?.totals?.totalRevenue || 0, "USD")}
+                </div>
               </CardContent>
             </Card>
-            <Card className="rounded-none border-border shadow-none bg-muted/5">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none bg-gray-50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Transactions</CardTitle>
               </CardHeader>
               <CardContent>
-                {revenueLoading ? (
-                  <Skeleton className="h-8 w-24 rounded-none" />
-                ) : (
-                  <div className="text-3xl font-light text-foreground">
-                    {revenueData?.totals?.totalTransactions || 0}
-                  </div>
-                )}
+                <div className="text-3xl font-light text-foreground">
+                  {revenueData?.totals?.totalTransactions || 0}
+                </div>
               </CardContent>
             </Card>
-            <Card className="rounded-none border-border shadow-none bg-muted/5">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none bg-gray-50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Avg. Transaction</CardTitle>
               </CardHeader>
               <CardContent>
-                {revenueLoading ? (
-                  <Skeleton className="h-8 w-24 rounded-none" />
-                ) : (
-                  <div className="text-3xl font-light text-foreground">
-                    {formatCurrency(revenueData?.totals?.avgTransactionValue || 0, "USD")}
-                  </div>
-                )}
+                <div className="text-3xl font-light text-foreground">
+                  {formatCurrency(revenueData?.totals?.avgTransactionValue || 0, "USD")}
+                </div>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
         <TabsContent value="enrollments" className="space-y-8 mt-0 pt-6">
-          <Card className="rounded-none border-border shadow-none">
-            <CardHeader className="p-6 border-b border-border bg-muted/5">
+          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none">
+            <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
               <CardTitle className="font-heading text-lg">Enrollments Over Time</CardTitle>
               <CardDescription>Daily enrollment numbers</CardDescription>
             </CardHeader>
             <CardContent className="p-6">
-              {enrollmentLoading ? (
-                <Skeleton className="h-[400px] w-full rounded-none" />
-              ) : enrollmentChartData.length === 0 ? (
-                <div className="h-[400px] flex items-center justify-center text-muted-foreground border border-dashed border-border bg-muted/5">
+              {enrollmentChartData.length === 0 ? (
+                <div className="h-[400px] flex items-center justify-center text-muted-foreground border border-dashed border-gray-200 bg-gray-50">
                   No enrollment data available
                 </div>
               ) : (
@@ -471,7 +451,7 @@ export default function AnalyticsPage() {
                         content={({ active, payload }) => {
                           if (active && payload && payload.length) {
                             return (
-                              <div className="bg-popover border border-border shadow-none p-3 rounded-none">
+                              <div className="bg-popover border border-gray-200 shadow-none p-3 rounded-[10px]">
                                 <p className="font-mono text-xs text-muted-foreground mb-1">{payload[0].payload.date}</p>
                                 <p className="font-bold text-foreground">
                                   {payload[0].value} enrollments
@@ -493,16 +473,14 @@ export default function AnalyticsPage() {
         </TabsContent>
 
         <TabsContent value="courses" className="space-y-8 mt-0 pt-6">
-          <Card className="rounded-none border-border shadow-none">
-            <CardHeader className="p-6 border-b border-border bg-muted/5">
+          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none">
+            <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
               <CardTitle className="font-heading text-lg">Top Performing Courses</CardTitle>
               <CardDescription>Courses ranked by enrollment</CardDescription>
             </CardHeader>
             <CardContent className="p-6">
-              {enrollmentLoading ? (
-                <Skeleton className="h-[400px] w-full rounded-none" />
-              ) : topCoursesChartData.length === 0 ? (
-                <div className="h-[400px] flex items-center justify-center text-muted-foreground border border-dashed border-border bg-muted/5">
+              {topCoursesChartData.length === 0 ? (
+                <div className="h-[400px] flex items-center justify-center text-muted-foreground border border-dashed border-gray-200 bg-gray-50">
                   No course data available
                 </div>
               ) : (
@@ -524,7 +502,7 @@ export default function AnalyticsPage() {
                         content={({ active, payload }) => {
                           if (active && payload && payload.length) {
                             return (
-                              <div className="bg-popover border border-border shadow-none p-3 rounded-none">
+                              <div className="bg-popover border border-gray-200 shadow-none p-3 rounded-[10px]">
                                 <p className="font-medium text-sm mb-1">{payload[0].payload.name}</p>
                                 <p className="font-mono text-xs text-muted-foreground">
                                   {payload[0].payload.enrollments} enrollments
@@ -546,8 +524,8 @@ export default function AnalyticsPage() {
 
           {/* Revenue by Course */}
           {revenueData?.revenueByCourse && revenueData.revenueByCourse.length > 0 && (
-            <Card className="rounded-none border-border shadow-none">
-              <CardHeader className="p-6 border-b border-border bg-muted/5">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none">
+              <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
                 <CardTitle className="font-heading text-lg">Revenue by Course</CardTitle>
                 <CardDescription>Top courses by revenue generated</CardDescription>
               </CardHeader>
@@ -556,7 +534,7 @@ export default function AnalyticsPage() {
                   {revenueData.revenueByCourse.map((course, index) => (
                     <div key={course.courseId} className="flex items-center justify-between p-4 hover:bg-muted/10 transition-colors">
                       <div className="flex items-center gap-4">
-                        <div className="flex h-8 w-8 items-center justify-center border border-border bg-muted text-muted-foreground font-mono text-xs">
+                        <div className="flex h-8 w-8 items-center justify-center border border-gray-200 bg-muted text-muted-foreground font-mono text-xs">
                           {index + 1}
                         </div>
                         <div>
@@ -580,18 +558,14 @@ export default function AnalyticsPage() {
     </div>
   );
 }
-function StatCard({ title, value, icon: Icon, color, isLoading }: StatCardProps) {
+function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   return (
-    <Card className="rounded-none border-border bg-card shadow-none">
+    <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card shadow-none">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{title}</p>
-            {isLoading ? (
-              <Skeleton className="h-8 w-24 mt-2 rounded-none" />
-            ) : (
-              <p className="text-3xl font-light mt-2 text-foreground">{value}</p>
-            )}
+            <p className="text-3xl font-light mt-2 text-foreground">{value}</p>
           </div>
           <div className={`h-10 w-10 ${color.replace('bg-', 'text-')} bg-opacity-10 bg-transparent flex items-center justify-center`}>
             <Icon className="h-6 w-6" />

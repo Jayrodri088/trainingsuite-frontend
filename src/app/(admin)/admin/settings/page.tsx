@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageLoader } from "@/components/ui/page-loader";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { adminApi } from "@/lib/api/admin";
@@ -124,19 +124,7 @@ export default function SettingsPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-8 p-6">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-8 w-48 rounded-none" />
-          <Skeleton className="h-10 w-32 rounded-none" />
-        </div>
-        <div className="grid gap-6">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-64 w-full rounded-none" />
-          ))}
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
@@ -144,7 +132,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-heading font-bold uppercase tracking-tight">Site Settings</h1>
+          <h1 className="text-3xl font-sans font-bold text-black font-bold uppercase tracking-tight">Site Settings</h1>
           <p className="text-muted-foreground mt-1">
             Configure your platform settings and preferences.
           </p>
@@ -153,7 +141,7 @@ export default function SettingsPage() {
 
       {/* Maintenance Mode Warning */}
       {siteConfig.maintenanceMode && (
-        <Alert variant="destructive" className="rounded-none border-destructive/20 bg-destructive/5">
+        <Alert variant="destructive" className="rounded-[10px] border-destructive/20 bg-destructive/5">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle className="uppercase font-bold tracking-wide">Maintenance Mode Active</AlertTitle>
           <AlertDescription>
@@ -163,31 +151,31 @@ export default function SettingsPage() {
       )}
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="bg-transparent border-b border-border w-full justify-start rounded-none h-auto p-0 gap-6">
+        <TabsList className="bg-transparent border-b border-gray-200 w-full justify-start rounded-[10px] h-auto p-0 gap-6">
           <TabsTrigger
             value="general"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-[10px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
           >
             <Globe className="h-3.5 w-3.5 mr-2" />
             General
           </TabsTrigger>
           <TabsTrigger
             value="appearance"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-[10px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
           >
             <Palette className="h-3.5 w-3.5 mr-2" />
             Appearance
           </TabsTrigger>
           <TabsTrigger
             value="features"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-[10px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
           >
             <Settings className="h-3.5 w-3.5 mr-2" />
             Features
           </TabsTrigger>
           <TabsTrigger
             value="payments"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-[10px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
           >
             <CreditCard className="h-3.5 w-3.5 mr-2" />
             Payments
@@ -196,9 +184,9 @@ export default function SettingsPage() {
 
         {/* General Settings */}
         <TabsContent value="general">
-          <Card className="rounded-none border-border">
-            <CardHeader className="bg-muted/5 border-b border-border">
-              <CardTitle className="font-heading uppercase tracking-wide">General Settings</CardTitle>
+          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <CardHeader className="bg-muted/5 border-b border-gray-200">
+              <CardTitle className="font-sans font-bold text-black uppercase tracking-wide">General Settings</CardTitle>
               <CardDescription>
                 Basic site information and contact details.
               </CardDescription>
@@ -214,7 +202,7 @@ export default function SettingsPage() {
                       setSiteConfig({ ...siteConfig, siteName: e.target.value })
                     }
                     placeholder="My Learning Platform"
-                    className="rounded-none border-border"
+                    className="rounded-[12px] border-gray-200 bg-white shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -227,7 +215,7 @@ export default function SettingsPage() {
                       setSiteConfig({ ...siteConfig, contactEmail: e.target.value })
                     }
                     placeholder="contact@example.com"
-                    className="rounded-none border-border"
+                    className="rounded-[12px] border-gray-200 bg-white shadow-sm"
                   />
                 </div>
               </div>
@@ -242,14 +230,14 @@ export default function SettingsPage() {
                   }
                   placeholder="A brief description of your platform..."
                   rows={3}
-                  className="rounded-none border-border resize-none"
+                  className="rounded-[12px] border-gray-200 bg-white shadow-sm resize-none"
                 />
               </div>
 
               <Separator />
 
               <div>
-                <h4 className="font-heading font-bold uppercase tracking-wide text-sm mb-6">Social Links</h4>
+                <h4 className="font-sans font-bold text-black font-bold uppercase tracking-wide text-sm mb-6">Social Links</h4>
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="facebook" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Facebook</Label>
@@ -263,7 +251,7 @@ export default function SettingsPage() {
                         })
                       }
                       placeholder="https://facebook.com/..."
-                      className="rounded-none border-border"
+                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
                     />
                   </div>
                   <div className="space-y-2">
@@ -278,7 +266,7 @@ export default function SettingsPage() {
                         })
                       }
                       placeholder="https://twitter.com/..."
-                      className="rounded-none border-border"
+                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
                     />
                   </div>
                   <div className="space-y-2">
@@ -293,7 +281,7 @@ export default function SettingsPage() {
                         })
                       }
                       placeholder="https://instagram.com/..."
-                      className="rounded-none border-border"
+                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
                     />
                   </div>
                   <div className="space-y-2">
@@ -308,7 +296,7 @@ export default function SettingsPage() {
                         })
                       }
                       placeholder="https://youtube.com/..."
-                      className="rounded-none border-border"
+                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
                     />
                   </div>
                 </div>
@@ -318,7 +306,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={handleSaveSiteConfig}
                   disabled={updateConfigMutation.isPending}
-                  className="rounded-none"
+                  className="rounded-[10px]"
                 >
                   {updateConfigMutation.isPending ? (
                     <>
@@ -339,9 +327,9 @@ export default function SettingsPage() {
 
         {/* Appearance Settings */}
         <TabsContent value="appearance">
-          <Card className="rounded-none border-border">
-            <CardHeader className="bg-muted/5 border-b border-border">
-              <CardTitle className="font-heading uppercase tracking-wide">Appearance Settings</CardTitle>
+          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <CardHeader className="bg-muted/5 border-b border-gray-200">
+              <CardTitle className="font-sans font-bold text-black uppercase tracking-wide">Appearance Settings</CardTitle>
               <CardDescription>
                 Customize the look and feel of your platform.
               </CardDescription>
@@ -358,14 +346,14 @@ export default function SettingsPage() {
                         setSiteConfig({ ...siteConfig, logo: e.target.value })
                       }
                       placeholder="https://example.com/logo.png"
-                      className="rounded-none border-border"
+                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
                     />
-                    <Button variant="outline" size="icon" className="rounded-none border-border aspect-square h-10 w-10">
+                    <Button variant="outline" size="icon" className="rounded-[12px] border-gray-200 bg-white shadow-sm aspect-square h-10 w-10">
                       <Upload className="h-4 w-4" />
                     </Button>
                   </div>
                   {siteConfig.logo && (
-                    <div className="mt-2 p-4 border border-border bg-muted/20">
+                    <div className="mt-2 p-4 border border-gray-200 bg-muted/20">
                       <img
                         src={siteConfig.logo}
                         alt="Logo preview"
@@ -384,9 +372,9 @@ export default function SettingsPage() {
                         setSiteConfig({ ...siteConfig, favicon: e.target.value })
                       }
                       placeholder="https://example.com/favicon.ico"
-                      className="rounded-none border-border"
+                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
                     />
-                    <Button variant="outline" size="icon" className="rounded-none border-border aspect-square h-10 w-10">
+                    <Button variant="outline" size="icon" className="rounded-[12px] border-gray-200 bg-white shadow-sm aspect-square h-10 w-10">
                       <Upload className="h-4 w-4" />
                     </Button>
                   </div>
@@ -396,7 +384,7 @@ export default function SettingsPage() {
               <Separator />
 
               <div>
-                <h4 className="font-heading font-bold uppercase tracking-wide text-sm mb-6">Brand Colors</h4>
+                <h4 className="font-sans font-bold text-black font-bold uppercase tracking-wide text-sm mb-6">Brand Colors</h4>
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="primaryColor" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Primary Color</Label>
@@ -408,7 +396,7 @@ export default function SettingsPage() {
                         onChange={(e) =>
                           setSiteConfig({ ...siteConfig, primaryColor: e.target.value })
                         }
-                        className="w-12 h-10 p-1 cursor-pointer rounded-none border-border"
+                        className="w-12 h-10 p-1 cursor-pointer rounded-[12px] border-gray-200 bg-white shadow-sm"
                       />
                       <Input
                         value={siteConfig.primaryColor || "#7c3aed"}
@@ -416,7 +404,7 @@ export default function SettingsPage() {
                           setSiteConfig({ ...siteConfig, primaryColor: e.target.value })
                         }
                         placeholder="#7c3aed"
-                        className="rounded-none border-border font-mono"
+                        className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
                       />
                     </div>
                   </div>
@@ -430,7 +418,7 @@ export default function SettingsPage() {
                         onChange={(e) =>
                           setSiteConfig({ ...siteConfig, secondaryColor: e.target.value })
                         }
-                        className="w-12 h-10 p-1 cursor-pointer rounded-none border-border"
+                        className="w-12 h-10 p-1 cursor-pointer rounded-[12px] border-gray-200 bg-white shadow-sm"
                       />
                       <Input
                         value={siteConfig.secondaryColor || "#f59e0b"}
@@ -438,7 +426,7 @@ export default function SettingsPage() {
                           setSiteConfig({ ...siteConfig, secondaryColor: e.target.value })
                         }
                         placeholder="#f59e0b"
-                        className="rounded-none border-border font-mono"
+                        className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
                       />
                     </div>
                   </div>
@@ -449,7 +437,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={handleSaveSiteConfig}
                   disabled={updateConfigMutation.isPending}
-                  className="rounded-none"
+                  className="rounded-[10px]"
                 >
                   {updateConfigMutation.isPending ? (
                     <>
@@ -470,16 +458,16 @@ export default function SettingsPage() {
 
         {/* Feature Toggles */}
         <TabsContent value="features">
-          <Card className="rounded-none border-border">
-            <CardHeader className="bg-muted/5 border-b border-border">
-              <CardTitle className="font-heading uppercase tracking-wide">Feature Toggles</CardTitle>
+          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <CardHeader className="bg-muted/5 border-b border-gray-200">
+              <CardTitle className="font-sans font-bold text-black uppercase tracking-wide">Feature Toggles</CardTitle>
               <CardDescription>
                 Enable or disable platform features.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 p-6">
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="flex items-center justify-between p-4 border border-border bg-card">
+                <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
                     <Label htmlFor="enablePayments" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
                       Enable Payments
@@ -497,7 +485,7 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 border border-border bg-card">
+                <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
                     <Label htmlFor="enableLiveStreaming" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
                       Enable Live Streaming
@@ -515,7 +503,7 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 border border-border bg-card">
+                <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
                     <Label htmlFor="enableForums" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
                       Enable Forums
@@ -533,7 +521,7 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 border border-border bg-card">
+                <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
                     <Label htmlFor="enableComments" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
                       Enable Comments
@@ -551,7 +539,7 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 border border-border bg-card">
+                <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
                     <Label htmlFor="enableRatings" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
                       Enable Ratings
@@ -569,7 +557,7 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 border border-border bg-card">
+                <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
                     <Label htmlFor="enableCertificates" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
                       Enable Certificates
@@ -618,10 +606,10 @@ export default function SettingsPage() {
                       setSiteConfig({ ...siteConfig, defaultStreamProvider: value })
                     }
                   >
-                    <SelectTrigger className="rounded-none border-border">
+                    <SelectTrigger className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="rounded-none border-border">
+                    <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                       <SelectItem value="youtube">YouTube</SelectItem>
                       <SelectItem value="vimeo">Vimeo</SelectItem>
                       <SelectItem value="custom">Custom</SelectItem>
@@ -634,7 +622,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={handleSaveSiteConfig}
                   disabled={updateConfigMutation.isPending}
-                  className="rounded-none"
+                  className="rounded-[10px]"
                 >
                   {updateConfigMutation.isPending ? (
                     <>
@@ -656,11 +644,11 @@ export default function SettingsPage() {
         {/* Payment Settings */}
         <TabsContent value="payments">
           <div className="space-y-6">
-            <Card className="rounded-none border-border">
-              <CardHeader className="bg-muted/5 border-b border-border">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+              <CardHeader className="bg-muted/5 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="font-heading uppercase tracking-wide">Payment Provider</CardTitle>
+                    <CardTitle className="font-sans font-bold text-black uppercase tracking-wide">Payment Provider</CardTitle>
                     <CardDescription>
                       Select your default payment provider.
                     </CardDescription>
@@ -676,10 +664,10 @@ export default function SettingsPage() {
                       setSiteConfig({ ...siteConfig, defaultPaymentProvider: value })
                     }
                   >
-                    <SelectTrigger className="w-48 rounded-none border-border">
+                    <SelectTrigger className="w-48 rounded-[12px] border-gray-200 bg-white shadow-sm">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="rounded-none border-border">
+                    <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                       <SelectItem value="stripe">Stripe</SelectItem>
                       <SelectItem value="paystack">Paystack</SelectItem>
                     </SelectContent>
@@ -688,14 +676,14 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-none border-border">
-              <CardHeader className="bg-muted/5 border-b border-border">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+              <CardHeader className="bg-muted/5 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center gap-2 font-heading uppercase tracking-wide">
+                    <CardTitle className="flex items-center gap-2 font-sans font-bold text-black uppercase tracking-wide">
                       Stripe Configuration
                       {siteConfig.defaultPaymentProvider === "stripe" && (
-                        <Badge variant="secondary" className="rounded-none text-[10px] bg-primary/10 text-primary border-0">Default</Badge>
+                        <Badge variant="secondary" className="rounded-[10px] text-[10px] bg-primary/10 text-primary border-0">Default</Badge>
                       )}
                     </CardTitle>
                     <CardDescription>
@@ -715,7 +703,7 @@ export default function SettingsPage() {
                       setPaymentConfig({ ...paymentConfig, stripePublicKey: e.target.value })
                     }
                     placeholder="pk_live_..."
-                    className="rounded-none border-border font-mono"
+                    className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
                   />
                 </div>
                 <div className="space-y-2">
@@ -728,20 +716,20 @@ export default function SettingsPage() {
                       setPaymentConfig({ ...paymentConfig, stripeSecretKey: e.target.value })
                     }
                     placeholder="sk_live_..."
-                    className="rounded-none border-border font-mono"
+                    className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
                   />
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="rounded-none border-border">
-              <CardHeader className="bg-muted/5 border-b border-border">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+              <CardHeader className="bg-muted/5 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center gap-2 font-heading uppercase tracking-wide">
+                    <CardTitle className="flex items-center gap-2 font-sans font-bold text-black uppercase tracking-wide">
                       Paystack Configuration
                       {siteConfig.defaultPaymentProvider === "paystack" && (
-                        <Badge variant="secondary" className="rounded-none text-[10px] bg-primary/10 text-primary border-0">Default</Badge>
+                        <Badge variant="secondary" className="rounded-[10px] text-[10px] bg-primary/10 text-primary border-0">Default</Badge>
                       )}
                     </CardTitle>
                     <CardDescription>
@@ -761,7 +749,7 @@ export default function SettingsPage() {
                       setPaymentConfig({ ...paymentConfig, paystackPublicKey: e.target.value })
                     }
                     placeholder="pk_live_..."
-                    className="rounded-none border-border font-mono"
+                    className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
                   />
                 </div>
                 <div className="space-y-2">
@@ -774,7 +762,7 @@ export default function SettingsPage() {
                       setPaymentConfig({ ...paymentConfig, paystackSecretKey: e.target.value })
                     }
                     placeholder="sk_live_..."
-                    className="rounded-none border-border font-mono"
+                    className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
                   />
                 </div>
               </CardContent>
@@ -785,14 +773,14 @@ export default function SettingsPage() {
                 onClick={handleSaveSiteConfig}
                 variant="outline"
                 disabled={updateConfigMutation.isPending}
-                className="rounded-none border-border"
+                className="rounded-[12px] border-gray-200 bg-white shadow-sm"
               >
                 Save Provider Settings
               </Button>
               <Button
                 onClick={handleSavePaymentConfig}
                 disabled={updatePaymentConfigMutation.isPending}
-                className="rounded-none"
+                className="rounded-[10px]"
               >
                 {updatePaymentConfigMutation.isPending ? (
                   <>

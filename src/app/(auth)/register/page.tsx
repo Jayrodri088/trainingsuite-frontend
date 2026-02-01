@@ -118,9 +118,9 @@ export default function RegisterPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight"><T>Create an account</T></h1>
-        <p className="text-muted-foreground">
+      <div className="space-y-2 text-center">
+        <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-black"><T>Create an account</T></h1>
+        <p className="text-gray-600 text-sm">
           <T>Enter your details to get started with your learning journey</T>
         </p>
       </div>
@@ -145,6 +145,7 @@ export default function RegisterPage() {
                     placeholder={t("John Doe")}
                     autoComplete="name"
                     disabled={isLoading}
+                    className="rounded-[10px] h-11 border-gray-200"
                     {...field}
                   />
                 </FormControl>
@@ -165,6 +166,7 @@ export default function RegisterPage() {
                     placeholder="name@example.com"
                     autoComplete="email"
                     disabled={isLoading}
+                    className="rounded-[10px] h-11 border-gray-200"
                     {...field}
                   />
                 </FormControl>
@@ -186,6 +188,7 @@ export default function RegisterPage() {
                       placeholder={t("Create a password")}
                       autoComplete="new-password"
                       disabled={isLoading}
+                      className="rounded-[10px] h-11 pr-10 border-gray-200"
                       {...field}
                     />
                     <Button
@@ -213,7 +216,7 @@ export default function RegisterPage() {
                           key={req.id}
                           className={cn(
                             "flex items-center gap-2 text-xs",
-                            passed ? "text-green-600" : "text-muted-foreground"
+                            passed ? "text-green-600" : "text-gray-600"
                           )}
                         >
                           {passed ? (
@@ -245,6 +248,7 @@ export default function RegisterPage() {
                       placeholder={t("Confirm your password")}
                       autoComplete="new-password"
                       disabled={isLoading}
+                      className="rounded-[10px] h-11 pr-10 border-gray-200"
                       {...field}
                     />
                     <Button
@@ -276,29 +280,29 @@ export default function RegisterPage() {
             />
             <label
               htmlFor="terms"
-              className="text-sm text-muted-foreground leading-tight"
+              className="text-sm font-sans text-gray-600 leading-tight"
             >
               <T>I agree to the</T>{" "}
-              <Link href="/terms" className="text-primary hover:underline">
+              <Link href="/terms" className="text-[#0052CC] hover:underline font-semibold">
                 <T>Terms of Service</T>
               </Link>{" "}
               <T>and</T>{" "}
-              <Link href="/privacy" className="text-primary hover:underline">
+              <Link href="/privacy" className="text-[#0052CC] hover:underline font-semibold">
                 <T>Privacy Policy</T>
               </Link>
             </label>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading || !acceptTerms}>
+          <Button type="submit" className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold" disabled={isLoading || !acceptTerms}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <T>Create account</T>
           </Button>
         </form>
       </Form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm font-sans text-gray-600">
         <T>Already have an account?</T>{" "}
-        <Link href="/login" className="text-primary hover:underline font-medium">
+        <Link href="/login" className="text-[#0052CC] hover:underline font-semibold">
           <T>Sign in</T>
         </Link>
       </p>

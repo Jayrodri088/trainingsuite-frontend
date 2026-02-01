@@ -3,6 +3,7 @@
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/components/t";
+import { PageLoader } from "@/components/ui/page-loader";
 
 interface LoadingProps {
   className?: string;
@@ -40,11 +41,7 @@ export function PageLoading() {
   );
 }
 
+/** Full-page overlay with blur and book loader; use for route/auth loading. */
 export function FullPageLoading() {
-  const { t } = useT();
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Loading size="lg" text={t("Loading...")} />
-    </div>
-  );
+  return <PageLoader />;
 }

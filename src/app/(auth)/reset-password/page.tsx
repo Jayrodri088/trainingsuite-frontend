@@ -76,13 +76,13 @@ function ResetPasswordForm() {
     return (
       <div className="space-y-6">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight"><T>Invalid reset link</T></h1>
-          <p className="text-muted-foreground">
+          <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-black"><T>Invalid reset link</T></h1>
+          <p className="font-sans text-gray-600">
             <T>This password reset link is invalid or has expired.</T>
           </p>
         </div>
 
-        <Button asChild className="w-full">
+        <Button asChild className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
           <Link href="/forgot-password"><T>Request a new link</T></Link>
         </Button>
       </div>
@@ -92,18 +92,18 @@ function ResetPasswordForm() {
   if (isSuccess) {
     return (
       <div className="space-y-6">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+        <div className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-green-100">
           <CheckCircle className="h-6 w-6 text-green-600" />
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight"><T>Password reset successful</T></h1>
-          <p className="text-muted-foreground">
+          <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-black"><T>Password reset successful</T></h1>
+          <p className="font-sans text-gray-600">
             <T>Your password has been reset successfully. You can now sign in with your new password.</T>
           </p>
         </div>
 
-        <Button asChild className="w-full">
+        <Button asChild className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
           <Link href="/login"><T>Sign in</T></Link>
         </Button>
       </div>
@@ -113,8 +113,8 @@ function ResetPasswordForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight"><T>Set new password</T></h1>
-        <p className="text-muted-foreground">
+        <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-black"><T>Set new password</T></h1>
+        <p className="font-sans text-gray-600">
           <T>Your new password must be different from previously used passwords.</T>
         </p>
       </div>
@@ -126,7 +126,7 @@ function ResetPasswordForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel><T>New Password</T></FormLabel>
+                <FormLabel className="font-sans text-gray-600"><T>New Password</T></FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -134,6 +134,7 @@ function ResetPasswordForm() {
                       placeholder={t("Enter your new password")}
                       autoComplete="new-password"
                       disabled={isLoading}
+                      className="rounded-[10px] h-11 pr-10 border-gray-200"
                       {...field}
                     />
                     <Button
@@ -145,9 +146,9 @@ function ResetPasswordForm() {
                       disabled={isLoading}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        <EyeOff className="h-4 w-4 text-gray-500" />
                       ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <Eye className="h-4 w-4 text-gray-500" />
                       )}
                     </Button>
                   </div>
@@ -161,7 +162,7 @@ function ResetPasswordForm() {
                           key={req.id}
                           className={cn(
                             "flex items-center gap-2 text-xs",
-                            passed ? "text-green-600" : "text-muted-foreground"
+                            passed ? "text-green-600" : "text-gray-600"
                           )}
                         >
                           {passed ? (
@@ -185,7 +186,7 @@ function ResetPasswordForm() {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel><T>Confirm New Password</T></FormLabel>
+                <FormLabel className="font-sans text-gray-600"><T>Confirm New Password</T></FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -193,6 +194,7 @@ function ResetPasswordForm() {
                       placeholder={t("Confirm your new password")}
                       autoComplete="new-password"
                       disabled={isLoading}
+                      className="rounded-[10px] h-11 pr-10 border-gray-200"
                       {...field}
                     />
                     <Button
@@ -204,9 +206,9 @@ function ResetPasswordForm() {
                       disabled={isLoading}
                     >
                       {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        <EyeOff className="h-4 w-4 text-gray-500" />
                       ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <Eye className="h-4 w-4 text-gray-500" />
                       )}
                     </Button>
                   </div>
@@ -216,14 +218,14 @@ function ResetPasswordForm() {
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <T>Reset password</T>
           </Button>
         </form>
       </Form>
 
-      <Button asChild variant="ghost" className="w-full">
+      <Button asChild variant="ghost" className="w-full rounded-[10px] text-gray-600 hover:text-[#0052CC] font-semibold">
         <Link href="/login"><T>Back to login</T></Link>
       </Button>
     </div>

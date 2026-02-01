@@ -123,10 +123,10 @@ export function CourseCompletionDialog({
 
           <div className="space-y-3 mt-4">
             {isLoadingCertificates ? (
-              <Button size="lg" className="w-full" disabled>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                <T>Loading Certificate...</T>
-              </Button>
+              <div className="flex items-center justify-center gap-2 py-8 text-muted-foreground">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="text-sm font-medium"><T>Loading...</T></span>
+              </div>
             ) : certificate ? (
               <div className="space-y-3">
                 <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-900">

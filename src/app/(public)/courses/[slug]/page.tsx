@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageLoader } from "@/components/ui/page-loader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
@@ -49,23 +50,6 @@ const levelColors = {
   intermediate: "bg-amber-100 text-amber-800",
   advanced: "bg-red-100 text-red-800",
 };
-
-function CourseDetailSkeleton() {
-  return (
-    <div className="container max-w-6xl py-4 sm:py-8 px-4 sm:px-6">
-      <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-          <Skeleton className="h-6 sm:h-8 w-3/4" />
-          <Skeleton className="h-16 sm:h-20 w-full" />
-          <Skeleton className="h-48 sm:h-64 w-full" />
-        </div>
-        <div className="order-first lg:order-none">
-          <Skeleton className="h-72 sm:h-96 w-full" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean }) {
   const { t } = useT();
@@ -391,8 +375,8 @@ export default function CourseDetailPage({
     }
   };
 
-  if (courseLoading) {
-    return <CourseDetailSkeleton />;
+  if (courseLoading || curriculumLoading) {
+    return <PageLoader />;
   }
 
   const course = courseResponse?.data;
@@ -625,13 +609,7 @@ export default function CourseDetailPage({
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0 px-4 sm:px-6">
-                    {curriculumLoading ? (
-                      <div className="space-y-3">
-                        {[...Array(4)].map((_, i) => (
-                          <Skeleton key={i} className="h-16 w-full" />
-                        ))}
-                      </div>
-                    ) : modules.length > 0 ? (
+                    {modules.length > 0 ? (
                       <Accordion type="multiple" className="space-y-3">
                         {modules.map((module, index) => (
                           <ModuleAccordion
@@ -847,18 +825,7 @@ function RelatedCourses({
       <div className="container max-w-6xl py-8 sm:py-12 px-4 sm:px-6">
         <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6"><T>Related Courses</T></h2>
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="overflow-hidden">
-                <Skeleton className="aspect-video" />
-                <CardContent className="p-3 sm:p-4 space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                  <Skeleton className="h-4 w-1/4" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <PageLoader />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {relatedCourses.map((course: Course) => (

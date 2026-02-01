@@ -182,33 +182,31 @@ export default function FAQPage() {
   });
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-primary/10 to-background py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+    <div className="min-h-screen bg-white">
+      <section className="py-14 sm:py-20 border-b border-gray-200">
+        <div className="container max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
             <T>Frequently Asked Questions</T>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            <T>Find answers to common questions about Training Suite. Can't find what you're looking for? Contact our support team.</T>
+          <p className="font-sans text-base md:text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+            <T>Find answers to common questions about the portal. Can't find what you're looking for? Contact our support team.</T>
           </p>
 
           {/* Search */}
           <div className="max-w-lg mx-auto relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <Input
               placeholder={t("Search for answers...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 text-lg"
+              className="pl-12 h-12 rounded-[10px] border-gray-200"
             />
           </div>
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="py-8 border-b">
-        <div className="container mx-auto px-4">
+      <section className="py-8 border-b border-gray-200">
+        <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap justify-center gap-3">
             <Button
               variant={activeCategory === null ? "default" : "outline"}
@@ -230,9 +228,8 @@ export default function FAQPage() {
         </div>
       </section>
 
-      {/* FAQs */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
+      <section className="py-14 sm:py-16">
+        <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             {filteredFaqs.length === 0 ? (
               <Card className="text-center py-12">
@@ -276,21 +273,20 @@ export default function FAQPage() {
         </div>
       </section>
 
-      {/* Still Need Help */}
-      <section className="py-16 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <Card className="max-w-2xl mx-auto">
+      <section className="py-14 sm:py-16 bg-[#f5f5f5]">
+        <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Card className="max-w-2xl mx-auto border-gray-200 rounded-[12px] shadow-sm">
             <CardHeader className="text-center">
-              <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                <MessageSquare className="h-8 w-8 text-primary" />
+              <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-[#0052CC]/10 flex items-center justify-center">
+                <MessageSquare className="h-8 w-8 text-[#0052CC]" />
               </div>
-              <CardTitle className="text-2xl"><T>Still have questions?</T></CardTitle>
-              <CardDescription>
+              <CardTitle className="font-sans text-2xl font-bold text-black"><T>Still have questions?</T></CardTitle>
+              <CardDescription className="font-sans text-gray-600">
                 <T>Can't find the answer you're looking for? Our support team is here to help.</T>
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" asChild>
+              <Button size="lg" asChild className="rounded-[10px] h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold">
                 <Link href="/contact"><T>Contact Support</T></Link>
               </Button>
             </CardContent>

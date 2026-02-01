@@ -12,7 +12,7 @@ export default function LearningLayout({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#f5f5f5]">
         {children}
       </div>
     </QueryClientProvider>

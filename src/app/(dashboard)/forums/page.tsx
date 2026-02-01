@@ -40,7 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageLoader } from "@/components/ui/page-loader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { forumsApi } from "@/lib/api/forums";
@@ -241,12 +241,12 @@ function CommunityPageContent() {
             {/* Content Section */}
             <div className="flex-1 p-4">
               <Link href={`/forums/${(post as any).forumId || forumInfo?._id}/posts/${post._id}`}>
-                <h3 className="font-semibold text-base hover:text-primary transition-colors mb-2 line-clamp-2">
+                <h3 className="font-sans font-bold text-black text-base hover:text-[#0052CC] transition-colors mb-2 line-clamp-2">
                   {post.title}
                 </h3>
               </Link>
               
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+              <p className="text-sm font-sans text-gray-600 line-clamp-2 mb-3">
                 {post.content}
               </p>
 
@@ -256,14 +256,14 @@ function CommunityPageContent() {
                   <div className="flex items-center gap-2">
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={author?.avatar} />
-                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                      <AvatarFallback className="text-xs font-sans bg-[#0052CC]/10 text-[#0052CC]">
                         {getInitials(author?.name || "?")}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-xs text-muted-foreground">{author?.name || "Anonymous"}</span>
+                    <span className="text-xs font-sans text-gray-600">{author?.name || "Anonymous"}</span>
                   </div>
                   <span className="text-xs text-muted-foreground">•</span>
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <span className="text-xs font-sans text-gray-600 flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {formatDistanceToNow(parseISO(post.createdAt), { addSuffix: true })}
                   </span>
@@ -275,7 +275,7 @@ function CommunityPageContent() {
                       {forumInfo.title}
                     </Badge>
                   )}
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1 text-xs font-sans text-gray-600">
                     <MessageCircle className="h-3.5 w-3.5" />
                     <span>{post.commentCount || 0} <T>answers</T></span>
                   </div>
@@ -293,12 +293,12 @@ function CommunityPageContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-heading font-bold tracking-tight"><T>Community</T></h1>
-          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl font-sans font-bold text-black tracking-tight"><T>Community</T></h1>
+          <p className="font-sans text-gray-600 mt-1 text-sm sm:text-base">
             <T>Ask questions, share knowledge, and connect with others.</T>
           </p>
         </div>
-        <Button onClick={() => setDialogOpen(true)} className="shrink-0">
+        <Button onClick={() => setDialogOpen(true)} className="shrink-0 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
           <Plus className="h-4 w-4 mr-2" />
           <T>Ask Question</T>
         </Button>
@@ -308,12 +308,12 @@ function CommunityPageContent() {
       <div className="flex flex-col sm:flex-row gap-3">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder={t("Search questions...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
+            className="pl-9 rounded-[10px] border-gray-200"
           />
         </div>
 
@@ -348,7 +348,7 @@ function CommunityPageContent() {
       {/* Active filter badge */}
       {selectedForum !== "all" && (
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground"><T>Filtering by:</T></span>
+          <span className="text-sm font-sans text-gray-600"><T>Filtering by:</T></span>
           <Badge variant="secondary" className="gap-1">
             {forums.find(f => f._id === selectedForum)?.title}
             <button onClick={() => setSelectedForum("all")} className="ml-1 hover:text-destructive">
@@ -360,41 +360,24 @@ function CommunityPageContent() {
 
       {/* Content */}
       {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Card key={i}>
-              <CardContent className="p-0">
-                <div className="flex">
-                  <div className="w-14 py-4 px-3 bg-muted/30 border-r">
-                    <Skeleton className="h-20 w-full" />
-                  </div>
-                  <div className="flex-1 p-4 space-y-3">
-                    <Skeleton className="h-5 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <PageLoader />
       ) : filteredPosts.length === 0 ? (
-        <Card className="border-dashed">
+        <Card className="rounded-[12px] border-gray-200 border-dashed bg-white shadow-sm">
           <CardContent className="py-16 text-center">
-            <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-              <MessageSquare className="h-8 w-8 text-muted-foreground" />
+            <div className="h-16 w-16 mx-auto mb-4 rounded-[12px] bg-gray-50 flex items-center justify-center">
+              <MessageSquare className="h-8 w-8 text-gray-500" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">
+            <h3 className="text-lg font-sans font-bold text-black mb-2">
               {searchQuery ? <T>No questions found</T> : <T>No questions yet</T>}
             </h3>
-            <p className="text-muted-foreground text-sm mb-4">
+            <p className="font-sans text-gray-600 text-sm mb-4">
               {searchQuery 
                 ? <T>Try adjusting your search or filters.</T>
                 : <T>Be the first to ask a question!</T>
               }
             </p>
             {!searchQuery && (
-              <Button onClick={() => setDialogOpen(true)}>
+              <Button onClick={() => setDialogOpen(true)} className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
                 <Plus className="h-4 w-4 mr-2" />
                 <T>Ask Question</T>
               </Button>
@@ -411,7 +394,7 @@ function CommunityPageContent() {
 
       {/* Stats Footer */}
       {!isLoading && filteredPosts.length > 0 && (
-        <div className="flex items-center justify-center gap-6 py-4 text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-6 py-4 text-sm font-sans text-gray-600">
           <div className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
             <span>{filteredPosts.length} <T>questions</T></span>
@@ -425,10 +408,10 @@ function CommunityPageContent() {
 
       {/* Ask Question Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg rounded-[12px] border-gray-200 shadow-lg">
           <DialogHeader>
-            <DialogTitle><T>Ask a Question</T></DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="font-sans font-bold text-black"><T>Ask a Question</T></DialogTitle>
+            <DialogDescription className="font-sans text-gray-600">
               <T>Share your question with the community.</T>
             </DialogDescription>
           </DialogHeader>
@@ -475,7 +458,7 @@ function CommunityPageContent() {
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                 <T>Cancel</T>
               </Button>
-              <Button type="submit" disabled={createPostMutation.isPending}>
+              <Button type="submit" disabled={createPostMutation.isPending} className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
                 {createPostMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

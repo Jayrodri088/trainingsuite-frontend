@@ -212,7 +212,7 @@ export default function CoursesPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="rounded-none border-border bg-card">
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-blue-200 bg-blue-50 text-blue-600">
@@ -220,12 +220,12 @@ export default function CoursesPage() {
               </div>
               <div>
                 <div className="text-3xl font-light text-foreground">{totalCourses}</div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Total Courses</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-600 mt-1">Total Courses</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-none border-border bg-card">
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-green-200 bg-green-50 text-green-600">
@@ -233,12 +233,12 @@ export default function CoursesPage() {
               </div>
               <div>
                 <div className="text-3xl font-light text-foreground">{publishedCount}</div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Published</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-600 mt-1">Published</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-none border-border bg-card">
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-gray-200 bg-gray-50 text-gray-600">
@@ -246,12 +246,12 @@ export default function CoursesPage() {
               </div>
               <div>
                 <div className="text-3xl font-light text-foreground">{draftCount}</div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Drafts</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-600 mt-1">Drafts</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-none border-border bg-card">
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-yellow-200 bg-yellow-50 text-yellow-600">
@@ -259,7 +259,7 @@ export default function CoursesPage() {
               </div>
               <div>
                 <div className="text-3xl font-light text-foreground">{pendingCount}</div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">Pending Review</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-600 mt-1">Pending Review</p>
               </div>
             </div>
           </CardContent>
@@ -267,24 +267,24 @@ export default function CoursesPage() {
       </div>
 
       {/* Filters & Actions */}
-      <Card className="rounded-none border-border">
-        <CardHeader className="pb-4 border-b border-border bg-muted/5">
+      <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <CardHeader className="pb-4 border-b border-gray-200 bg-gray-50">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <div className="relative w-full sm:w-[300px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" />
                 <Input
                   placeholder="Search courses..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 rounded-none border-border bg-muted/20 focus:bg-background"
+                  className="pl-9 rounded-[12px] border-gray-200 bg-white shadow-sm bg-white focus:bg-background"
                 />
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-[150px] rounded-none border-border bg-muted/20">
+                <SelectTrigger className="w-full sm:w-[150px] rounded-[12px] border-gray-200 bg-white shadow-sm bg-white">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
-                <SelectContent className="rounded-none border-border">
+                <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="published">Published</SelectItem>
                   <SelectItem value="draft">Draft</SelectItem>
@@ -294,7 +294,7 @@ export default function CoursesPage() {
               </Select>
             </div>
             <div className="flex gap-2 w-full sm:w-auto justify-end">
-              <Button variant="outline" size="sm" className="rounded-none border-border">
+              <Button variant="outline" size="sm" className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
@@ -304,7 +304,7 @@ export default function CoursesPage() {
         <CardContent className="p-6">
           {/* Bulk Actions */}
           {selectedCourses.length > 0 && (
-            <div className="flex flex-wrap items-center gap-3 mb-6 p-3 bg-primary/5 border border-primary/20 rounded-none">
+            <div className="flex flex-wrap items-center gap-3 mb-6 p-3 bg-primary/5 border border-primary/20 rounded-[10px]">
               <span className="text-sm font-medium px-2">
                 {selectedCourses.length} selected
               </span>
@@ -314,7 +314,7 @@ export default function CoursesPage() {
                 size="sm"
                 onClick={handleBulkPublish}
                 disabled={publishMutation.isPending}
-                className="rounded-none h-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+                className="rounded-[10px] h-8 text-green-600 hover:text-green-700 hover:bg-green-50"
               >
                 {publishMutation.isPending ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -328,7 +328,7 @@ export default function CoursesPage() {
                 size="sm"
                 onClick={handleBulkFeature}
                 disabled={featureMutation.isPending}
-                className="rounded-none h-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                className="rounded-[10px] h-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
               >
                 {featureMutation.isPending ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -340,7 +340,7 @@ export default function CoursesPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="rounded-none h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="rounded-[10px] h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
                 onClick={handleBulkArchive}
                 disabled={archiveMutation.isPending}
               >
@@ -355,11 +355,11 @@ export default function CoursesPage() {
           )}
 
           {/* Table */}
-          <div className="border border-border rounded-none overflow-hidden">
+          <div className="border border-gray-200 rounded-[10px] overflow-hidden">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/30 border-border hover:bg-muted/30">
+                  <TableRow className="bg-gray-50 border-gray-200 hover:bg-gray-50">
                     <TableHead className="w-[50px] pl-6">
                       <Checkbox
                         checked={
@@ -367,7 +367,7 @@ export default function CoursesPage() {
                           filteredCourses.length > 0
                         }
                         onCheckedChange={toggleSelectAll}
-                        className="rounded-none border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                        className="rounded-[10px] border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
                     </TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider">Course</TableHead>
@@ -383,24 +383,24 @@ export default function CoursesPage() {
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <div className="flex flex-col items-center">
-                          <BookOpen className="h-12 w-12 text-muted-foreground/30 mb-4" />
-                          <p className="text-muted-foreground font-medium">No courses found matching your criteria</p>
+                          <BookOpen className="h-12 w-12 text-gray-600/30 mb-4" />
+                          <p className="text-gray-600 font-medium">No courses found matching your criteria</p>
                         </div>
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredCourses.map((course) => (
-                      <TableRow key={course._id} className="border-border hover:bg-muted/10 transition-colors">
+                      <TableRow key={course._id} className="border-gray-200 hover:bg-gray-50 transition-colors">
                         <TableCell className="pl-6">
                           <Checkbox
                             checked={selectedCourses.includes(course._id)}
                             onCheckedChange={() => toggleSelect(course._id)}
-                            className="rounded-none border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                            className="rounded-[10px] border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                           />
                         </TableCell>
                         <TableCell className="max-w-[300px]">
                           <div className="flex items-center gap-4">
-                            <div className="h-12 w-16 border border-border bg-muted flex items-center justify-center overflow-hidden shrink-0">
+                            <div className="h-12 w-16 border border-gray-200 bg-muted flex items-center justify-center overflow-hidden shrink-0">
                               {course.thumbnail ? (
                                 <img
                                   src={course.thumbnail}
@@ -408,7 +408,7 @@ export default function CoursesPage() {
                                   className="h-full w-full object-cover"
                                 />
                               ) : (
-                                <BookOpen className="h-5 w-5 text-muted-foreground/50" />
+                                <BookOpen className="h-5 w-5 text-gray-600/50" />
                               )}
                             </div>
                             <div className="min-w-0">
@@ -427,8 +427,8 @@ export default function CoursesPage() {
                         <TableCell>
                           <Badge
                             variant="outline"
-                            className={`rounded-none uppercase text-[10px] tracking-wide font-bold h-6 ${course.status === 'published' ? 'border-green-200 bg-green-50 text-green-700' :
-                                course.status === 'draft' ? 'border-border bg-muted text-muted-foreground' :
+                            className={`rounded-[10px] uppercase text-[10px] tracking-wide font-bold h-6 ${course.status === 'published' ? 'border-green-200 bg-green-50 text-green-700' :
+                                course.status === 'draft' ? 'border-gray-200 bg-muted text-gray-600' :
                                   course.status === 'pending' ? 'border-yellow-200 bg-yellow-50 text-yellow-700' :
                                     'border-red-200 bg-red-50 text-red-700'
                               }`}
@@ -439,7 +439,7 @@ export default function CoursesPage() {
                         <TableCell>
                           <Badge
                             variant="secondary"
-                            className="rounded-none font-normal text-muted-foreground bg-transparent border border-border"
+                            className="rounded-[10px] font-normal text-gray-600 bg-transparent border border-gray-200"
                           >
                             {course.level || "beginner"}
                           </Badge>
@@ -447,7 +447,7 @@ export default function CoursesPage() {
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <span className="font-mono text-sm">{course.enrollmentCount || 0}</span>
-                            <Users className="h-3.5 w-3.5 text-muted-foreground/70" />
+                            <Users className="h-3.5 w-3.5 text-gray-600/70" />
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
@@ -459,20 +459,20 @@ export default function CoursesPage() {
                         <TableCell className="pr-6">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-none hover:bg-muted">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-[10px] hover:bg-muted">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="rounded-none border-border">
+                            <DropdownMenuContent align="end" className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                               <DropdownMenuLabel className="font-heading font-bold text-xs uppercase tracking-wider">Actions</DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem asChild className="rounded-none cursor-pointer">
+                              <DropdownMenuItem asChild className="rounded-[10px] cursor-pointer">
                                 <Link href={`/courses/${course.slug || course._id}`}>
                                   <Eye className="h-4 w-4 mr-2" />
                                   View Course
                                 </Link>
                               </DropdownMenuItem>
-                              <DropdownMenuItem asChild className="rounded-none cursor-pointer">
+                              <DropdownMenuItem asChild className="rounded-[10px] cursor-pointer">
                                 <Link href={`/admin/courses/${course._id}`}>
                                   <Edit className="h-4 w-4 mr-2" />
                                   Edit / Manage
@@ -481,7 +481,7 @@ export default function CoursesPage() {
                               {course.status !== "published" && (
                                 <DropdownMenuItem
                                   onClick={() => publishMutation.mutate(course._id)}
-                                  className="rounded-none cursor-pointer"
+                                  className="rounded-[10px] cursor-pointer"
                                 >
                                   <CheckCircle className="h-4 w-4 mr-2" />
                                   Publish
@@ -492,7 +492,7 @@ export default function CoursesPage() {
                                   onClick={() =>
                                     featureMutation.mutate({ id: course._id, featured: false })
                                   }
-                                  className="rounded-none cursor-pointer"
+                                  className="rounded-[10px] cursor-pointer"
                                 >
                                   <Sparkles className="h-4 w-4 mr-2" />
                                   Unfeature
@@ -502,7 +502,7 @@ export default function CoursesPage() {
                                   onClick={() =>
                                     featureMutation.mutate({ id: course._id, featured: true })
                                   }
-                                  className="rounded-none cursor-pointer"
+                                  className="rounded-[10px] cursor-pointer"
                                 >
                                   <Sparkles className="h-4 w-4 mr-2" />
                                   Feature
@@ -512,14 +512,14 @@ export default function CoursesPage() {
                               {course.status !== "archived" && (
                                 <DropdownMenuItem
                                   onClick={() => archiveMutation.mutate(course._id)}
-                                  className="rounded-none cursor-pointer"
+                                  className="rounded-[10px] cursor-pointer"
                                 >
                                   <Archive className="h-4 w-4 mr-2" />
                                   Archive
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuItem
-                                className="text-destructive focus:text-destructive rounded-none cursor-pointer"
+                                className="text-destructive focus:text-destructive rounded-[10px] cursor-pointer"
                                 onClick={() => handleDelete(course)}
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
@@ -539,7 +539,7 @@ export default function CoursesPage() {
           {/* Pagination */}
           {pagination && pagination.totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+              <p className="text-xs text-gray-600 uppercase tracking-wide font-medium">
                 Showing <span className="text-foreground">{filteredCourses.length}</span> of <span className="text-foreground">{pagination.total}</span> courses
               </p>
               <div className="flex items-center gap-2">
@@ -548,7 +548,7 @@ export default function CoursesPage() {
                   size="sm"
                   disabled={page === 1}
                   onClick={() => setPage((p) => p - 1)}
-                  className="rounded-none h-8 w-8 p-0"
+                  className="rounded-[10px] h-8 w-8 p-0"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -557,7 +557,7 @@ export default function CoursesPage() {
                     key={i}
                     variant={page === i + 1 ? "default" : "outline"}
                     size="sm"
-                    className={`rounded-none h-8 w-8 p-0 ${page === i + 1 ? "bg-primary text-primary-foreground" : ""}`}
+                    className={`rounded-[10px] h-8 w-8 p-0 ${page === i + 1 ? "bg-primary text-primary-foreground" : ""}`}
                     onClick={() => setPage(i + 1)}
                   >
                     {i + 1}
@@ -568,7 +568,7 @@ export default function CoursesPage() {
                   size="sm"
                   disabled={page === pagination.totalPages}
                   onClick={() => setPage((p) => p + 1)}
-                  className="rounded-none h-8 w-8 p-0"
+                  className="rounded-[10px] h-8 w-8 p-0"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -580,7 +580,7 @@ export default function CoursesPage() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-none border-border">
+        <AlertDialogContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-heading">Delete Course</AlertDialogTitle>
             <AlertDialogDescription>
@@ -590,10 +590,10 @@ export default function CoursesPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-none border-border">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-[12px] border-gray-200 bg-white shadow-sm">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-destructive hover:bg-destructive/90 rounded-none text-destructive-foreground"
+              className="bg-destructive hover:bg-destructive/90 rounded-[10px] text-destructive-foreground"
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending ? (
@@ -613,29 +613,29 @@ function CoursesTableSkeleton() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-muted/10 border border-border p-6">
-            <Skeleton className="h-8 w-12 mb-2 rounded-none" />
-            <Skeleton className="h-4 w-24 rounded-none" />
+          <div key={i} className="bg-muted/10 border border-gray-200 p-6">
+            <Skeleton className="h-8 w-12 mb-2 rounded-[10px]" />
+            <Skeleton className="h-4 w-24 rounded-[10px]" />
           </div>
         ))}
       </div>
-      <div className="border border-border bg-background">
-        <div className="p-6 border-b border-border">
+      <div className="border border-gray-200 bg-background">
+        <div className="p-6 border-b border-gray-200">
           <div className="flex gap-4">
-            <Skeleton className="h-10 flex-1 max-w-sm rounded-none" />
-            <Skeleton className="h-10 w-[130px] rounded-none" />
+            <Skeleton className="h-10 flex-1 max-w-sm rounded-[10px]" />
+            <Skeleton className="h-10 w-[130px] rounded-[10px]" />
           </div>
         </div>
         <div className="p-0">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 border-b border-border last:border-0">
-              <Skeleton className="h-12 w-16 rounded-none" />
+            <div key={i} className="flex items-center gap-4 p-4 border-b border-gray-200 last:border-0">
+              <Skeleton className="h-12 w-16 rounded-[10px]" />
               <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-[40%] rounded-none" />
-                <Skeleton className="h-3 w-[20%] rounded-none" />
+                <Skeleton className="h-4 w-[40%] rounded-[10px]" />
+                <Skeleton className="h-3 w-[20%] rounded-[10px]" />
               </div>
-              <Skeleton className="h-4 w-20 rounded-none hidden sm:block" />
-              <Skeleton className="h-8 w-8 rounded-none" />
+              <Skeleton className="h-4 w-20 rounded-[10px] hidden sm:block" />
+              <Skeleton className="h-8 w-8 rounded-[10px]" />
             </div>
           ))}
         </div>

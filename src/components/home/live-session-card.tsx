@@ -106,14 +106,14 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
 
 export function LiveSessionCardSkeleton() {
   return (
-    <div className="border border-border h-full bg-card">
-      <Skeleton className="aspect-video w-full rounded-none" />
+    <div className="border border-gray-200 rounded-[12px] h-full bg-white shadow-sm overflow-hidden">
+      <Skeleton className="aspect-video w-full rounded-t-[12px] rounded-b-none" />
       <div className="p-6 space-y-4">
-        <Skeleton className="h-4 w-24 rounded-none" />
-        <Skeleton className="h-6 w-full rounded-none" />
-        <Skeleton className="h-4 w-3/4 rounded-none" />
+        <Skeleton className="h-4 w-24 rounded-[10px]" />
+        <Skeleton className="h-6 w-full rounded-[10px]" />
+        <Skeleton className="h-4 w-3/4 rounded-[10px]" />
         <div className="pt-4 mt-auto">
-          <Skeleton className="h-9 w-full rounded-none" />
+          <Skeleton className="h-9 w-full rounded-[10px]" />
         </div>
       </div>
     </div>

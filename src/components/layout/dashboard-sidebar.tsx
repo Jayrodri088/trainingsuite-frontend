@@ -68,14 +68,13 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 z-40 h-screen border-r border-border bg-background transition-all duration-300",
+        "fixed left-0 top-0 z-40 h-screen border-r border-gray-200 bg-[#FAFAFA] transition-all duration-300",
         collapsed ? "w-[70px]" : "w-[260px]"
       )}
     >
       <div className="flex h-full flex-col">
-        {/* Header */}
         <div className={cn(
-          "flex items-center justify-between border-b border-border",
+          "flex items-center justify-between border-b border-gray-200",
           collapsed ? "h-16 px-4" : "h-[72px] px-5"
         )}>
           <Logo iconOnly={collapsed} />
@@ -83,7 +82,7 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 rounded-none hidden lg:flex shrink-0 ml-2"
+              className="h-7 w-7 rounded-[10px] hidden lg:flex shrink-0 ml-2 text-gray-700 hover:bg-gray-200"
               onClick={() => onCollapse(!collapsed)}
             >
               <ChevronLeft
@@ -102,7 +101,7 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
             {sidebarItems.map((section) => (
               <div key={section.title}>
                 {!collapsed && (
-                  <p className="mb-4 px-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  <p className="mb-4 px-2 text-xs font-semibold text-gray-500 font-sans">
                     {t(section.title)}
                   </p>
                 )}
@@ -116,15 +115,15 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
                         <Link
                           href={item.href}
                           className={cn(
-                            "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors border-l-2 border-transparent hover:bg-muted/50",
+                            "flex items-center gap-3 px-3 py-2 text-sm font-medium font-sans transition-colors border-l-2 border-transparent rounded-[8px] hover:bg-gray-200/60",
                             isActive
-                              ? "border-primary text-foreground font-semibold bg-muted/30"
-                              : "text-muted-foreground hover:text-foreground",
+                              ? "border-[#0052CC] text-[#0052CC] font-semibold bg-[#0052CC]/10"
+                              : "text-gray-600 hover:text-gray-900",
                             collapsed && "justify-center px-2 border-l-0"
                           )}
                           title={collapsed ? t(item.label) : undefined}
                         >
-                          <Icon className={cn("h-4 w-4 shrink-0", isActive && "text-primary")} />
+                          <Icon className={cn("h-4 w-4 shrink-0", isActive && "text-[#0052CC]")} />
                           {!collapsed && <span>{t(item.label)}</span>}
                         </Link>
                       </li>
@@ -136,19 +135,18 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
           </div>
         </nav>
 
-        {/* User Info */}
         {user && !collapsed && (
-          <div className="border-t border-border p-4">
+          <div className="border-t border-gray-200 p-4">
             <div className="flex items-center gap-3 p-2">
-              <Avatar className="h-9 w-9 rounded-full border border-border">
+              <Avatar className="h-9 w-9 rounded-full border border-gray-200">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="bg-muted text-foreground font-medium text-xs">
+                <AvatarFallback className="bg-gray-200 text-gray-700 font-sans font-medium text-xs">
                   {getInitials(user.name)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate">{user.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                <p className="text-sm font-sans font-semibold text-black truncate">{user.name}</p>
+                <p className="text-xs font-sans text-gray-500 truncate">{user.email}</p>
               </div>
             </div>
           </div>

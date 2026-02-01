@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
@@ -102,36 +103,34 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-primary/10 to-background py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6"><T>Contact Us</T></h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            <T>Have a question or need help? We're here for you. Reach out to our team and we'll get back to you as soon as possible.</T>
+    <div className="min-h-screen bg-white">
+      <section className="py-14 sm:py-20 md:py-24 border-b border-gray-200">
+        <div className="container max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4"><T>Contact Us</T></h1>
+          <p className="font-sans text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
+            <T>Have a question or need help? We&apos;re here for you. Reach out to our team and we&apos;ll get back to you as soon as possible.</T>
           </p>
         </div>
       </section>
 
-      {/* Contact Methods */}
-      <section className="py-12 border-b">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-6">
+      <section className="py-12 md:py-16 border-b border-gray-200">
+        <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {contactMethods.map((method) => (
-              <Card key={method.title}>
+              <Card key={method.title} className="border-gray-200 rounded-[12px] shadow-sm">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="h-12 w-12 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <method.icon className="h-6 w-6 text-primary" />
+                    <div className="h-12 w-12 shrink-0 rounded-[10px] bg-[#0052CC]/10 flex items-center justify-center">
+                      <method.icon className="h-6 w-6 text-[#0052CC]" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{t(method.title)}</h3>
-                      <p className="text-sm text-muted-foreground mb-2">
+                      <h3 className="font-sans font-semibold text-black">{t(method.title)}</h3>
+                      <p className="font-sans text-sm text-gray-600 mb-2">
                         {t(method.description)}
                       </p>
                       <a
                         href={method.href}
-                        className="text-primary hover:underline text-sm font-medium"
+                        className="font-sans text-[#0052CC] hover:underline text-sm font-medium"
                       >
                         {method.value}
                       </a>
@@ -144,15 +143,13 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Contact Form & FAQ */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      <section className="py-14 sm:py-20">
+        <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
             <div>
-              <h2 className="text-2xl font-bold mb-2"><T>Send us a message</T></h2>
-              <p className="text-muted-foreground mb-8">
-                <T>Fill out the form below and we'll respond within 24-48 hours.</T>
+              <h2 className="font-sans text-2xl font-bold text-black mb-2"><T>Send us a message</T></h2>
+              <p className="font-sans text-gray-600 mb-8">
+                <T>Fill out the form below and we&apos;ll respond within 24-48 hours.</T>
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -236,7 +233,7 @@ export default function ContactPage() {
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto rounded-[10px] h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -254,22 +251,21 @@ export default function ContactPage() {
               </form>
             </div>
 
-            {/* Quick Links */}
             <div>
-              <h2 className="text-2xl font-bold mb-2"><T>Quick Help</T></h2>
-              <p className="text-muted-foreground mb-8">
+              <h2 className="font-sans text-2xl font-bold text-black mb-2"><T>Quick Help</T></h2>
+              <p className="font-sans text-gray-600 mb-8">
                 <T>Find answers to common questions or explore our resources.</T>
               </p>
 
               <div className="space-y-4">
-                <Card>
+                <Card className="border-gray-200 rounded-[12px] shadow-sm">
                   <CardContent className="py-4">
                     <Link
                       href="/faq"
                       className="flex items-center gap-4 hover:opacity-80 transition-opacity"
                     >
-                      <div className="h-10 w-10 shrink-0 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <HelpCircle className="h-5 w-5 text-blue-600" />
+                      <div className="h-10 w-10 shrink-0 rounded-[10px] bg-[#0052CC]/10 flex items-center justify-center">
+                        <HelpCircle className="h-5 w-5 text-[#0052CC]" />
                       </div>
                       <div>
                         <h3 className="font-semibold"><T>Frequently Asked Questions</T></h3>
@@ -281,14 +277,14 @@ export default function ContactPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-gray-200 rounded-[12px] shadow-sm">
                   <CardContent className="py-4">
                     <Link
                       href="/courses"
                       className="flex items-center gap-4 hover:opacity-80 transition-opacity"
                     >
-                      <div className="h-10 w-10 shrink-0 rounded-lg bg-green-100 flex items-center justify-center">
-                        <MessageSquare className="h-5 w-5 text-green-600" />
+                      <div className="h-10 w-10 shrink-0 rounded-[10px] bg-[#0052CC]/10 flex items-center justify-center">
+                        <MessageSquare className="h-5 w-5 text-[#0052CC]" />
                       </div>
                       <div>
                         <h3 className="font-semibold"><T>Browse Courses</T></h3>
@@ -300,14 +296,14 @@ export default function ContactPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-gray-200 rounded-[12px] shadow-sm">
                   <CardContent className="py-4">
                     <Link
                       href="/about"
                       className="flex items-center gap-4 hover:opacity-80 transition-opacity"
                     >
-                      <div className="h-10 w-10 shrink-0 rounded-lg bg-purple-100 flex items-center justify-center">
-                        <Users className="h-5 w-5 text-purple-600" />
+                      <div className="h-10 w-10 shrink-0 rounded-[10px] bg-[#0052CC]/10 flex items-center justify-center">
+                        <Users className="h-5 w-5 text-[#0052CC]" />
                       </div>
                       <div>
                         <h3 className="font-semibold"><T>About Us</T></h3>
@@ -320,27 +316,26 @@ export default function ContactPage() {
                 </Card>
               </div>
 
-              {/* Business Hours */}
-              <Card className="mt-8">
+              <Card className="mt-8 border-gray-200 rounded-[12px] shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-lg"><T>Business Hours</T></CardTitle>
+                  <CardTitle className="font-sans text-lg font-bold text-black"><T>Business Hours</T></CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2 text-sm">
+                  <div className="font-sans space-y-2 text-sm text-gray-600">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground"><T>Monday - Friday</T></span>
+                      <span><T>Monday - Friday</T></span>
                       <span>9:00 AM - 6:00 PM EST</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground"><T>Saturday</T></span>
+                      <span><T>Saturday</T></span>
                       <span>10:00 AM - 4:00 PM EST</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground"><T>Sunday</T></span>
+                      <span><T>Sunday</T></span>
                       <span><T>Closed</T></span>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-4">
+                  <p className="font-sans text-xs text-gray-500 mt-4">
                     <T>* Response times may vary during holidays</T>
                   </p>
                 </CardContent>

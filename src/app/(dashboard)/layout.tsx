@@ -15,7 +15,7 @@ export default function DashboardLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#f5f5f5] text-foreground">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <DashboardSidebar
@@ -40,7 +40,7 @@ export default function DashboardLayout({
         )}
       >
         <DashboardHeader onMenuClick={() => setMobileMenuOpen(true)} />
-        <main className="flex-1 p-6 md:p-8 lg:p-10 max-w-7xl mx-auto w-full animate-in fade-in duration-500">
+        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 md:py-8 max-w-7xl mx-auto w-full animate-in fade-in duration-500">
           {children}
         </main>
       </div>

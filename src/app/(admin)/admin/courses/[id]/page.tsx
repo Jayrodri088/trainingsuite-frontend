@@ -66,7 +66,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageLoader } from "@/components/ui/page-loader";
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi, UpdateCourseData } from "@/lib/api/courses";
 import { modulesApi, lessonsApi, CreateModuleData, CreateLessonData } from "@/lib/api/lessons";
@@ -474,18 +474,13 @@ export default function AdminCourseEditorPage({
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-96 w-full" />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!course) {
     return (
       <div className="text-center py-12">
-        <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+        <BookOpen className="h-12 w-12 mx-auto text-gray-600 mb-4" />
         <h2 className="text-lg font-medium">Course not found</h2>
         <Button asChild className="mt-4">
           <Link href="/admin/courses">Back to Courses</Link>
@@ -557,9 +552,9 @@ export default function AdminCourseEditorPage({
             <CardContent>
               {modules.length === 0 ? (
                 <div className="text-center py-12 border-2 border-dashed rounded-lg">
-                  <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <BookOpen className="h-12 w-12 mx-auto text-gray-600 mb-4" />
                   <h3 className="text-lg font-medium">No modules yet</h3>
-                  <p className="text-muted-foreground mt-1">
+                  <p className="text-gray-600 mt-1">
                     Start building the course by adding a module.
                   </p>
                   <Button onClick={() => handleOpenModuleDialog()} className="mt-4">
@@ -583,13 +578,13 @@ export default function AdminCourseEditorPage({
                           <CollapsibleTrigger asChild>
                             <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50">
                               <div className="flex items-center gap-3">
-                                <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+                                <GripVertical className="h-5 w-5 text-gray-600 cursor-grab" />
                                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium">
                                   {moduleIndex + 1}
                                 </div>
                                 <div>
                                   <h4 className="font-medium">{module.title}</h4>
-                                  <p className="text-sm text-muted-foreground">
+                                  <p className="text-sm text-gray-600">
                                     {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
                                   </p>
                                 </div>
@@ -650,7 +645,7 @@ export default function AdminCourseEditorPage({
                             <div className="border-t px-4 pb-4">
                               {lessons.length === 0 ? (
                                 <div className="text-center py-6">
-                                  <p className="text-sm text-muted-foreground mb-2">
+                                  <p className="text-sm text-gray-600 mb-2">
                                     No lessons in this module
                                   </p>
                                   <Button
@@ -670,8 +665,8 @@ export default function AdminCourseEditorPage({
                                       className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
                                     >
                                       <div className="flex items-center gap-3">
-                                        <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-                                        <div className="text-muted-foreground">
+                                        <GripVertical className="h-4 w-4 text-gray-600 cursor-grab" />
+                                        <div className="text-gray-600">
                                           {getLessonIcon(lesson.type || "text")}
                                         </div>
                                         <div>
@@ -683,7 +678,7 @@ export default function AdminCourseEditorPage({
                                               {lesson.type || "text"}
                                             </Badge>
                                             {lesson.duration && (
-                                              <span className="text-xs text-muted-foreground">
+                                              <span className="text-xs text-gray-600">
                                                 {lesson.duration} min
                                               </span>
                                             )}
@@ -772,7 +767,7 @@ export default function AdminCourseEditorPage({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                      <ImageIcon className="h-8 w-8 text-gray-600" />
                     )}
                   </div>
                   <div className="space-y-2">
@@ -797,7 +792,7 @@ export default function AdminCourseEditorPage({
                       )}
                       {thumbnailUploading ? "Uploading..." : "Upload Image"}
                     </Button>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-600">
                       Recommended: 1280x720px (16:9 ratio). Max 5MB.
                     </p>
                   </div>
@@ -864,7 +859,7 @@ export default function AdminCourseEditorPage({
               </div>
               <div className="space-y-2">
                 <Label>Course Duration</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-gray-600">
                   {course?.duration && course.duration > 0
                     ? `${course.duration} minutes (calculated from lesson videos)`
                     : "Duration is automatically calculated from the video lengths of all lessons."}
@@ -1019,7 +1014,7 @@ export default function AdminCourseEditorPage({
                       }}
                       placeholder="https://example.com/video.mp4 or YouTube URL"
                     />
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-600">
                       Auto-detects for same-origin videos. External hosts may require manual entry.
                     </p>
                   </div>
@@ -1041,7 +1036,7 @@ export default function AdminCourseEditorPage({
                       />
                       {durationLoading && (
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <Clock className="h-4 w-4 animate-spin text-muted-foreground" />
+                          <Clock className="h-4 w-4 animate-spin text-gray-600" />
                         </div>
                       )}
                     </div>
@@ -1075,7 +1070,7 @@ export default function AdminCourseEditorPage({
                   />
                   <Label htmlFor="isFree">Free Preview</Label>
                 </div>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-gray-600">
                   (Allow non-enrolled users to access this lesson)
                 </span>
               </div>
@@ -1147,7 +1142,7 @@ export default function AdminCourseEditorPage({
                         )}
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-600">
                       Add downloadable files like PDFs, slides, code samples, etc.
                     </p>
                   </div>

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { CourseCard, CourseCardSkeleton } from "./course-card";
+import { CourseCard } from "./course-card";
+import { PageLoader } from "@/components/ui/page-loader";
 import type { Course, Enrollment } from "@/types";
 import { T } from "@/components/t";
 
@@ -19,7 +20,11 @@ export function CourseListSection({
   isLoading,
   useMockCoursesOnly,
 }: CourseListSectionProps) {
-  const showSkeletons = !useMockCoursesOnly && isLoading;
+  const showLoader = !useMockCoursesOnly && isLoading;
+
+  if (showLoader) {
+    return <PageLoader />;
+  }
 
   return (
     <section className="py-16 sm:py-20 md:py-24 lg:py-32 bg-white">
@@ -43,13 +48,7 @@ export function CourseListSection({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center sm:justify-items-stretch">
-          {showSkeletons ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="w-full max-w-[280px] sm:max-w-none">
-                <CourseCardSkeleton />
-              </div>
-            ))
-          ) : (
+          {(
             courses.map((course) => (
               <div key={course._id} className="w-full max-w-[280px] sm:max-w-none md:max-w-none">
                 <CourseCard

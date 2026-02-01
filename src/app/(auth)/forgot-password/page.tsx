@@ -52,33 +52,33 @@ export default function ForgotPasswordPage() {
   if (isSubmitted) {
     return (
       <div className="space-y-6">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-          <Mail className="h-6 w-6 text-primary" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-[#0052CC]/10">
+          <Mail className="h-6 w-6 text-[#0052CC]" />
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight"><T>Check your email</T></h1>
-          <p className="text-muted-foreground">
+          <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-black"><T>Check your email</T></h1>
+          <p className="font-sans text-gray-600">
             <T>We've sent a password reset link to</T>{" "}
-            <span className="font-medium text-foreground">{submittedEmail}</span>
+            <span className="font-semibold text-black">{submittedEmail}</span>
           </p>
         </div>
 
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm font-sans text-gray-600">
             <T>Didn't receive the email? Check your spam folder or</T>{" "}
             <button
               onClick={() => {
                 setIsSubmitted(false);
                 form.reset();
               }}
-              className="text-primary hover:underline font-medium"
+              className="text-[#0052CC] hover:underline font-semibold"
             >
               <T>try another email address</T>
             </button>
           </p>
 
-          <Button asChild variant="outline" className="w-full">
+          <Button asChild variant="outline" className="w-full rounded-[10px] border-gray-200 hover:bg-gray-50 font-semibold">
             <Link href="/login">
               <ArrowLeft className="mr-2 h-4 w-4" />
               <T>Back to login</T>
@@ -92,8 +92,8 @@ export default function ForgotPasswordPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight"><T>Forgot password?</T></h1>
-        <p className="text-muted-foreground">
+        <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-black"><T>Forgot password?</T></h1>
+        <p className="font-sans text-gray-600">
           <T>No worries, we'll send you reset instructions.</T>
         </p>
       </div>
@@ -105,13 +105,14 @@ export default function ForgotPasswordPage() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel><T>Email</T></FormLabel>
+                <FormLabel className="font-sans text-gray-600"><T>Email</T></FormLabel>
                 <FormControl>
                   <Input
                     type="email"
                     placeholder={t("Enter your email address")}
                     autoComplete="email"
                     disabled={isLoading}
+                    className="rounded-[10px] h-11 border-gray-200"
                     {...field}
                   />
                 </FormControl>
@@ -120,14 +121,14 @@ export default function ForgotPasswordPage() {
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <T>Reset password</T>
           </Button>
         </form>
       </Form>
 
-      <Button asChild variant="ghost" className="w-full">
+      <Button asChild variant="ghost" className="w-full rounded-[10px] text-gray-600 hover:text-[#0052CC] font-semibold">
         <Link href="/login">
           <ArrowLeft className="mr-2 h-4 w-4" />
           <T>Back to login</T>
