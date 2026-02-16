@@ -6,4 +6,3 @@ export { CourseListSection } from "./course-list-section";
 export { LiveSessionsSection } from "./live-sessions-section";
 export { StatementSection } from "./statement-section";
 export { TestimoniesSection } from "./testimonies-section";
-export { getMockCourses } from "./mock-courses";

@@ -11,18 +11,14 @@ interface CourseListSectionProps {
   courses: Course[];
   enrollmentMap: Map<string, Enrollment>;
   isLoading: boolean;
-  useMockCoursesOnly: boolean;
 }
 
 export function CourseListSection({
   courses,
   enrollmentMap,
   isLoading,
-  useMockCoursesOnly,
 }: CourseListSectionProps) {
-  const showLoader = !useMockCoursesOnly && isLoading;
-
-  if (showLoader) {
+  if (isLoading) {
     return <PageLoader />;
   }
 

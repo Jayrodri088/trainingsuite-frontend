@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -13,14 +12,12 @@ import {
   TestimoniesSection,
   LiveSessionsSection,
   StatementSection,
-  getMockCourses,
 } from "@/components/home";
 
 export default function HomePage() {
   const { isAuthenticated } = useAuth();
   const { t } = useT();
 
-  const USE_MOCK_COURSES_ONLY = true;
   const { data: coursesResponse, isLoading } = useCourses(
     {
       status: "published",
@@ -28,7 +25,7 @@ export default function HomePage() {
       order: "desc",
       limit: 50,
     },
-    { enabled: !USE_MOCK_COURSES_ONLY }
+    { enabled: true }
   );
   const { data: enrollmentsResponse } = useEnrollments();
 
@@ -38,7 +35,7 @@ export default function HomePage() {
     refetchInterval: 30000,
   });
 
-  const courses = USE_MOCK_COURSES_ONLY ? [] : (coursesResponse?.data || []);
+  const courses = coursesResponse?.data || [];
   const enrollments = enrollmentsResponse?.data || [];
   const liveSessions = liveSessionsResponse?.data || [];
 
@@ -64,7 +61,7 @@ export default function HomePage() {
     });
   }
 
-  const coursesToShow: Course[] = courses.length > 0 ? courses : getMockCourses();
+  const coursesToShow: Course[] = courses;
 
   const statementItems = [
     t("Global Networking"),
@@ -80,16 +77,15 @@ export default function HomePage() {
         courses={coursesToShow}
         enrollmentMap={enrollmentMap}
         isLoading={isLoading}
-        useMockCoursesOnly={USE_MOCK_COURSES_ONLY}
       />
       <TestimoniesSection />
-      {/* {(hasLiveSessions || isLoadingLiveSessions) && (
+      {(hasLiveSessions || isLoadingLiveSessions) && (
         <LiveSessionsSection
           sessions={sortedLiveSessions}
           isLoading={isLoadingLiveSessions}
           hasLiveNow={hasLiveNow}
         />
-      )} */}
+      )}
       <StatementSection
         isAuthenticated={!!isAuthenticated}
         statementItems={statementItems}
