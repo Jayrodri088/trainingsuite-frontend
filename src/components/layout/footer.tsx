@@ -121,7 +121,7 @@ export function Footer() {
         {/* Bottom copyright */}
         <div className="mt-16 pt-8 border-t border-gray-200">
           <p className="font-sans text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} <T>Rhapsody Global Missionaries. All rights reserved.</T>
+            &copy; {new Date().getFullYear()} <T>Rhapsody Omega Force. All rights reserved.</T>
           </p>
         </div>
       </div>

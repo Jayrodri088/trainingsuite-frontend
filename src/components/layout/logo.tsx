@@ -25,7 +25,7 @@ export function Logo({ className, iconOnly = false, variant = "default", reload 
     >
       <Image
         src="/logo.webp"
-        alt="Rhapsody Global Missionary Portal"
+        alt="Rhapsody Omega Force"
         width={36}
         height={36}
         className="h-9 w-auto shrink-0"
@@ -38,7 +38,7 @@ export function Logo({ className, iconOnly = false, variant = "default", reload 
               variant === "light" ? "text-white" : "text-gray-900"
             )}
           >
-            Rhapsody Global
+            Rhapsody Omega
           </span>
           <span 
             className={cn(
@@ -46,7 +46,7 @@ export function Logo({ className, iconOnly = false, variant = "default", reload 
               variant === "light" ? "text-white/80" : "text-gray-600"
             )}
           >
-            Missionary Portal
+            Force
           </span>
         </div>
       )}

@@ -22,7 +22,7 @@ export default function AboutPage() {
       <section className="py-14 sm:py-20 md:py-24 border-b border-gray-200">
         <div className="container max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
-            <T>About Rhapsody Global Missionaries Portal</T>
+            <T>About Rhapsody Omega Force</T>
           </h1>
           <p className="font-sans text-base md:text-lg text-gray-600 max-w-3xl mx-auto mb-8">
             <T>We&apos;re on a mandate to equip ministers worldwide with world-class training materials and live mentorship for global impact.</T>
@@ -44,7 +44,7 @@ export default function AboutPage() {
             <h2 className="font-sans text-2xl md:text-3xl font-bold text-black text-center mb-8"><T>Our Story</T></h2>
             <div className="font-sans text-gray-600 space-y-4 leading-relaxed">
               <p>
-                <T>Rhapsody Global Missionaries Portal was founded with a simple yet powerful vision: to equip ministers for global impact. We are building a comprehensive training platform to serve ministers across the globe.</T>
+                <T>Rhapsody Omega Force was founded with a simple yet powerful vision: to equip ministers for global impact. We are building a comprehensive training platform to serve ministers across the globe.</T>
               </p>
               <p>
                 <T>Our team recognized that quality theological and practical training should be accessible to every minister. We set out to create a platform that offers structured curriculum, HD video lessons, live mentorship, and official certification—all designed for the next level of impact.</T>
@@ -81,7 +81,7 @@ export default function AboutPage() {
           </h2>
           <p className="font-sans text-white/90 max-w-2xl mx-auto mb-8 text-base md:text-lg">
             {isAuthenticated
-              ? <T>Explore our courses and continue building your skills with the Rhapsody Global Missionaries Portal.</T>
+              ? <T>Explore our courses and continue building your skills with Rhapsody Omega Force.</T>
               : <T>Join a global network of ministers. Browse our courses and begin your training today.</T>}
           </p>
           <Button asChild size="lg" className="rounded-[10px] h-11 px-8 bg-white text-[#0052CC] hover:bg-white/90 font-bold">

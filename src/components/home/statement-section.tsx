@@ -64,7 +64,7 @@ export function StatementSection({ isAuthenticated, statementItems }: StatementS
             </h2>
 
             <p className="text-sm md:text-lg text-white/90 leading-relaxed max-w-lg mx-auto lg:mx-0">
-              <T>Join a global network of ministers equipping themselves for the next level of impact through the Rhapsody Global Missionaries Portal.</T>
+              <T>Join a global network of ministers equipping themselves for the next level of impact through Rhapsody Omega Force.</T>
             </p>
 
             <ul className="space-y-2 text-white/90 text-left mx-auto lg:mx-0 max-w-sm lg:max-w-none">
