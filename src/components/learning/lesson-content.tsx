@@ -37,7 +37,7 @@ export function LessonContent({ lesson }: { lesson: Lesson | null }) {
             <T>Lesson Materials</T>
           </h3>
           <div className="space-y-2">
-            {lesson.materials.map((material: { name?: string }, index: number) => (
+            {(lesson.materials as Array<{ name?: string }>).map((material, index: number) => (
               <Card key={index} className="rounded-[12px] border-gray-200 shadow-sm">
                 <CardContent className="p-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">

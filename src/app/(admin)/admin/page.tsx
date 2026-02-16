@@ -39,6 +39,7 @@ interface StatCardProps {
   value: string | number;
   icon: React.ElementType;
   color: string;
+  isLoading?: boolean;
 }
 
 function StatCard({ title, value, icon: Icon, color, isLoading }: StatCardProps) {
@@ -202,7 +203,6 @@ export default function AdminDashboardPage() {
                   </Badge>
                 </div>
               </div>
-            )}
           </CardContent>
         </Card>
 
@@ -277,7 +277,7 @@ export default function AdminDashboardPage() {
                     <TableRow key={course._id} className="border-gray-200 hover:bg-gray-50">
                       <TableCell className="pl-6 py-4">
                         <div className="flex items-center gap-4">
-                          <div className="h-12 w-16 bg-muted flex items-center justify-center overflow-hidden border border-gray-200 rounded-[10px]>
+                          <div className="h-12 w-16 bg-muted flex items-center justify-center overflow-hidden border border-gray-200 rounded-[10px]">
                             {course.thumbnail ? (
                               <img
                                 src={course.thumbnail}

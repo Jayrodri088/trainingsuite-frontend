@@ -43,6 +43,23 @@ const notificationColors: Record<string, { bg: string; text: string; border: str
   warning: { bg: "bg-red-50", text: "text-red-600", border: "border-red-200" },
 };
 
+function NotificationSkeleton() {
+  return (
+    <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+      <CardContent className="p-5">
+        <div className="flex gap-5">
+          <Skeleton className="h-10 w-10 shrink-0 rounded-[10px]" />
+          <div className="flex-1 space-y-3">
+            <Skeleton className="h-4 w-48 rounded-[8px]" />
+            <Skeleton className="h-4 w-full rounded-[8px]" />
+            <Skeleton className="h-3 w-32 rounded-[8px]" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function NotificationCard({
   notification,
   onMarkAsRead,
@@ -264,7 +281,11 @@ export default function NotificationsPage() {
 
         <TabsContent value="unread" className="mt-8">
           {isLoading ? (
-            <PageLoader />
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <NotificationSkeleton key={i} />
+              ))}
+            </div>
           ) : unreadNotifications.length > 0 ? (
             <div className="space-y-4">
               {unreadNotifications.map((notification) => (
