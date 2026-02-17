@@ -13,6 +13,7 @@ export function CourseCard({ course, enrollment }: { course: Course; enrollment?
   const isEnrolled = !!enrollment;
   const progress = enrollment?.progress || 0;
   const isCompleted = enrollment?.status === "completed" || progress >= 100;
+  const isPaidCourse = !course.isFree && (course.price || 0) > 0;
 
   const thumbnailSrc = normalizeUploadUrl(course.thumbnail) || "/Images/course.png";
 
@@ -38,7 +39,13 @@ export function CourseCard({ course, enrollment }: { course: Course; enrollment?
             ) : (
               <span className="text-sm text-gray-500">{course.ratingCount ?? 0} <T>ratings</T></span>
             )}
-            <span className="text-sm text-gray-500"><T>Video Course</T></span>
+            {isPaidCourse ? (
+              <span className="text-sm font-semibold text-emerald-700">
+                {(course.currency || "USD").toUpperCase()} {Number(course.price || 0).toFixed(2)}
+              </span>
+            ) : (
+              <span className="text-sm text-gray-500"><T>Video Course</T></span>
+            )}
           </div>
 
           <h3 className="font-sans text-lg font-bold text-black mb-4 leading-tight line-clamp-2 group-hover:underline decoration-1 underline-offset-2">
@@ -66,7 +73,7 @@ export function CourseCard({ course, enrollment }: { course: Course; enrollment?
               <span
                 className="inline-flex w-full justify-center rounded-[12px] border border-[#D4D4D4] bg-white py-2.5 text-sm font-medium text-gray-800 shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.1),0px_1px_3px_0px_rgba(0,0,0,0.1)] outline-1 outline-white/10 outline-offset-0 group-hover:bg-gray-50 transition-colors"
               >
-                <T>Start Learning</T>
+                {isPaidCourse ? <T>Buy Course</T> : <T>Start Learning</T>}
               </span>
             )}
           </div>

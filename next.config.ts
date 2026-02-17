@@ -21,6 +21,19 @@ const nextConfig: NextConfig = {
   },
   // Note: /uploads/* is handled by the API route at src/app/uploads/[...path]/route.ts
   // This provides more reliable proxying in standalone mode than rewrites
+  async headers() {
+    return [
+      {
+        source: '/Images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
