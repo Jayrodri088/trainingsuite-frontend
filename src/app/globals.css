@@ -8,7 +8,7 @@
 
   /* Typography */
   --font-sans: var(--font-roboto);
-  --font-heading: var(--font-heading);
+  --font-heading: var(--font-display);
   --font-mono: var(--font-geist-mono);
 
   --color-sidebar-ring: var(--sidebar-ring);
@@ -51,6 +51,9 @@
 }
 
 :root {
+  --font-roboto: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Georgia", "Times New Roman", serif;
+  --font-geist-mono: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --radius: 0rem;
   /* Sharp, professional corners */
 
