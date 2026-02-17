@@ -24,10 +24,14 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
         className="relative min-h-[min(85vh,780px)] w-full max-w-7xl mx-auto rounded-2xl sm:rounded-3xl overflow-hidden bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-0"
         style={{ backgroundImage: "url(/Images/bg-world.png)" }}
       >
-        {/* Headline – white, large, bold */}
-        <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-4 max-w-4xl leading-tight">
-          <T>Equipping Ministers for Global Impact.</T>
+        <h1 className="font-sans text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-3 max-w-5xl leading-tight">
+          <T>Rhapsody Omega Force</T>
         </h1>
+
+        {/* Hero text */}
+        <h2 className="font-sans text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4 max-w-4xl leading-tight">
+          <T>Equipping Ministers for Global Impact.</T>
+        </h2>
 
         {/* Subheading – white, smaller */}
         <p className="text-white/95 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-8 font-normal">

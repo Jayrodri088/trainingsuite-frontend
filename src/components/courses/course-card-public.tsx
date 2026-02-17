@@ -43,7 +43,7 @@ export function CourseCardPublic({
   const progress = enrollment?.progress || 0;
   const isCompleted = enrollment?.status === "completed" || progress >= 100;
   const isInProgress = isEnrolled && progress > 0 && !isCompleted;
-  const isPaidCourse = !course.isFree && (course.price || 0) > 0;
+  const isPaidCourse = (course.price || 0) > 0;
 
   const getEnrollmentBadge = () => {
     if (isCompleted) return <Badge className="bg-green-600 hover:bg-green-600 text-xs rounded-[8px]"><T>Completed</T></Badge>;
@@ -93,6 +93,11 @@ export function CourseCardPublic({
                 {isPaidCourse && (
                   <span className="text-xs font-medium text-emerald-700">
                     {(course.currency || "USD").toUpperCase()} {Number(course.price || 0).toFixed(2)}
+                  </span>
+                )}
+                {!isPaidCourse && (
+                  <span className="text-xs font-medium text-blue-700">
+                    <T>Free</T>
                   </span>
                 )}
               </div>
@@ -154,6 +159,11 @@ export function CourseCardPublic({
             {isPaidCourse && (
               <span className="text-xs font-medium text-emerald-700">
                 {(course.currency || "USD").toUpperCase()} {Number(course.price || 0).toFixed(2)}
+              </span>
+            )}
+            {!isPaidCourse && (
+              <span className="text-xs font-medium text-blue-700">
+                <T>Free</T>
               </span>
             )}
           </div>

@@ -386,7 +386,7 @@ export default function CourseDetailPage({
       return;
     }
 
-    const isPaidCourse = !course.isFree && (course.price || 0) > 0;
+    const isPaidCourse = (course.price || 0) > 0;
     if (isPaidCourse) {
       initializePaymentMutation.mutate(course._id);
       return;
@@ -486,7 +486,7 @@ export default function CourseDetailPage({
                 <Badge className={levelColors[course.level as keyof typeof levelColors] || "bg-gray-100 text-gray-800"}>
                   {t(course.level || "beginner")}
                 </Badge>
-                {!course.isFree && (course.price || 0) > 0 && (
+                {(course.price || 0) > 0 && (
                   <Badge className="bg-emerald-600 hover:bg-emerald-600">
                     {(course.currency || "USD").toUpperCase()} {Number(course.price || 0).toFixed(2)}
                   </Badge>
@@ -585,7 +585,7 @@ export default function CourseDetailPage({
                       disabled={enrollMutation.isPending || initializePaymentMutation.isPending}
                     >
                       {(enrollMutation.isPending || initializePaymentMutation.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                      {!course.isFree && (course.price || 0) > 0 ? <T>Buy Course</T> : <T>Start Training</T>}
+                      {(course.price || 0) > 0 ? <T>Buy Course</T> : <T>Start Training</T>}
                     </Button>
                   )}
 
@@ -749,7 +749,7 @@ export default function CourseDetailPage({
                             <T>Enroll in this course to leave a review</T>
                           </p>
                           <Button onClick={handleEnroll}>
-                            {!course.isFree && (course.price || 0) > 0 ? <T>Buy Course</T> : <T>Start Training</T>}
+                            {(course.price || 0) > 0 ? <T>Buy Course</T> : <T>Start Training</T>}
                           </Button>
                         </div>
                       ) : (

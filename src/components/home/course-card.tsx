@@ -13,7 +13,7 @@ export function CourseCard({ course, enrollment }: { course: Course; enrollment?
   const isEnrolled = !!enrollment;
   const progress = enrollment?.progress || 0;
   const isCompleted = enrollment?.status === "completed" || progress >= 100;
-  const isPaidCourse = !course.isFree && (course.price || 0) > 0;
+  const isPaidCourse = (course.price || 0) > 0;
 
   const thumbnailSrc = normalizeUploadUrl(course.thumbnail) || "/Images/course.png";
 
@@ -44,7 +44,7 @@ export function CourseCard({ course, enrollment }: { course: Course; enrollment?
                 {(course.currency || "USD").toUpperCase()} {Number(course.price || 0).toFixed(2)}
               </span>
             ) : (
-              <span className="text-sm text-gray-500"><T>Video Course</T></span>
+              <span className="text-sm font-medium text-blue-700"><T>Free</T></span>
             )}
           </div>
 
