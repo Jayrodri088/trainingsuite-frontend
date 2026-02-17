@@ -10,3 +10,4 @@ export { liveSessionsApi } from "./live-sessions";
 export { categoriesApi } from "./categories";
 export { adminApi } from "./admin";
 export { announcementsApi } from "./announcements";
+export { paymentsApi } from "./payments";

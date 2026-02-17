@@ -43,6 +43,7 @@ export function CourseCardPublic({
   const progress = enrollment?.progress || 0;
   const isCompleted = enrollment?.status === "completed" || progress >= 100;
   const isInProgress = isEnrolled && progress > 0 && !isCompleted;
+  const isPaidCourse = !course.isFree && (course.price || 0) > 0;
 
   const getEnrollmentBadge = () => {
     if (isCompleted) return <Badge className="bg-green-600 hover:bg-green-600 text-xs rounded-[8px]"><T>Completed</T></Badge>;
@@ -89,6 +90,11 @@ export function CourseCardPublic({
                   </div>
                 ) : null}
                 <span className="text-xs text-gray-500">{(course.enrollmentCount || 0).toLocaleString()} <T>enrolled</T></span>
+                {isPaidCourse && (
+                  <span className="text-xs font-medium text-emerald-700">
+                    {(course.currency || "USD").toUpperCase()} {Number(course.price || 0).toFixed(2)}
+                  </span>
+                )}
               </div>
             </div>
             <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -107,7 +113,9 @@ export function CourseCardPublic({
                   </Button>
                 </>
               ) : (
-                <Button size="sm" className={"h-8 text-xs w-full sm:w-auto " + btnPrimary}><T>Start Training</T></Button>
+                <Button size="sm" className={"h-8 text-xs w-full sm:w-auto " + btnPrimary}>
+                  {isPaidCourse ? <T>Buy Course</T> : <T>Start Training</T>}
+                </Button>
               )}
             </div>
           </CardContent>
@@ -143,6 +151,11 @@ export function CourseCardPublic({
               </div>
             ) : null}
             <span className="text-xs text-gray-500">{(course.enrollmentCount || 0).toLocaleString()} <T>enrolled</T></span>
+            {isPaidCourse && (
+              <span className="text-xs font-medium text-emerald-700">
+                {(course.currency || "USD").toUpperCase()} {Number(course.price || 0).toFixed(2)}
+              </span>
+            )}
           </div>
           {isEnrolled ? (
             <div className="mt-3">
@@ -158,7 +171,9 @@ export function CourseCardPublic({
             </div>
           ) : (
             <div className="mt-3">
-              <Button size="sm" className={"h-7 text-xs w-full rounded-[10px] " + btnPrimary}><T>Start Training</T></Button>
+              <Button size="sm" className={"h-7 text-xs w-full rounded-[10px] " + btnPrimary}>
+                {isPaidCourse ? <T>Buy Course</T> : <T>Start Training</T>}
+              </Button>
             </div>
           )}
         </CardContent>

@@ -17,6 +17,7 @@ export interface CreateCourseData {
   category: string;
   price?: number;
   isFree?: boolean;
+  currency?: string;
   level?: string;
 }
 

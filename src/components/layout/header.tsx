@@ -108,8 +108,8 @@ export function Header() {
             />
           </form>
 
-          {/* Language Selector - in mobile only to match header design */}
-          <div className="hidden">
+          {/* Language Selector */}
+          <div>
             <LanguageSelector />
           </div>
 

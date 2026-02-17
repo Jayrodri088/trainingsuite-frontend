@@ -81,13 +81,6 @@ export default function SettingsPage() {
     },
   });
 
-  const [paymentConfig, setPaymentConfig] = useState({
-    stripePublicKey: "",
-    stripeSecretKey: "",
-    paystackPublicKey: "",
-    paystackSecretKey: "",
-  });
-
   useEffect(() => {
     if (configData?.data) {
       setSiteConfig(configData.data);
@@ -105,22 +98,9 @@ export default function SettingsPage() {
     },
   });
 
-  const updatePaymentConfigMutation = useMutation({
-    mutationFn: (data: typeof paymentConfig) => adminApi.updatePaymentConfig(data),
-    onSuccess: () => {
-      toast({ title: "Payment settings saved successfully" });
-    },
-    onError: () => {
-      toast({ title: "Failed to save payment settings", variant: "destructive" });
-    },
-  });
 
   const handleSaveSiteConfig = () => {
     updateConfigMutation.mutate(siteConfig);
-  };
-
-  const handleSavePaymentConfig = () => {
-    updatePaymentConfigMutation.mutate(paymentConfig);
   };
 
   if (isLoading) {
@@ -687,38 +667,15 @@ export default function SettingsPage() {
                       )}
                     </CardTitle>
                     <CardDescription>
-                      Configure your Stripe API keys.
+                      Stripe keys are managed through server environment variables.
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4 p-6">
-                <div className="space-y-2">
-                  <Label htmlFor="stripePublicKey" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Publishable Key</Label>
-                  <Input
-                    id="stripePublicKey"
-                    type="password"
-                    value={paymentConfig.stripePublicKey}
-                    onChange={(e) =>
-                      setPaymentConfig({ ...paymentConfig, stripePublicKey: e.target.value })
-                    }
-                    placeholder="pk_live_..."
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="stripeSecretKey" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Secret Key</Label>
-                  <Input
-                    id="stripeSecretKey"
-                    type="password"
-                    value={paymentConfig.stripeSecretKey}
-                    onChange={(e) =>
-                      setPaymentConfig({ ...paymentConfig, stripeSecretKey: e.target.value })
-                    }
-                    placeholder="sk_live_..."
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
-                  />
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  Set <code>STRIPE_SECRET_KEY</code> and <code>STRIPE_WEBHOOK_SECRET</code> on the backend environment.
+                </p>
               </CardContent>
             </Card>
 
@@ -733,56 +690,25 @@ export default function SettingsPage() {
                       )}
                     </CardTitle>
                     <CardDescription>
-                      Configure your Paystack API keys.
+                      Paystack keys are also expected from server environment variables.
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4 p-6">
-                <div className="space-y-2">
-                  <Label htmlFor="paystackPublicKey" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Public Key</Label>
-                  <Input
-                    id="paystackPublicKey"
-                    type="password"
-                    value={paymentConfig.paystackPublicKey}
-                    onChange={(e) =>
-                      setPaymentConfig({ ...paymentConfig, paystackPublicKey: e.target.value })
-                    }
-                    placeholder="pk_live_..."
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="paystackSecretKey" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Secret Key</Label>
-                  <Input
-                    id="paystackSecretKey"
-                    type="password"
-                    value={paymentConfig.paystackSecretKey}
-                    onChange={(e) =>
-                      setPaymentConfig({ ...paymentConfig, paystackSecretKey: e.target.value })
-                    }
-                    placeholder="sk_live_..."
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
-                  />
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  Configure Paystack server keys only if you keep Paystack enabled as a provider.
+                </p>
               </CardContent>
             </Card>
 
             <div className="flex justify-end gap-4 pt-4">
               <Button
                 onClick={handleSaveSiteConfig}
-                variant="outline"
                 disabled={updateConfigMutation.isPending}
-                className="rounded-[12px] border-gray-200 bg-white shadow-sm"
-              >
-                Save Provider Settings
-              </Button>
-              <Button
-                onClick={handleSavePaymentConfig}
-                disabled={updatePaymentConfigMutation.isPending}
                 className="rounded-[10px]"
               >
-                {updatePaymentConfigMutation.isPending ? (
+                {updateConfigMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Saving...
@@ -790,7 +716,7 @@ export default function SettingsPage() {
                 ) : (
                   <>
                     <Save className="h-4 w-4 mr-2" />
-                    Save API Keys
+                    Save Payment Settings
                   </>
                 )}
               </Button>

@@ -46,6 +46,9 @@ export default function AdminCreateCoursePage() {
     title: "",
     description: "",
     category: "",
+    isFree: true,
+    price: 0,
+    currency: "USD",
     level: "beginner",
     duration: 0,
     requirements: [],
@@ -115,6 +118,10 @@ export default function AdminCreateCoursePage() {
       toast({ title: "Category is required", variant: "destructive" });
       return;
     }
+    if (formData.isFree === false && Number(formData.price || 0) <= 0) {
+      toast({ title: "Paid courses must have a price greater than 0", variant: "destructive" });
+      return;
+    }
 
     let thumbnailUrl = formData.thumbnail;
 
@@ -136,6 +143,9 @@ export default function AdminCreateCoursePage() {
       title: formData.title.trim(),
       description: formData.description.trim(),
       category: formData.category,
+      isFree: formData.isFree ?? true,
+      price: formData.isFree ? 0 : Number(formData.price || 0),
+      currency: (formData.currency || "USD").toUpperCase(),
       level: formData.level,
       requirements: formData.requirements,
       objectives: formData.objectives,
@@ -286,6 +296,62 @@ export default function AdminCreateCoursePage() {
                         <SelectItem value="advanced">Advanced</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                </div>
+                <div className="space-y-4 rounded-lg border p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="isFree">Free Course</Label>
+                      <p className="text-xs text-gray-600">
+                        Turn off for paid courses.
+                      </p>
+                    </div>
+                    <input
+                      id="isFree"
+                      type="checkbox"
+                      checked={formData.isFree ?? true}
+                      onChange={(e) => {
+                        const nextIsFree = e.target.checked;
+                        setFormData({
+                          ...formData,
+                          isFree: nextIsFree,
+                          price: nextIsFree ? 0 : formData.price || 0,
+                        });
+                      }}
+                    />
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="price">Price</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        disabled={formData.isFree}
+                        value={formData.price ?? 0}
+                        onChange={(e) =>
+                          setFormData({ ...formData, price: Number(e.target.value || 0) })
+                        }
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="currency">Currency</Label>
+                      <Select
+                        value={formData.currency || "USD"}
+                        onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                      >
+                        <SelectTrigger id="currency">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="USD">USD</SelectItem>
+                          <SelectItem value="EUR">EUR</SelectItem>
+                          <SelectItem value="GBP">GBP</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-2">

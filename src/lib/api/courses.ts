@@ -12,6 +12,9 @@ export interface CreateCourseData {
   title: string;
   description: string;
   category: string;
+  isFree?: boolean;
+  price?: number;
+  currency?: string;
   level?: string;
   duration?: number;
   requirements?: string[];
@@ -22,6 +25,7 @@ export interface CreateCourseData {
 
 export interface UpdateCourseData extends Partial<CreateCourseData> {
   status?: string;
+  isPublished?: boolean;
   thumbnail?: string;
   previewVideo?: string;
 }

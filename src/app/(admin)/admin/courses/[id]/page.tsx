@@ -857,6 +857,66 @@ export default function AdminCourseEditorPage({
                   </Select>
                 </div>
               </div>
+              <div className="space-y-4 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="course-is-free">Free Course</Label>
+                    <p className="text-xs text-gray-600">
+                      Paid courses require Stripe checkout before enrollment.
+                    </p>
+                  </div>
+                  <input
+                    id="course-is-free"
+                    type="checkbox"
+                    checked={course.isFree ?? (course.price || 0) === 0}
+                    onChange={(e) => {
+                      const nextIsFree = e.target.checked;
+                      updateCourseMutation.mutate({
+                        isFree: nextIsFree,
+                        price: nextIsFree ? 0 : Math.max(course.price || 0, 1),
+                      });
+                    }}
+                  />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="course-price">Price</Label>
+                    <Input
+                      id="course-price"
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      disabled={course.isFree}
+                      defaultValue={course.price || 0}
+                      onBlur={(e) => {
+                        const nextPrice = Number(e.target.value || 0);
+                        updateCourseMutation.mutate({
+                          isFree: false,
+                          price: nextPrice,
+                        });
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="course-currency">Currency</Label>
+                    <Select
+                      value={course.currency || "USD"}
+                      onValueChange={(value) =>
+                        updateCourseMutation.mutate({ currency: value })
+                      }
+                    >
+                      <SelectTrigger id="course-currency">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="USD">USD</SelectItem>
+                        <SelectItem value="EUR">EUR</SelectItem>
+                        <SelectItem value="GBP">GBP</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
               <div className="space-y-2">
                 <Label>Course Duration</Label>
                 <p className="text-sm text-gray-600">

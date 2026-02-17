@@ -13,17 +13,12 @@ const ROW_1_TESTIMONIALS = [
   {
     quoteKey: "The classes from Missionaries Portal have been really helpful in equipping me carry out our mandate to reach the last man. Thanks a lot to all the teacher.",
     name: "Deaconess Bunmi",
-    roleKey: "Restaurant Owner",
+    roleKey: "Minister",
   },
   {
     quoteKey: "The classes from Missionaries Portal have been really helpful in equipping me carry out our mandate to reach the last man. Thanks a lot to all the teacher.",
     name: "Brother Samuel",
-    roleKey: "Restaurant Owner",
-  },
-  {
-    quoteKey: "Really can't do an entire post without mentioning them. They did everything I was going to.",
-    name: "Bemos Dynamics Restaurant",
-    roleKey: "Restaurant Owner",
+    roleKey: "Minister",
   },
 ] as const;
 
@@ -32,22 +27,17 @@ const ROW_2_TESTIMONIALS = [
   {
     quoteKey: "The classes from Missionaries Portal have been really helpful in equipping me carry out our mandate to reach the last man. Thanks a lot to all the teacher.",
     name: "Sister Sadie Sinks",
-    roleKey: "Restaurant Owner",
+    roleKey: "Minister",
   },
   {
     quoteKey: "The classes from Missionaries Portal have been really helpful in equipping me carry out our mandate to reach the last man. Thanks a lot to all the teacher.",
     name: "Sister Anna De Amas",
-    roleKey: "Restaurant Owner",
+    roleKey: "Minister",
   },
   {
     quoteKey: "The classes from Missionaries Portal have been really helpful in equipping me carry out our mandate to reach the last man. Thanks a lot to all the teacher.",
-    name: "Bemos Dynamics Restaurant",
-    roleKey: "Restaurant Owner",
-  },
-  {
-    quoteKey: "The classes from Missionaries Portal have been really helpful in equipping me carry out our mandate to reach the last man. Thanks a lot to all the teacher.",
-    name: "Bemos Dynamics Restaurant",
-    roleKey: "Restaurant Owner",
+    name: "Brother Emmanuel",
+    roleKey: "Minister",
   },
 ] as const;
 

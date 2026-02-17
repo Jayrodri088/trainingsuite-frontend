@@ -41,6 +41,7 @@ import { useCourse, useCourseCurriculum, useCourseRatings, useAuth } from "@/hoo
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi } from "@/lib/api/courses";
 import { enrollmentsApi } from "@/lib/api/enrollments";
+import { paymentsApi } from "@/lib/api/payments";
 import { normalizeUploadUrl } from "@/lib/utils";
 import type { Course, Module, Lesson, Rating } from "@/types";
 import { T, useT } from "@/components/t";
@@ -348,6 +349,27 @@ export default function CourseDetailPage({
     },
   });
 
+  const initializePaymentMutation = useMutation({
+    mutationFn: (courseId: string) =>
+      paymentsApi.initialize({
+        courseId,
+        paymentMethod: "card",
+        currency: (courseResponse?.data?.currency || "USD").toUpperCase(),
+      }),
+    onSuccess: (response) => {
+      const checkoutUrl = response?.data?.checkoutUrl;
+      if (!checkoutUrl) {
+        toast({ title: t("Unable to start checkout"), variant: "destructive" });
+        return;
+      }
+      window.location.href = checkoutUrl;
+    },
+    onError: (error: Error & { response?: { data?: { error?: string; message?: string } } }) => {
+      const message = error?.response?.data?.error || error?.response?.data?.message || t("Failed to initialize payment");
+      toast({ title: message, variant: "destructive" });
+    },
+  });
+
   const handleEnroll = () => {
     const course = courseResponse?.data;
     if (!course) return;
@@ -364,7 +386,12 @@ export default function CourseDetailPage({
       return;
     }
 
-    // Direct enrollment for all training materials
+    const isPaidCourse = !course.isFree && (course.price || 0) > 0;
+    if (isPaidCourse) {
+      initializePaymentMutation.mutate(course._id);
+      return;
+    }
+
     enrollMutation.mutate(course._id);
   };
 
@@ -459,6 +486,11 @@ export default function CourseDetailPage({
                 <Badge className={levelColors[course.level as keyof typeof levelColors] || "bg-gray-100 text-gray-800"}>
                   {t(course.level || "beginner")}
                 </Badge>
+                {!course.isFree && (course.price || 0) > 0 && (
+                  <Badge className="bg-emerald-600 hover:bg-emerald-600">
+                    {(course.currency || "USD").toUpperCase()} {Number(course.price || 0).toFixed(2)}
+                  </Badge>
+                )}
                 {course.category && typeof course.category === "object" && (
                   <Badge variant="outline" className="border-slate-500 text-slate-300">
                     {t(course.category.name)}
@@ -550,10 +582,10 @@ export default function CourseDetailPage({
                       size="lg"
                       className="w-full mb-3"
                       onClick={handleEnroll}
-                      disabled={enrollMutation.isPending}
+                      disabled={enrollMutation.isPending || initializePaymentMutation.isPending}
                     >
-                      {enrollMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                      <T>Start Training</T>
+                      {(enrollMutation.isPending || initializePaymentMutation.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                      {!course.isFree && (course.price || 0) > 0 ? <T>Buy Course</T> : <T>Start Training</T>}
                     </Button>
                   )}
 
@@ -717,7 +749,7 @@ export default function CourseDetailPage({
                             <T>Enroll in this course to leave a review</T>
                           </p>
                           <Button onClick={handleEnroll}>
-                            <T>Start Training</T>
+                            {!course.isFree && (course.price || 0) > 0 ? <T>Buy Course</T> : <T>Start Training</T>}
                           </Button>
                         </div>
                       ) : (
