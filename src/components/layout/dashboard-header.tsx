@@ -26,7 +26,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications, useMarkAsRead } from "@/hooks";
 import { getInitials } from "@/lib/utils";
@@ -71,7 +70,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
       <Button
         variant="ghost"
         size="icon"
-        className="lg:hidden h-9 w-9 text-gray-700 hover:bg-gray-200 rounded-[10px]"
+        className="lg:hidden h-9 w-9 rounded-[10px] text-gray-700 hover:text-gray-900 hover:bg-gray-200 border-0 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-0"
         onClick={onMenuClick}
       >
         <Menu className="h-5 w-5" />
@@ -82,7 +81,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder={t("Search training...")}
-            className="w-full pl-9 h-9 rounded-[10px] bg-white border-gray-200 text-gray-900 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-[#0052CC]/30"
+            className="w-full pl-9 h-9 rounded-[10px] bg-white border border-gray-200 text-gray-900 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-primary/30"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -96,27 +95,34 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-[10px] text-gray-600 hover:text-gray-900 hover:bg-gray-200">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative h-9 w-9 rounded-[10px] text-gray-600 hover:text-gray-900 hover:bg-gray-200 border-0 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-0"
+            >
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
-                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-600 ring-2 ring-background" />
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-[9999px] bg-red-500 ring-2 ring-[#FAFAFA]" />
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 rounded-[12px] border-gray-200 shadow-lg">
-            <DropdownMenuLabel className="flex items-center justify-between p-4 pb-2 font-sans">
-              <span className="font-bold text-black"><T>Notifications</T></span>
+          <DropdownMenuContent
+            align="end"
+            className="w-80 rounded-[12px] border border-gray-200 bg-white text-gray-900 shadow-lg p-0"
+          >
+            <DropdownMenuLabel className="flex items-center justify-between p-4 pb-2 font-sans border-b border-gray-100">
+              <span className="font-bold text-gray-900"><T>Notifications</T></span>
               {unreadCount > 0 && (
                 <span className="text-xs text-gray-500">{unreadCount} <T>unread</T></span>
               )}
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="bg-gray-100" />
             <div className="max-h-[300px] overflow-y-auto">
               {notifications.length > 0 ? (
                 notifications.slice(0, 5).map((notification) => (
             <DropdownMenuItem
                 key={notification._id}
-                className="flex flex-col items-start gap-1 p-3 cursor-pointer rounded-lg focus:bg-gray-100 font-sans"
+                className="flex flex-col items-start gap-1 p-3 cursor-pointer rounded-[8px] hover:bg-gray-50 focus:bg-gray-50 font-sans text-gray-900"
                     onClick={() => handleNotificationClick(notification)}
                   >
                     <div className="flex items-center gap-2 w-full">
@@ -128,7 +134,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
                     <p className="text-xs text-gray-600 line-clamp-2">
                       <T>{notification.message}</T>
                     </p>
-                    <p className="text-xs text-muted-foreground/50 mt-1">
+                    <p className="text-xs text-gray-500 mt-1">
                       {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                     </p>
                   </DropdownMenuItem>
@@ -146,62 +152,69 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
         {user && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-3 pl-2 pr-1 h-10 rounded-[10px] hover:bg-gray-200 text-gray-700">
-                <Avatar className="h-8 w-8 border border-gray-200">
+              <Button
+                variant="ghost"
+                className="flex items-center gap-3 pl-2 pr-1 h-10 rounded-[10px] hover:bg-gray-200 hover:text-gray-900 text-gray-700 border-0 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-0"
+              >
+                <Avatar className="h-8 w-8 border border-gray-200 rounded-[9999px]">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="bg-gray-200 text-gray-700 text-xs font-sans font-medium">
+                  <AvatarFallback className="bg-gray-200 text-gray-900 text-xs font-sans font-medium">
                     {getInitials(user.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden sm:flex flex-col items-start gap-0.5 text-sm font-sans">
-                  <span className="font-semibold text-black leading-none">{user.name.split(" ")[0]}</span>
+                  <span className="font-semibold text-gray-900 leading-none">{user.name.split(" ")[0]}</span>
                 </div>
                 <ChevronDown className="h-3 w-3 text-gray-500" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-[12px] border-gray-200 shadow-lg font-sans">
-              <DropdownMenuLabel className="font-normal p-4 pb-2">
+            <DropdownMenuContent
+              align="end"
+              className="w-56 rounded-[12px] border border-gray-200 bg-white text-gray-900 shadow-lg font-sans p-0"
+            >
+              <DropdownMenuLabel className="font-normal p-4 pb-2 border-b border-gray-100">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-semibold text-black leading-none">{user.name}</p>
-                  <p className="text-xs text-gray-500 leading-none">{user.email}</p>
+                  <p className="text-sm font-semibold text-gray-900 leading-none">{user.name}</p>
+                  <p className="text-xs text-gray-500 leading-none truncate">{user.email}</p>
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-gray-100">
+              <DropdownMenuSeparator className="bg-gray-100" />
+              <DropdownMenuItem asChild className="rounded-[8px] cursor-pointer hover:bg-gray-50 focus:bg-gray-50 text-gray-900">
                 <Link href="/">
                   <Home className="mr-2 h-4 w-4" />
                   <T>Home</T>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-gray-100">
+              <DropdownMenuItem asChild className="rounded-[8px] cursor-pointer hover:bg-gray-50 focus:bg-gray-50 text-gray-900">
                 <Link href="/dashboard">
                   <User className="mr-2 h-4 w-4" />
                   <T>Dashboard</T>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-gray-100">
+              <DropdownMenuItem asChild className="rounded-[8px] cursor-pointer hover:bg-gray-50 focus:bg-gray-50 text-gray-900">
                 <Link href="/my-courses">
                   <BookOpen className="mr-2 h-4 w-4" />
                   <T>My Courses</T>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-gray-100">
+              <DropdownMenuItem asChild className="rounded-[8px] cursor-pointer hover:bg-gray-50 focus:bg-gray-50 text-gray-900">
                 <Link href="/certificates">
                   <Award className="mr-2 h-4 w-4" />
                   <T>Certificates</T>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-gray-100">
+              <DropdownMenuItem asChild className="rounded-[8px] cursor-pointer hover:bg-gray-50 focus:bg-gray-50 text-gray-900">
                 <Link href="/settings">
                   <Settings className="mr-2 h-4 w-4" />
                   <T>Settings</T>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="bg-gray-100" />
               <DropdownMenuItem
                 onClick={logout}
                 disabled={isLoggingOut}
-                className="text-destructive focus:text-destructive rounded-lg cursor-pointer focus:bg-red-50"
+                variant="destructive"
+                className="rounded-[8px] cursor-pointer hover:bg-red-50 focus:bg-red-50 text-red-600 focus:text-red-600"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 {isLoggingOut ? <T>Signing out...</T> : <T>Sign out</T>}

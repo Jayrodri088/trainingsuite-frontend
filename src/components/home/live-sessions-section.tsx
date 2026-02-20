@@ -28,8 +28,8 @@ export function LiveSessionsSection({
           <div className="max-w-2xl">
             <div className="flex items-center gap-3 mb-4">
               {hasLiveNow && (
-                <Badge className="bg-red-600 text-white font-bold rounded-none border-0 uppercase text-[10px] tracking-wider animate-pulse">
-                  <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block animate-pulse" />
+                <Badge className="bg-red-600 text-white font-bold rounded-[9999px] border-0 uppercase text-[10px] tracking-wider animate-pulse">
+                  <span className="mr-1.5 h-1.5 w-1.5 rounded-[9999px] bg-white inline-block animate-pulse" />
                   <T>Live Now</T>
                 </Badge>
               )}

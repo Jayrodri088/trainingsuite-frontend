@@ -214,18 +214,18 @@ function CommunityPageContent() {
     };
     
     return (
-      <Card className="hover:shadow-md transition-all border-border bg-card">
+      <Card className="hover:shadow-md transition-all border border-gray-200 rounded-[12px] bg-white text-gray-900 shadow-sm">
         <CardContent className="p-0">
           <div className="flex">
             {/* Vote Section */}
-            <div className="flex flex-col items-center justify-center py-4 px-2 sm:px-4 bg-muted/30 border-r border-border min-w-[60px] sm:min-w-[80px]">
+            <div className="flex flex-col items-center justify-center py-4 px-2 sm:px-4 bg-gray-50 border-r border-gray-200 min-w-[60px] sm:min-w-[80px] rounded-l-[12px]">
               <Button 
                 variant="ghost" 
                 size="sm"
-                className={`h-auto py-2 px-2 sm:px-3 flex flex-col sm:flex-row items-center gap-1 ${
+                className={`h-auto py-2 px-2 sm:px-3 rounded-[8px] flex flex-col sm:flex-row items-center gap-1 ${
                   isLiked 
                     ? "text-primary bg-primary/10" 
-                    : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+                    : "text-gray-600 hover:text-primary hover:bg-primary/10"
                 }`}
                 onClick={handleVote}
                 title={t(isLiked ? "Remove upvote" : "Upvote this question")}
@@ -233,7 +233,7 @@ function CommunityPageContent() {
                 <ThumbsUp className={`h-4 w-4 sm:h-5 sm:w-5 ${isLiked ? "fill-primary" : ""}`} />
                 <span className="text-xs sm:text-sm font-semibold">{displayCount}</span>
               </Button>
-              <span className="text-[10px] text-muted-foreground mt-1 hidden sm:block">
+              <span className="text-[10px] text-gray-500 mt-1 hidden sm:block">
                 {isLiked ? t("Upvoted") : t("Upvote")}
               </span>
             </div>
@@ -241,7 +241,7 @@ function CommunityPageContent() {
             {/* Content Section */}
             <div className="flex-1 p-4">
               <Link href={`/forums/${(post as any).forumId || forumInfo?._id}/posts/${post._id}`}>
-                <h3 className="font-sans font-bold text-black text-base hover:text-[#0052CC] transition-colors mb-2 line-clamp-2">
+                <h3 className="font-sans font-bold text-gray-900 text-base hover:text-[#0052CC] transition-colors mb-2 line-clamp-2">
                   {post.title}
                 </h3>
               </Link>
@@ -254,16 +254,16 @@ function CommunityPageContent() {
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
+                    <Avatar className="h-6 w-6 rounded-[9999px]">
                       <AvatarImage src={author?.avatar} />
-                      <AvatarFallback className="text-xs font-sans bg-[#0052CC]/10 text-[#0052CC]">
+                      <AvatarFallback className="text-xs font-sans bg-primary/10 text-primary rounded-[9999px]">
                         {getInitials(author?.name || "?")}
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-xs font-sans text-gray-600">{author?.name || "Anonymous"}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">•</span>
-                  <span className="text-xs font-sans text-gray-600 flex items-center gap-1">
+                  <span className="text-xs text-gray-400">•</span>
+                  <span className="text-xs font-sans text-gray-500 flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {formatDistanceToNow(parseISO(post.createdAt), { addSuffix: true })}
                   </span>
@@ -271,11 +271,11 @@ function CommunityPageContent() {
 
                 <div className="flex items-center gap-3">
                   {forumInfo && (
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs rounded-[6px] border-gray-300 text-gray-700">
                       {forumInfo.title}
                     </Badge>
                   )}
-                  <div className="flex items-center gap-1 text-xs font-sans text-gray-600">
+                  <div className="flex items-center gap-1 text-xs font-sans text-gray-500">
                     <MessageCircle className="h-3.5 w-3.5" />
                     <span>{post.commentCount || 0} <T>answers</T></span>
                   </div>

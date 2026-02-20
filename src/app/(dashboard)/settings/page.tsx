@@ -173,31 +173,31 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="bg-transparent border-b border-gray-200 w-full justify-start rounded-none h-auto p-0 gap-4 sm:gap-8 overflow-x-auto flex-nowrap">
+        <TabsList className="bg-gray-100 border border-gray-200 w-full justify-start rounded-[10px] h-auto p-1 gap-1 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="profile"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-3 font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black transition-none shrink-0"
+            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
             <User className="h-4 w-4 mr-2" />
             <T>Profile</T>
           </TabsTrigger>
           <TabsTrigger
             value="security"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-3 font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black transition-none shrink-0"
+            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
             <Lock className="h-4 w-4 mr-2" />
             <T>Security</T>
           </TabsTrigger>
           <TabsTrigger
             value="notifications"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-3 font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black transition-none shrink-0"
+            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
             <Bell className="h-4 w-4 mr-2" />
             <T>Alerts</T>
           </TabsTrigger>
           <TabsTrigger
             value="preferences"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-3 font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black transition-none shrink-0"
+            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
             <Globe className="h-4 w-4 mr-2" />
             <T>Preferences</T>

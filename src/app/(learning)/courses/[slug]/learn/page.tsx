@@ -169,16 +169,16 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
           </div>
 
           <Tabs defaultValue="content" className="flex-1">
-            <TabsList className="w-full justify-start rounded-none border-b border-gray-200 bg-transparent h-12 px-4 overflow-x-auto flex-nowrap gap-2">
-              <TabsTrigger value="content" className="shrink-0 data-[state=active]:border-b-2 data-[state=active]:border-[#0052CC] data-[state=active]:text-[#0052CC] rounded-none font-sans font-medium text-gray-600 data-[state=active]:font-semibold">
+            <TabsList className="w-full justify-start rounded-[10px] border border-gray-200 bg-gray-100 h-12 px-4 overflow-x-auto flex-nowrap gap-2">
+              <TabsTrigger value="content" className="shrink-0 rounded-md data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm font-sans font-medium text-gray-600 data-[state=active]:font-semibold">
                 <BookOpen className="h-4 w-4 mr-2" />
                 <T>Content</T>
               </TabsTrigger>
-              <TabsTrigger value="discussion" className="shrink-0 data-[state=active]:border-b-2 data-[state=active]:border-[#0052CC] data-[state=active]:text-[#0052CC] rounded-none font-sans font-medium text-gray-600 data-[state=active]:font-semibold">
+              <TabsTrigger value="discussion" className="shrink-0 rounded-[8px] font-sans font-medium text-gray-600 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm">
                 <MessageSquare className="h-4 w-4 mr-2" />
                 <T>Discussion</T>
               </TabsTrigger>
-              <TabsTrigger value="notes" className="shrink-0 data-[state=active]:border-b-2 data-[state=active]:border-[#0052CC] data-[state=active]:text-[#0052CC] rounded-none font-sans font-medium text-gray-600 data-[state=active]:font-semibold">
+              <TabsTrigger value="notes" className="shrink-0 rounded-[8px] font-sans font-medium text-gray-600 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm">
                 <FileText className="h-4 w-4 mr-2" />
                 <T>Notes</T>
               </TabsTrigger>

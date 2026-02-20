@@ -250,24 +250,24 @@ export default function MyCoursesPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="bg-transparent border-b border-gray-200 w-full justify-start rounded-none h-auto p-0 gap-4 sm:gap-6 overflow-x-auto flex-nowrap">
+        <TabsList className="bg-gray-100 border border-gray-200 w-full justify-start rounded-[10px] h-auto p-1 gap-1 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="all"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-2 -mb-px font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black shrink-0"
+            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
-            <T>All</T> <Badge variant="secondary" className="ml-2 rounded-[8px] text-[10px] bg-gray-100 text-gray-600">{filteredEnrollments.length}</Badge>
+            <T>All</T> <Badge className="ml-2 rounded-[6px] bg-gray-200 text-gray-700 border-0 text-[10px]">{filteredEnrollments.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="in-progress"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-2 -mb-px font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black shrink-0"
+            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
-            <T>In Progress</T> <Badge variant="secondary" className="ml-2 rounded-[8px] text-[10px] bg-gray-100 text-gray-600">{activeEnrollments.length}</Badge>
+            <T>In Progress</T> <Badge className="ml-2 rounded-[6px] bg-gray-200 text-gray-700 border-0 text-[10px]">{activeEnrollments.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="completed"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#0052CC] data-[state=active]:bg-transparent px-0 pb-2 -mb-px font-sans font-semibold text-sm text-gray-600 data-[state=active]:text-black shrink-0"
+            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
-            <T>Completed</T> <Badge variant="secondary" className="ml-2 rounded-[8px] text-[10px] bg-gray-100 text-gray-600">{completedEnrollments.length}</Badge>
+            <T>Completed</T> <Badge className="ml-2 rounded-[6px] bg-gray-200 text-gray-700 border-0 text-[10px]">{completedEnrollments.length}</Badge>
           </TabsTrigger>
         </TabsList>
 

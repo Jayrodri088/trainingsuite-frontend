@@ -37,12 +37,12 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
 
           <div className="absolute top-3 right-3 z-10">
             {isLive ? (
-              <Badge className="bg-red-600 text-white font-bold rounded-none border-0 uppercase text-[10px] tracking-wider animate-pulse">
-                <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block animate-pulse" />
+              <Badge className="bg-red-600 text-white font-bold rounded-[9999px] border-0 uppercase text-[10px] tracking-wider animate-pulse">
+                <span className="mr-1.5 h-1.5 w-1.5 rounded-[9999px] bg-white inline-block animate-pulse" />
                 <T>Live Now</T>
               </Badge>
             ) : isScheduled ? (
-              <Badge variant="outline" className="bg-background text-foreground font-medium rounded-none border-foreground/10 text-xs tracking-wide">
+              <Badge variant="outline" className="bg-background text-foreground font-medium rounded-[9999px] border-foreground/10 text-xs tracking-wide">
                 <T>Upcoming</T>
               </Badge>
             ) : null}
@@ -50,7 +50,7 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
 
           {isLive && session.attendeeCount > 0 && (
             <div className="absolute bottom-3 left-3 z-10">
-              <Badge variant="secondary" className="bg-black/60 text-white rounded-none border-0 text-xs">
+              <Badge variant="secondary" className="bg-black/60 text-white rounded-[9999px] border-0 text-xs">
                 <Users className="h-3 w-3 mr-1" />
                 {session.attendeeCount} <T>watching</T>
               </Badge>
@@ -81,7 +81,7 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
 
           <div className="mt-auto pt-4">
             {isLive ? (
-              <Button className="w-full rounded-none h-9 text-xs uppercase tracking-wide bg-red-600 hover:bg-red-700 text-white">
+              <Button className="w-full rounded-[10px] h-9 text-xs uppercase tracking-wide bg-red-600 hover:bg-red-700 text-white">
                 <Radio className="h-3 w-3 mr-2 animate-pulse" />
                 <T>Join Live</T>
               </Button>

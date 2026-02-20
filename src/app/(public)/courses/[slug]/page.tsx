@@ -62,7 +62,7 @@ function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean })
   return (
     <div className="flex items-center justify-between py-2 px-3 rounded hover:bg-muted/50">
       <div className="flex items-center gap-3">
-        <div className="text-muted-foreground">{getIcon()}</div>
+        <div className="text-gray-500">{getIcon()}</div>
         <span className="text-sm">{t(lesson.title)}</span>
         {lesson.isFree && !isLocked && (
           <Badge variant="outline" className="text-xs">
@@ -70,7 +70,7 @@ function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean })
           </Badge>
         )}
       </div>
-      <div className="flex items-center gap-2 text-muted-foreground">
+      <div className="flex items-center gap-2 text-gray-500">
         {lesson.duration && lesson.duration > 0 && (
           <span className="text-xs">{lesson.duration} <T>min</T></span>
         )}
@@ -94,7 +94,7 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
           </div>
           <div>
             <h4 className="font-medium text-sm">{t(module.title)}</h4>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-xs text-gray-600 mt-0.5">
               {lessons.length} <T>lessons</T>{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
             </p>
           </div>
@@ -120,7 +120,7 @@ function RatingBar({ rating, percentage }: { rating: number; percentage: number 
     <div className="flex items-center gap-2">
       <span className="text-sm w-12">{rating} <T>star</T></span>
       <Progress value={percentage} className="h-2 flex-1" />
-      <span className="text-sm text-muted-foreground w-10">{percentage}%</span>
+      <span className="text-sm text-gray-600 w-10">{percentage}%</span>
     </div>
   );
 }
@@ -227,7 +227,7 @@ function ReviewForm({
           ))}
         </div>
         {existingReview.review && (
-          <p className="text-sm text-muted-foreground">{existingReview.review}</p>
+          <p className="text-sm text-gray-600">{existingReview.review}</p>
         )}
       </div>
     );
@@ -239,11 +239,11 @@ function ReviewForm({
         {existingReview ? <T>Update your review</T> : <T>Leave a review</T>}
       </h4>
       <div className="mb-4">
-        <p className="text-sm text-muted-foreground mb-2"><T>Your rating</T></p>
+        <p className="text-sm text-gray-600 mb-2"><T>Your rating</T></p>
         <StarRatingInput value={rating} onChange={setRating} />
       </div>
       <div className="mb-4">
-        <p className="text-sm text-muted-foreground mb-2"><T>Your review (optional)</T></p>
+        <p className="text-sm text-gray-600 mb-2"><T>Your review (optional)</T></p>
         <Textarea
           value={review}
           onChange={(e) => setReview(e.target.value)}
@@ -412,7 +412,7 @@ export default function CourseDetailPage({
     return (
       <div className="container max-w-6xl py-12 sm:py-16 px-4 sm:px-6 text-center">
         <h1 className="text-xl sm:text-2xl font-bold"><T>Course not found</T></h1>
-        <p className="text-sm sm:text-base text-muted-foreground mt-2">
+        <p className="text-sm sm:text-base text-gray-600 mt-2">
           <T>The course you are looking for does not exist or has been removed.</T>
         </p>
         <Button className="mt-4 sm:mt-6" onClick={() => router.push("/courses")}>
@@ -466,82 +466,80 @@ export default function CourseDetailPage({
   );
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <div className="bg-linear-to-br from-slate-900 to-slate-800 text-white">
-        <div className="container max-w-6xl py-6 sm:py-12 px-4 sm:px-6">
-          <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
-            <div className="lg:col-span-2 order-2 lg:order-1">
+    <div className="min-h-screen bg-background">
+      {/* Dark hero section – sharp structure: radius, spacing, clear hierarchy */}
+      <div className="bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white border-b border-white/10">
+        <div className="container max-w-6xl py-8 sm:py-12 px-4 sm:px-6">
+          <div className="grid lg:grid-cols-3 gap-8 lg:gap-10">
+            <div className="lg:col-span-2 order-2 lg:order-1 space-y-5">
               <Button
                 variant="ghost"
                 size="sm"
-                className="mb-3 sm:mb-4 text-slate-300 hover:text-white hover:bg-white/10"
+                className="rounded-[10px] text-slate-200 hover:text-white hover:bg-white/10 border border-white/20 hover:border-white/30 h-9 px-3"
                 onClick={() => router.push("/courses")}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 <T>All Courses</T>
               </Button>
 
-              <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
-                <Badge className={levelColors[course.level as keyof typeof levelColors] || "bg-gray-100 text-gray-800"}>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className={`rounded-[9999px] ${levelColors[course.level as keyof typeof levelColors] || "bg-slate-600 text-white"}`}>
                   {t(course.level || "beginner")}
                 </Badge>
                 {(course.price || 0) > 0 && (
-                  <Badge className="bg-emerald-600 hover:bg-emerald-600">
+                  <Badge className="rounded-[9999px] bg-emerald-600 text-white border-0">
                     {(course.currency || "USD").toUpperCase()} {Number(course.price || 0).toFixed(2)}
                   </Badge>
                 )}
                 {course.category && typeof course.category === "object" && (
-                  <Badge variant="outline" className="border-slate-500 text-slate-300">
+                  <Badge variant="outline" className="rounded-[9999px] border-slate-400 text-slate-200">
                     {t(course.category.name)}
                   </Badge>
                 )}
                 {isEnrolled && (
-                  <Badge className={isCompleted ? "bg-green-600 hover:bg-green-600" : "bg-blue-600 hover:bg-blue-600"}>
-                    {isCompleted ? <T>Completed</T> : <>{enrollmentProgress}% <T>Complete</T></>}
+<Badge className={`rounded-[9999px] ${isCompleted ? "bg-green-600" : "bg-primary"} text-white`}>
+                  {isCompleted ? <T>Completed</T> : <>{enrollmentProgress}% <T>Complete</T></>}
                   </Badge>
                 )}
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3 sm:mb-4">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">
                 {t(course.title)}
               </h1>
 
-              <p className="text-slate-300 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6">
+              <p className="text-slate-200 text-base sm:text-lg leading-relaxed max-w-2xl">
                 {t(course.description || "")}
               </p>
 
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm">
-                <div className="flex items-center gap-1 text-amber-400">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
+                <div className="flex items-center gap-1.5 text-amber-400">
                   <Star className="h-4 w-4 fill-current" />
-                  <span className="font-semibold">{course.rating?.toFixed(1) || "N/A"}</span>
-                  <span className="text-slate-400">({course.ratingCount || 0} <T>ratings</T>)</span>
+                  <span className="font-semibold text-white">{course.rating?.toFixed(1) || "N/A"}</span>
+                  <span className="text-slate-300">({course.ratingCount || 0} <T>ratings</T>)</span>
                 </div>
-                <div className="flex items-center gap-1 text-slate-300">
+                <div className="flex items-center gap-1.5 text-slate-200">
                   <Users className="h-4 w-4" />
                   <span>{(course.enrollmentCount || 0).toLocaleString()} <T>students</T></span>
                 </div>
                 {course.language && (
-                  <div className="flex items-center gap-1 text-slate-300">
+                  <div className="flex items-center gap-1.5 text-slate-200">
                     <Globe className="h-4 w-4" />
                     <span>{course.language}</span>
                   </div>
                 )}
                 {course.updatedAt && (
-                  <div className="flex items-center gap-1 text-slate-300">
+                  <div className="flex items-center gap-1.5 text-slate-200">
                     <Calendar className="h-4 w-4" />
                     <span><T>Updated</T> {new Date(course.updatedAt).toLocaleDateString()}</span>
                   </div>
                 )}
               </div>
-
             </div>
 
-            {/* Enrollment Card */}
+            {/* Enrollment Card – rounded corners, clear border */}
             <div className="lg:row-span-2 order-1 lg:order-2">
-              <Card className="lg:sticky lg:top-24 shadow-lg">
-                {/* Preview Image */}
-                <div className="aspect-video bg-linear-to-br from-violet-500 to-purple-600 rounded-t-lg relative overflow-hidden">
+              <Card className="lg:sticky lg:top-24 rounded-[12px] border border-white/20 bg-slate-800/90 shadow-xl overflow-hidden">
+                <div className="aspect-video bg-slate-900 rounded-t-[12px] relative overflow-hidden">
                   {normalizeUploadUrl(course.thumbnail) && (
                     <Image
                       src={normalizeUploadUrl(course.thumbnail)!}
@@ -552,35 +550,33 @@ export default function CourseDetailPage({
                     />
                   )}
                 </div>
-                <CardContent className="p-6">
+                <CardContent className="p-6 bg-slate-800/95">
                   {isEnrolled ? (
-                    <div className="space-y-3">
-                      {/* Enrollment Status Badge */}
+                    <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <Badge className={isCompleted ? "bg-green-600" : "bg-blue-600"}>
+                        <Badge className={`rounded-[9999px] ${isCompleted ? "bg-green-600" : "bg-primary"} text-white`}>
                           {isCompleted ? <T>Completed</T> : <T>In Progress</T>}
                         </Badge>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-slate-200">
                           {enrollmentProgress}% <T>complete</T>
                         </span>
                       </div>
 
-                      {/* Progress Bar */}
-                      <div className="w-full bg-muted rounded-full h-2">
+                      <div className="w-full bg-slate-700 rounded-[9999px] h-2 overflow-hidden">
                         <div
-                          className={`h-2 rounded-full transition-all ${isCompleted ? "bg-green-500" : "bg-primary"}`}
+                          className="h-2 rounded-[9999px] bg-primary transition-all"
                           style={{ width: `${Math.min(enrollmentProgress, 100)}%` }}
                         />
                       </div>
 
-                      <Button size="lg" className={`w-full ${isCompleted ? "bg-green-600 hover:bg-green-700" : ""}`} onClick={handleGoToLearning}>
+                      <Button size="lg" className="w-full rounded-[10px]" onClick={handleGoToLearning}>
                         {isCompleted ? <T>Review Course</T> : <T>Continue Learning</T>}
                       </Button>
                     </div>
                   ) : (
                     <Button
                       size="lg"
-                      className="w-full mb-3"
+                      className="w-full mb-3 rounded-[10px]"
                       onClick={handleEnroll}
                       disabled={enrollMutation.isPending || initializePaymentMutation.isPending}
                     >
@@ -589,27 +585,27 @@ export default function CourseDetailPage({
                     </Button>
                   )}
 
-                  <div className="mt-6 space-y-3">
-                    <h4 className="font-semibold text-sm"><T>This course includes:</T></h4>
-                    <ul className="space-y-2 text-sm">
+                  <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
+                    <h4 className="font-semibold text-sm text-white"><T>This course includes:</T></h4>
+                    <ul className="space-y-2.5 text-sm text-slate-200">
                       <li className="flex items-center gap-2">
-                        <Video className="h-4 w-4 text-muted-foreground" />
+                        <Video className="h-4 w-4 shrink-0 text-slate-300" />
                         <span>{totalDuration > 0 ? <>{totalDuration} <T>min of video</T></> : <T>Video content</T>}</span>
                       </li>
                       <li className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4 text-muted-foreground" />
+                        <BookOpen className="h-4 w-4 shrink-0 text-slate-300" />
                         <span>{totalLessons} <T>lessons</T></span>
                       </li>
                       <li className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        <FileText className="h-4 w-4 shrink-0 text-slate-300" />
                         <span><T>Downloadable resources</T></span>
                       </li>
                       <li className="flex items-center gap-2">
-                        <Award className="h-4 w-4 text-muted-foreground" />
+                        <Award className="h-4 w-4 shrink-0 text-slate-300" />
                         <span><T>Certificate of completion</T></span>
                       </li>
                       <li className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <Clock className="h-4 w-4 shrink-0 text-slate-300" />
                         <span><T>Full lifetime access</T></span>
                       </li>
                     </ul>
@@ -622,11 +618,11 @@ export default function CourseDetailPage({
       </div>
 
       {/* Course Content */}
-      <div className="container max-w-6xl py-6 sm:py-8 px-4 sm:px-6">
+      <div className="container max-w-6xl py-6 sm:py-8 px-4 sm:px-6 bg-background">
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="lg:col-span-2">
             <Tabs defaultValue="curriculum" className="w-full">
-              <TabsList className="mb-4 sm:mb-6 w-full justify-start overflow-x-auto flex-nowrap gap-1 sm:gap-2 h-auto p-1">
+              <TabsList className="mb-4 sm:mb-6 w-full justify-start overflow-x-auto flex-nowrap gap-1 sm:gap-2 h-auto p-1 rounded-[8px] bg-gray-100 border border-gray-200">
                 <TabsTrigger value="curriculum" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Curriculum</T></TabsTrigger>
                 <TabsTrigger value="overview" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Overview</T></TabsTrigger>
                 <TabsTrigger value="reviews" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Reviews</T></TabsTrigger>
@@ -637,7 +633,7 @@ export default function CourseDetailPage({
                   <CardHeader className="pb-4 px-4 sm:px-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                       <CardTitle className="text-base sm:text-lg"><T>Course Content</T></CardTitle>
-                      <p className="text-xs sm:text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-gray-600">
                         {modules.length} <T>modules</T> &bull; {totalLessons} <T>lessons</T>{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
                       </p>
                     </div>
@@ -655,7 +651,7 @@ export default function CourseDetailPage({
                         ))}
                       </Accordion>
                     ) : (
-                      <p className="text-center py-8 text-muted-foreground">
+                      <p className="text-center py-8 text-gray-600">
                         <T>Curriculum coming soon.</T>
                       </p>
                     )}
@@ -679,7 +675,7 @@ export default function CourseDetailPage({
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-muted-foreground"><T>No course outcomes specified.</T></p>
+                      <p className="text-gray-600"><T>No course outcomes specified.</T></p>
                     )}
 
                     {course.requirements && course.requirements.length > 0 && (
@@ -688,7 +684,7 @@ export default function CourseDetailPage({
                         <ul className="space-y-2">
                           {course.requirements.map((req: string, index: number) => (
                             <li key={index} className="flex items-start gap-2">
-                              <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+                              <ChevronRight className="h-5 w-5 text-gray-500 shrink-0" />
                               <span className="text-sm">{t(req)}</span>
                             </li>
                           ))}
@@ -722,7 +718,7 @@ export default function CourseDetailPage({
                             />
                           ))}
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-600">
                           <T>Based on</T> {course.ratingCount || 0} <T>reviews</T>
                         </p>
                       </div>
@@ -745,7 +741,7 @@ export default function CourseDetailPage({
                         />
                       ) : isAuthenticated ? (
                         <div className="bg-muted/50 rounded-lg p-4 text-center">
-                          <p className="text-muted-foreground mb-3">
+                          <p className="text-gray-600 mb-3">
                             <T>Enroll in this course to leave a review</T>
                           </p>
                           <Button onClick={handleEnroll}>
@@ -754,7 +750,7 @@ export default function CourseDetailPage({
                         </div>
                       ) : (
                         <div className="bg-muted/50 rounded-lg p-4 text-center">
-                          <p className="text-muted-foreground mb-3">
+                          <p className="text-gray-600 mb-3">
                             <T>Sign in to leave a review</T>
                           </p>
                           <Button asChild>
@@ -780,7 +776,7 @@ export default function CourseDetailPage({
                                 <div className="flex-1">
                                   <div className="flex items-center justify-between">
                                     <h4 className="font-medium">{rating.user?.name || t("Anonymous")}</h4>
-                                    <span className="text-sm text-muted-foreground">
+                                    <span className="text-sm text-gray-600">
                                       {new Date(rating.createdAt).toLocaleDateString()}
                                     </span>
                                   </div>
@@ -796,7 +792,7 @@ export default function CourseDetailPage({
                                     ))}
                                   </div>
                                   {rating.review && (
-                                    <p className="text-sm text-muted-foreground mt-2">
+                                    <p className="text-sm text-gray-600 mt-2">
                                       {rating.review}
                                     </p>
                                   )}
@@ -806,7 +802,7 @@ export default function CourseDetailPage({
                           ))}
                       </div>
                     ) : !userReview ? (
-                      <p className="text-center py-8 text-muted-foreground mt-6">
+                      <p className="text-center py-8 text-gray-600 mt-6">
                         <T>No reviews yet. Be the first to review this course!</T>
                       </p>
                     ) : null}
@@ -855,7 +851,7 @@ function RelatedCourses({
   }
 
   return (
-    <div className="border-t bg-muted/30">
+    <div className="border-t border-border bg-muted/30">
       <div className="container max-w-6xl py-8 sm:py-12 px-4 sm:px-6">
         <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6"><T>Related Courses</T></h2>
         {isLoading ? (
@@ -868,8 +864,8 @@ function RelatedCourses({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {relatedCourses.map((course: Course) => (
               <Link key={course._id} href={`/courses/${course.slug}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
-                  <div className="aspect-video bg-linear-to-br from-violet-500 to-purple-600 relative">
+                <Card className="overflow-hidden rounded-[12px] hover:shadow-lg transition-shadow h-full">
+                  <div className="aspect-video rounded-t-[12px] bg-gray-100 relative overflow-hidden">
                     {normalizeUploadUrl(course.thumbnail) ? (
                       <Image
                         src={normalizeUploadUrl(course.thumbnail)!}
@@ -886,7 +882,7 @@ function RelatedCourses({
                   </div>
                   <CardContent className="p-3 sm:p-4">
                     <h3 className="font-semibold line-clamp-2 mb-2 text-sm sm:text-base">{t(course.title)}</h3>
-                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-2">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-2">
                       <div className="flex items-center gap-1">
                         <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
                         <span>{course.rating?.toFixed(1) || "N/A"}</span>

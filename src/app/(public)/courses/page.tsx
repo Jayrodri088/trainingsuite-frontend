@@ -151,7 +151,7 @@ function CoursesContent() {
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon"
-                className={`rounded-none h-9 w-9 ${viewMode === "grid" ? "bg-[#0052CC]/10 text-[#0052CC]" : "text-gray-600 hover:bg-gray-100"}`}
+                className={`rounded-[10px] h-9 w-9 ${viewMode === "grid" ? "bg-[#0052CC]/10 text-[#0052CC]" : "text-gray-600 hover:bg-gray-100"}`}
               onClick={() => setViewMode("grid")}
             >
               <Grid3X3 className="h-4 w-4" />
@@ -159,7 +159,7 @@ function CoursesContent() {
             <Button
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="icon"
-                className={`rounded-none h-9 w-9 ${viewMode === "list" ? "bg-[#0052CC]/10 text-[#0052CC]" : "text-gray-600 hover:bg-gray-100"}`}
+                className={`rounded-[10px] h-9 w-9 ${viewMode === "list" ? "bg-[#0052CC]/10 text-[#0052CC]" : "text-gray-600 hover:bg-gray-100"}`}
               onClick={() => setViewMode("list")}
             >
               <List className="h-4 w-4" />
