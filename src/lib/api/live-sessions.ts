@@ -1,6 +1,16 @@
 import { apiClient } from "./client";
 import type { ApiResponse, PaginatedResponse, LiveSession, LiveAttendance } from "@/types";
 
+export interface LiveSessionReminder {
+  _id: string;
+  session: string | { _id: string; title?: string; scheduledAt?: string };
+  user: string;
+  remindAt: string;
+  sentAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const liveSessionsApi = {
   getAll: async (page = 1, limit = 10, status?: string) => {
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
@@ -76,6 +86,28 @@ export const liveSessionsApi = {
   recordAttendance: async (id: string) => {
     const response = await apiClient.post<ApiResponse<LiveAttendance>>(
       `/live-sessions/${id}/attendance`
+    );
+    return response.data;
+  },
+
+  getReminder: async (sessionId: string) => {
+    const response = await apiClient.get<ApiResponse<LiveSessionReminder | null>>(
+      `/live-sessions/${sessionId}/reminders`
+    );
+    return response.data;
+  },
+
+  setReminder: async (sessionId: string, minutesBefore: 15 | 60 | 1440) => {
+    const response = await apiClient.post<ApiResponse<LiveSessionReminder>>(
+      `/live-sessions/${sessionId}/reminders`,
+      { minutesBefore }
+    );
+    return response.data;
+  },
+
+  removeReminder: async (sessionId: string) => {
+    const response = await apiClient.delete<ApiResponse<null>>(
+      `/live-sessions/${sessionId}/reminders`
     );
     return response.data;
   },

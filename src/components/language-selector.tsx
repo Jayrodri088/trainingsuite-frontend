@@ -18,17 +18,21 @@ export function LanguageSelector() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 [&_svg]:text-gray-600 [&_svg]:hover:text-gray-900"
+        >
           {isTranslating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Globe className="h-4 w-4" />
           )}
-          <span className="hidden sm:inline">{currentLang?.name || 'English'}</span>
-          <span className="sm:hidden">{currentLang?.code.toUpperCase() || 'EN'}</span>
+          <span className="hidden sm:inline font-medium">{currentLang?.name || 'English'}</span>
+          <span className="sm:hidden font-medium">{currentLang?.code.toUpperCase() || 'EN'}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48 max-h-80 overflow-y-auto">
+      <DropdownMenuContent align="end" className="w-48 max-h-80 overflow-y-auto rounded-[12px] border border-gray-200 bg-white text-gray-900 shadow-lg">
         {supportedLanguages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}

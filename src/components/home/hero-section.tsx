@@ -10,10 +10,10 @@ interface HeroSectionProps {
 }
 
 const HERO_IMAGES = [
-  "/Images/course-1.png",
+  "/Images/course-2.png",
   "/Images/course.png",
-  "/Images/course-1.png",
-  "/Images/course.png",
+  "/Images/course-3.png",
+  "/Images/course-4.png",
 ] as const;
 
 export function HeroSection({ isAuthenticated }: HeroSectionProps) {
@@ -43,7 +43,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
           {isAuthenticated ? (
             <Button
               asChild
-              className="rounded-[10px] h-12 px-8 text-sm font-bold bg-[#0052CC] hover:bg-[#003d99] text-white border-0 uppercase tracking-wide w-full sm:w-auto"
+              className="rounded-lg h-12 px-8 text-sm font-bold bg-[#0052CC] hover:bg-[#003d99] text-white border-0 uppercase tracking-wide w-full sm:w-auto"
               size="lg"
             >
               <Link href="/dashboard"><T>Access Dashboard</T></Link>
@@ -51,7 +51,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
           ) : (
             <Button
               asChild
-              className="rounded-[10px] h-12 px-8 text-sm font-bold bg-[#0052CC] hover:bg-[#003d99] text-white border-0 uppercase tracking-wide w-full sm:w-auto"
+              className="rounded-lg h-12 px-8 text-sm font-bold bg-[#0052CC] hover:bg-[#003d99] text-white border-0 uppercase tracking-wide w-full sm:w-auto"
               size="lg"
             >
               <Link href="/register"><T>Begin Training</T></Link>
@@ -61,7 +61,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
             asChild
             variant="outline"
             size="lg"
-            className="rounded-[10px] h-12 px-8 text-sm font-semibold bg-white! text-gray-800! hover:bg-gray-50! border border-gray-300 uppercase tracking-wide w-full sm:w-auto"
+            className="rounded-lg h-12 px-8 text-sm font-semibold bg-white! text-gray-800! hover:bg-gray-50! border border-gray-300 uppercase tracking-wide w-full sm:w-auto"
           >
             <Link href="/courses"><T>View Curriculum</T></Link>
           </Button>
@@ -73,7 +73,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
             {[...HERO_IMAGES, ...HERO_IMAGES].map((src, i) => (
               <div
                 key={i}
-                className="relative shrink-0 w-[220px] sm:w-[260px] md:w-[300px] aspect-4/3 rounded-[12px] overflow-hidden border-2 border-white/40 bg-white/5 shadow-lg"
+                className="relative shrink-0 w-[220px] sm:w-[260px] md:w-[300px] aspect-4/3 rounded-xl overflow-hidden border-2 border-white/40 bg-white/5 shadow-lg"
               >
                 <Image
                   src={src}

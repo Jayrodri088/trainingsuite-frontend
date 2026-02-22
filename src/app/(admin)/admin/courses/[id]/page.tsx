@@ -74,6 +74,7 @@ import { categoriesApi } from "@/lib/api/categories";
 import { uploadApi } from "@/lib/api/upload";
 import { getVideoDuration } from "@/lib/utils";
 import type { Module, Lesson, CourseLevel, Material } from "@/types";
+import { REGISTRATION_NETWORKS } from "@/lib/validations/auth";
 
 export default function AdminCourseEditorPage({
   params,
@@ -853,6 +854,26 @@ export default function AdminCourseEditorPage({
                       <SelectItem value="beginner">Beginner</SelectItem>
                       <SelectItem value="intermediate">Intermediate</SelectItem>
                       <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Network</Label>
+                  <Select
+                    value={course.network ?? ""}
+                    onValueChange={(value) =>
+                      updateCourseMutation.mutate({ network: value || undefined })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select network (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {REGISTRATION_NETWORKS.map((net) => (
+                        <SelectItem key={net} value={net}>
+                          {net}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

@@ -18,7 +18,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { registerSchema, type RegisterFormData } from "@/lib/validations/auth";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { registerSchema, REGISTRATION_NETWORKS, type RegisterFormData } from "@/lib/validations/auth";
 import { authApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "sonner";
@@ -58,6 +65,7 @@ export default function RegisterPage() {
     defaultValues: {
       name: "",
       email: "",
+      network: REGISTRATION_NETWORKS[0],
       password: "",
       confirmPassword: "",
     },
@@ -78,6 +86,7 @@ export default function RegisterPage() {
       const response = await authApi.register({
         name: data.name,
         email: data.email,
+        network: data.network,
         password: data.password,
         confirmPassword: data.confirmPassword,
       });
@@ -94,7 +103,7 @@ export default function RegisterPage() {
           const fieldErrors = errorData.errors;
 
           Object.entries(fieldErrors).forEach(([field, messages]) => {
-            if (field === "name" || field === "email" || field === "password" || field === "confirmPassword") {
+            if (field === "name" || field === "email" || field === "network" || field === "password" || field === "confirmPassword") {
               form.setError(field as keyof RegisterFormData, {
                 type: "server",
                 message: messages.join(". "),
@@ -170,6 +179,35 @@ export default function RegisterPage() {
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="network"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel><T>Network</T></FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={isLoading}
+                >
+                  <FormControl>
+                    <SelectTrigger className="rounded-[10px] h-11 border-gray-200 w-full">
+                      <SelectValue placeholder={t("Select your network")} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {REGISTRATION_NETWORKS.map((network) => (
+                      <SelectItem key={network} value={network}>
+                        {network}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

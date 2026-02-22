@@ -68,7 +68,7 @@ function CoursesContent() {
     return map;
   }, [enrollmentsResponse?.data]);
 
-  const activeFiltersCount = [filters.category, filters.level, filters.language].filter(Boolean).length;
+  const activeFiltersCount = [filters.category, filters.network, filters.language].filter(Boolean).length;
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">

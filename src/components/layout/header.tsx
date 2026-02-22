@@ -65,6 +65,7 @@ export function Header() {
 
   const navItems = [
     { label: t("Home"), href: "/", icon: null },
+    { label: t("About"), href: "/about", icon: null },
     { label: t("Curriculum"), href: "/courses", icon: BookOpen },
     { label: t("Mentorship"), href: "/live-sessions", icon: Users },
   ];

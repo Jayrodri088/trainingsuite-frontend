@@ -26,8 +26,10 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PageLoader } from "@/components/ui/page-loader";
+import { SetReminderDialog } from "@/components/live-sessions/set-reminder-dialog";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { getInitials } from "@/lib/utils";
 import { LivestreamPlayer, detectStreamType } from "@/components/livestream";
@@ -42,9 +44,11 @@ export default function LiveSessionDetailPage() {
   const { t } = useT();
   const queryClient = useQueryClient();
   const sessionId = params.id as string;
+  const auth = useAuth();
   const [countdown, setCountdown] = useState<string | null>(null);
   const [hasJoined, setHasJoined] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [showReminderDialog, setShowReminderDialog] = useState(false);
 
   const { data: sessionData, isLoading, refetch } = useQuery({
     queryKey: ["live-session", sessionId],
@@ -321,10 +325,32 @@ export default function LiveSessionDetailPage() {
             {getStatusDisplay()}
           </div>
         </div>
-        <Button variant="outline" size="icon">
-          <Share2 className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {(session.status === "scheduled" || session.status === "live") && auth?.user && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-[10px] border-gray-200 hover:bg-[#0052CC]/10 hover:text-[#0052CC] font-sans font-medium"
+              onClick={() => setShowReminderDialog(true)}
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              <T>Remind me</T>
+            </Button>
+          )}
+          <Button variant="outline" size="icon" className="rounded-[10px]">
+            <Share2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
+
+      {showReminderDialog && (
+        <SetReminderDialog
+          sessionId={sessionId}
+          sessionTitle={session.title}
+          open={showReminderDialog}
+          onOpenChange={setShowReminderDialog}
+        />
+      )}
 
       {/* Video Player */}
       {renderVideoPlayer()}

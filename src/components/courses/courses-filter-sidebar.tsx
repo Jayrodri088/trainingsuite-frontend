@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { CourseFilters } from "@/types";
 import { T, useT } from "@/components/t";
+import { REGISTRATION_NETWORKS } from "@/lib/validations/auth";
+
+export const COURSE_NETWORKS = [...REGISTRATION_NETWORKS];
 
 export const COURSE_LANGUAGES = [
   { code: "en", name: "English" },
@@ -40,12 +43,6 @@ export function CoursesFilterSidebar({
 }) {
   const { t } = useT();
 
-  const levels = [
-    { value: "beginner", label: t("Beginner") },
-    { value: "intermediate", label: t("Intermediate") },
-    { value: "advanced", label: t("Advanced") },
-  ];
-
   return (
     <div className="space-y-6 pb-4">
       {categories.length > 0 && (
@@ -74,23 +71,23 @@ export function CoursesFilterSidebar({
       )}
 
       <div>
-        <h4 className="font-sans font-semibold text-sm text-black mb-3"><T>Level</T></h4>
+        <h4 className="font-sans font-semibold text-sm text-black mb-3"><T>Network</T></h4>
         <div className="space-y-3">
-          {levels.map((level) => (
+          {COURSE_NETWORKS.map((network) => (
             <label
-              key={level.value}
+              key={network}
               className="flex items-center gap-3 cursor-pointer py-1"
             >
               <Checkbox
-                checked={filters.level === level.value}
+                checked={filters.network === network}
                 onCheckedChange={(checked) => {
                   setFilters({
                     ...filters,
-                    level: checked ? (level.value as CourseFilters["level"]) : undefined,
+                    network: checked ? network : undefined,
                   });
                 }}
               />
-              <span className="text-sm font-sans text-gray-600">{level.label}</span>
+              <span className="text-sm font-sans text-gray-600">{t(network)}</span>
             </label>
           ))}
         </div>

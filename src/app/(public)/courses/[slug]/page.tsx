@@ -28,6 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { PageLoader } from "@/components/ui/page-loader";
 import { CourseCardPublicSkeleton } from "@/components/courses/course-card-public";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CourseChatPanel } from "@/components/courses/course-chat-panel";
 import {
   Accordion,
   AccordionContent,
@@ -626,6 +627,7 @@ export default function CourseDetailPage({
                 <TabsTrigger value="curriculum" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Curriculum</T></TabsTrigger>
                 <TabsTrigger value="overview" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Overview</T></TabsTrigger>
                 <TabsTrigger value="reviews" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Reviews</T></TabsTrigger>
+                <TabsTrigger value="course-chat" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Course chat</T></TabsTrigger>
               </TabsList>
 
               <TabsContent value="curriculum" className="mt-0">
@@ -808,6 +810,12 @@ export default function CourseDetailPage({
                     ) : null}
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="course-chat" className="mt-0">
+                <div className="max-w-2xl">
+                  <CourseChatPanel courseIdOrSlug={resolvedParams.slug} />
+                </div>
               </TabsContent>
             </Tabs>
           </div>

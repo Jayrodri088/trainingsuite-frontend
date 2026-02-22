@@ -6,6 +6,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  network?: string;
   avatar?: string;
   bio?: string;
   title?: string;
@@ -41,6 +42,7 @@ export interface Course {
   currency?: string;
   status?: CourseStatus;
   level?: CourseLevel;
+  network?: string;
   language?: string;
   duration?: number;
   enrollmentCount?: number;
@@ -391,6 +393,7 @@ export interface CourseFilters {
   category?: string;
   instructor?: string;
   level?: CourseLevel;
+  network?: string;
   language?: string;
   preferredLanguage?: string; // For sorting - shows preferred language first
   isFree?: boolean;

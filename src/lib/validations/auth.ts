@@ -1,5 +1,16 @@
 import { z } from "zod";
 
+export const REGISTRATION_NETWORKS = [
+  "REON",
+  "TNI",
+  "YOUTHS AGLOW",
+  "SAY YES TO KIDS",
+  "RIM",
+  "RIN",
+  "NOLB",
+  "REACHOUT CAMPAIGNS",
+] as const;
+
 export const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
@@ -11,6 +22,9 @@ export const registerSchema = z.object({
     .min(2, "Name must be at least 2 characters")
     .max(100, "Name must be less than 100 characters"),
   email: z.string().email("Please enter a valid email address"),
+  network: z.enum(REGISTRATION_NETWORKS, {
+    message: "Please select your network",
+  }),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")

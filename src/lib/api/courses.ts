@@ -12,6 +12,7 @@ export interface CreateCourseData {
   title: string;
   description: string;
   category: string;
+  network?: string;
   isFree?: boolean;
   price?: number;
   currency?: string;
@@ -102,4 +103,28 @@ export const coursesApi = {
     );
     return response.data;
   },
+
+  getChat: async (courseIdOrSlug: string, page = 1, limit = 50) => {
+    const response = await apiClient.get<PaginatedResponse<CourseChatMessage>>(
+      `/courses/${courseIdOrSlug}/chat?page=${page}&limit=${limit}`
+    );
+    return response.data;
+  },
+
+  sendChatMessage: async (courseIdOrSlug: string, message: string) => {
+    const response = await apiClient.post<ApiResponse<CourseChatMessage>>(
+      `/courses/${courseIdOrSlug}/chat`,
+      { message }
+    );
+    return response.data;
+  },
 };
+
+export interface CourseChatMessage {
+  _id: string;
+  course: string;
+  user: { _id: string; name?: string; avatar?: string };
+  message: string;
+  createdAt: string;
+  updatedAt: string;
+}

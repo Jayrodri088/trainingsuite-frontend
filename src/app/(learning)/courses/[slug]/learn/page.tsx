@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCourse, useCourseCurriculum, useEnrollment } from "@/hooks";
 import { LessonComments } from "@/components/lessons/lesson-comments";
 import { CourseCompletionDialog } from "@/components/courses/course-completion-dialog";
+import { CourseChatPanel } from "@/components/courses/course-chat-panel";
 import { useToast } from "@/hooks/use-toast";
 import { lessonsApi } from "@/lib/api/lessons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -178,6 +179,10 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
                 <MessageSquare className="h-4 w-4 mr-2" />
                 <T>Discussion</T>
               </TabsTrigger>
+              <TabsTrigger value="course-chat" className="shrink-0 rounded-[8px] font-sans font-medium text-gray-600 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                <T>Course chat</T>
+              </TabsTrigger>
               <TabsTrigger value="notes" className="shrink-0 rounded-[8px] font-sans font-medium text-gray-600 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm">
                 <FileText className="h-4 w-4 mr-2" />
                 <T>Notes</T>
@@ -190,6 +195,9 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
             </TabsContent>
             <TabsContent value="discussion" className="mt-0">
               <LessonComments lessonId={activeLesson?._id || ""} />
+            </TabsContent>
+            <TabsContent value="course-chat" className="mt-0 p-4">
+              <CourseChatPanel courseIdOrSlug={resolvedParams.slug} />
             </TabsContent>
             <TabsContent value="notes" className="mt-0 p-6">
               <div className="text-center py-12">

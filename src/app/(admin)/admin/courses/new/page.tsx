@@ -37,6 +37,7 @@ import { coursesApi, CreateCourseData } from "@/lib/api/courses";
 import { categoriesApi } from "@/lib/api/categories";
 import { uploadApi } from "@/lib/api/upload";
 import type { CourseLevel } from "@/types";
+import { REGISTRATION_NETWORKS } from "@/lib/validations/auth";
 
 export default function AdminCreateCoursePage() {
   const router = useRouter();
@@ -46,6 +47,7 @@ export default function AdminCreateCoursePage() {
     title: "",
     description: "",
     category: "",
+    network: undefined,
     isFree: true,
     price: 0,
     currency: "USD",
@@ -143,6 +145,7 @@ export default function AdminCreateCoursePage() {
       title: formData.title.trim(),
       description: formData.description.trim(),
       category: formData.category,
+      network: formData.network,
       isFree: formData.isFree ?? true,
       price: formData.isFree ? 0 : Number(formData.price || 0),
       currency: (formData.currency || "USD").toUpperCase(),
@@ -294,6 +297,24 @@ export default function AdminCreateCoursePage() {
                         <SelectItem value="beginner">Beginner</SelectItem>
                         <SelectItem value="intermediate">Intermediate</SelectItem>
                         <SelectItem value="advanced">Advanced</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="network">Network</Label>
+                    <Select
+                      value={formData.network ?? ""}
+                      onValueChange={(value) => setFormData({ ...formData, network: value || undefined })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select network (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {REGISTRATION_NETWORKS.map((net) => (
+                          <SelectItem key={net} value={net}>
+                            {net}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

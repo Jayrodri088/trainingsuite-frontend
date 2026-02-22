@@ -13,6 +13,7 @@ import {
   Search,
   History,
   CheckCircle,
+  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,16 +33,20 @@ import {
 } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PageLoader } from "@/components/ui/page-loader";
+import { SetReminderDialog } from "@/components/live-sessions/set-reminder-dialog";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { getInitials, normalizeUploadUrl } from "@/lib/utils";
 import type { LiveSession } from "@/types";
 import { format, parseISO, differenceInMinutes, formatDistanceToNow } from "date-fns";
 import { T, useT } from "@/components/t";
+import { useAuth } from "@/hooks";
 
 export default function LiveSessionsPage() {
   const { t } = useT();
+  const auth = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [reminderSessionId, setReminderSessionId] = useState<string | null>(null);
 
   // Fetch upcoming sessions (scheduled + live)
   const { data: upcomingData, isLoading: isLoadingUpcoming } = useQuery({
@@ -270,20 +275,40 @@ export default function LiveSessionsPage() {
                 </div>
               </CardContent>
 
-              <CardFooter className="pt-0">
+              <CardFooter className="pt-0 flex flex-col gap-2">
                 {session.status === "live" ? (
-                  <Button className="w-full bg-red-600 hover:bg-red-700" asChild>
+                  <Button className="w-full rounded-[10px] bg-red-600 hover:bg-red-700" asChild>
                     <Link href={`/live-sessions/${session._id}`}>
                       <Play className="h-4 w-4 mr-2" />
                       <T>Join Live</T>
                     </Link>
                   </Button>
                 ) : (
-                  <Button className="w-full rounded-[10px] border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] font-semibold" variant="outline" asChild>
-                    <Link href={`/live-sessions/${session._id}`}>
-                      <T>View Details</T>
-                    </Link>
-                  </Button>
+                  <>
+                    <div className="flex gap-2 w-full">
+                      <Button className="flex-1 rounded-[10px] border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] font-semibold" variant="outline" asChild>
+                        <Link href={`/live-sessions/${session._id}`}>
+                          <T>View Details</T>
+                        </Link>
+                      </Button>
+                      {auth?.user && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="rounded-[10px] border-gray-200 hover:bg-[#0052CC]/10 hover:text-[#0052CC] hover:border-[#0052CC]/30 shrink-0"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setReminderSessionId(session._id);
+                          }}
+                          title={t("Set reminder")}
+                        >
+                          <Bell className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </>
                 )}
               </CardFooter>
             </Card>
@@ -379,6 +404,19 @@ export default function LiveSessionsPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {reminderSessionId && (
+        <SetReminderDialog
+          sessionId={reminderSessionId}
+          sessionTitle={
+            (activeTab === "upcoming" ? upcomingSessions : pastSessions).find(
+              (s) => s._id === reminderSessionId
+            )?.title
+          }
+          open={!!reminderSessionId}
+          onOpenChange={(open) => !open && setReminderSessionId(null)}
+        />
       )}
     </div>
   );
