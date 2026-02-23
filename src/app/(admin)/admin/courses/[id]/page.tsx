@@ -1,7 +1,6 @@
 "use client";
 
-import { use, useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { use, useState, useCallback } from "react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -13,7 +12,6 @@ import {
   ChevronRight,
   Video,
   FileText,
-  HelpCircle,
   Trash2,
   Edit,
   Eye,
@@ -73,7 +71,7 @@ import { modulesApi, lessonsApi, CreateModuleData, CreateLessonData } from "@/li
 import { categoriesApi } from "@/lib/api/categories";
 import { uploadApi } from "@/lib/api/upload";
 import { getVideoDuration } from "@/lib/utils";
-import type { Module, Lesson, CourseLevel, Material } from "@/types";
+import type { Module, Lesson, CourseLevel, Material, ApiError } from "@/types";
 import { REGISTRATION_NETWORKS } from "@/lib/validations/auth";
 
 export default function AdminCourseEditorPage({
@@ -83,7 +81,6 @@ export default function AdminCourseEditorPage({
 }) {
   const resolvedParams = use(params);
   const courseId = resolvedParams.id;
-  const router = useRouter();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -215,7 +212,7 @@ export default function AdminCourseEditorPage({
       });
       toast({ title: "Lesson created successfully" });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       const message = error?.response?.data?.message || error?.message || "Failed to create lesson";
       toast({ title: message, variant: "destructive" });
     },
@@ -239,7 +236,7 @@ export default function AdminCourseEditorPage({
       });
       toast({ title: "Lesson updated successfully" });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       const message = error?.response?.data?.message || error?.message || "Failed to update lesson";
       toast({ title: message, variant: "destructive" });
     },
@@ -257,7 +254,7 @@ export default function AdminCourseEditorPage({
   });
 
   // Materials state
-  const [materials, setMaterials] = useState<Material[]>([]);
+  const [_materials, setMaterials] = useState<Material[]>([]);
   const [newMaterialTitle, setNewMaterialTitle] = useState("");
   const [newMaterialUrl, setNewMaterialUrl] = useState("");
 
@@ -360,7 +357,7 @@ export default function AdminCourseEditorPage({
         await updateCourseMutation.mutateAsync({ thumbnail: response.data.fileUrl });
         toast({ title: "Thumbnail uploaded successfully" });
       }
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Failed to upload thumbnail", variant: "destructive" });
     } finally {
       setThumbnailUploading(false);

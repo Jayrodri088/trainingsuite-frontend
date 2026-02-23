@@ -18,6 +18,8 @@ interface Particle {
   size: number;
   velocityX: number;
   velocityY: number;
+  animationDuration: number;
+  animationDelay: number;
 }
 
 const colors = [
@@ -35,11 +37,13 @@ export function Confetti({ active, duration = 3000, className }: ConfettiProps) 
   const [particles, setParticles] = useState<Particle[]>([]);
   const [isVisible, setIsVisible] = useState(false);
 
+  // Generate particles when animation becomes active
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (active) {
       setIsVisible(true);
 
-      // Generate particles
+      // Generate particles with pre-computed animation values
       const newParticles: Particle[] = [];
       for (let i = 0; i < 150; i++) {
         newParticles.push({
@@ -51,6 +55,8 @@ export function Confetti({ active, duration = 3000, className }: ConfettiProps) 
           size: 6 + Math.random() * 8,
           velocityX: (Math.random() - 0.5) * 4,
           velocityY: 2 + Math.random() * 4,
+          animationDuration: 2 + Math.random(),
+          animationDelay: Math.random() * 0.5,
         });
       }
       setParticles(newParticles);
@@ -85,8 +91,8 @@ export function Confetti({ active, duration = 3000, className }: ConfettiProps) 
             height: `${particle.size}px`,
             backgroundColor: particle.color,
             transform: `rotate(${particle.rotation}deg)`,
-            animation: `confetti-fall ${2 + Math.random()}s linear forwards`,
-            animationDelay: `${Math.random() * 0.5}s`,
+            animation: `confetti-fall ${particle.animationDuration}s linear forwards`,
+            animationDelay: `${particle.animationDelay}s`,
           }}
         />
       ))}

@@ -76,7 +76,7 @@ function CameraZoomSync({
   const { camera } = useThree();
   useFrame(() => {
     if (!controlsRef.current) return;
-    camera.position.z = controlsRef.current.cameraZ;
+    camera.position.setZ(controlsRef.current.cameraZ);
   });
   return null;
 }

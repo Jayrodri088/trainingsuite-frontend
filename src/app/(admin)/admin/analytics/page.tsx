@@ -9,8 +9,6 @@ import {
   TrendingUp,
   Calendar,
   Download,
-  ArrowUpRight,
-  ArrowDownRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PageLoader } from "@/components/ui/page-loader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AreaChart,
@@ -42,9 +39,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
-  Legend,
 } from "recharts";
 import { adminApi } from "@/lib/api/admin";
 import { formatCurrency } from "@/lib/utils";
@@ -181,7 +175,7 @@ export default function AnalyticsPage() {
     },
   ];
 
-  const isLoading = overviewLoading || revenueLoading || enrollmentLoading;
+  const _isLoading = overviewLoading || revenueLoading || enrollmentLoading;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

@@ -89,7 +89,7 @@ export function SetReminderDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="rounded-[12px] border-gray-200 bg-white shadow-lg sm:max-w-[400px] font-sans"
+        className="rounded-xl border-gray-200 bg-white shadow-lg sm:max-w-[400px] font-sans"
         showCloseButton={true}
       >
         <DialogHeader>
@@ -100,7 +100,7 @@ export function SetReminderDialog({
           <DialogDescription className="font-sans text-gray-600 text-sm">
             {sessionTitle ? (
               <>
-                <T>Get notified before</T> "{sessionTitle}"
+                <T>Get notified before</T> &quot;{sessionTitle}&quot;
               </>
             ) : (
               <T>Get notified before this live session starts.</T>
@@ -127,7 +127,7 @@ export function SetReminderDialog({
                 type="button"
                 onClick={() => setSelected(opt.value)}
                 disabled={isLoading}
-                className={`flex items-center justify-between w-full rounded-[10px] border px-4 py-3 text-left font-sans text-sm transition-colors ${
+                className={`flex items-center justify-between w-full rounded-lg border px-4 py-3 text-left font-sans text-sm transition-colors ${
                   selected === opt.value
                     ? "border-[#0052CC] bg-[#0052CC]/5 text-[#0052CC]"
                     : "border-gray-200 bg-white text-black hover:bg-gray-50 hover:border-gray-300"
@@ -145,7 +145,7 @@ export function SetReminderDialog({
             <Button
               type="button"
               variant="outline"
-              className="rounded-[10px] border-gray-200 text-gray-700 hover:bg-gray-50 font-sans font-medium order-2 sm:order-1"
+              className="rounded-lg border-gray-200 text-gray-700 hover:bg-gray-50 font-sans font-medium order-2 sm:order-1"
               onClick={() => removeReminderMutation.mutate()}
               disabled={isLoading}
             >
@@ -154,7 +154,7 @@ export function SetReminderDialog({
           ) : null}
           <Button
             type="button"
-            className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-sans font-semibold order-1 sm:order-2"
+            className="rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-sans font-semibold order-1 sm:order-2"
             onClick={handleSet}
             disabled={selected == null || isLoading}
           >

@@ -510,7 +510,7 @@ export default function UsersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="font-heading">Delete User</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <span className="font-semibold text-foreground">"{userToDelete?.name}"</span>?
+              Are you sure you want to delete <span className="font-semibold text-foreground">&quot;{userToDelete?.name}&quot;</span>?
               <br /><br />
               This action cannot be undone. It will permanently remove:
               <ul className="list-disc pl-5 mt-2 space-y-1">

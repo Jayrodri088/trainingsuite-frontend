@@ -1,11 +1,12 @@
 "use client";
 
 import { useTranslation } from '@/contexts/translation-context';
-import { ElementType } from 'react';
 
-interface TProps<C extends ElementType = 'span'> {
+type HTMLElementTag = 'span' | 'div' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label' | 'strong' | 'em' | 'small' | 'a' | 'button';
+
+interface TProps {
   children: string;
-  as?: C;
+  as?: HTMLElementTag;
   className?: string;
 }
 
@@ -16,18 +17,17 @@ interface TProps<C extends ElementType = 'span'> {
  *   <T>Welcome to our platform</T>
  *   <T as="h1" className="text-2xl">Page Title</T>
  */
-export function T<C extends ElementType = 'span'>({ 
+export function T({ 
   children, 
-  as, 
+  as: Tag = 'span', 
   className 
-}: TProps<C>) {
+}: TProps) {
   // Include translationVersion to force re-render when translations arrive
   const { t, translationVersion } = useTranslation();
-  const Component = as || 'span';
   
   // The translationVersion is used implicitly to trigger re-renders
   // when new translations are fetched from the API
-  return <Component className={className} data-tv={translationVersion}>{t(children)}</Component>;
+  return <Tag className={className} data-tv={translationVersion}>{t(children)}</Tag>;
 }
 
 /**

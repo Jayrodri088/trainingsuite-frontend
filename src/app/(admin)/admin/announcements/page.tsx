@@ -58,7 +58,7 @@ import { PageLoader } from "@/components/ui/page-loader";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { adminApi } from "@/lib/api/admin";
-import type { Announcement, AnnouncementPriority } from "@/types";
+import type { Announcement, AnnouncementPriority, ApiError } from "@/types";
 import { format, parseISO, isAfter, isBefore } from "date-fns";
 
 export default function AnnouncementsPage() {
@@ -96,7 +96,7 @@ export default function AnnouncementsPage() {
       resetForm();
       toast({ title: "Announcement created and sent to all users!" });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       const message = error?.response?.data?.message || error?.response?.data?.error || "Failed to create announcement";
       toast({ title: message, variant: "destructive" });
     },
@@ -540,7 +540,7 @@ export default function AnnouncementsPage() {
           <DialogHeader>
             <DialogTitle className="font-sans font-bold text-black uppercase tracking-wide">Delete Announcement</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete <span className="font-semibold text-foreground">"{selectedAnnouncement?.title}"</span>?
+              Are you sure you want to delete <span className="font-semibold text-foreground">&quot;{selectedAnnouncement?.title}&quot;</span>?
               <br />This action cannot be undone.
             </DialogDescription>
           </DialogHeader>

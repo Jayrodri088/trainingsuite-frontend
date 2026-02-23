@@ -75,7 +75,7 @@ function PostDetailPageContent() {
     if (optimisticPostLikes.has(postItem._id)) {
       return optimisticPostLikes.get(postItem._id)!;
     }
-    return !!(postItem as any).isLiked;
+    return !!postItem.isLiked;
   };
 
   // Helper to get effective liked state for comment
@@ -83,7 +83,7 @@ function PostDetailPageContent() {
     if (optimisticCommentLikes.has(comment._id)) {
       return optimisticCommentLikes.get(comment._id)!;
     }
-    return !!(comment as any).isLiked;
+    return !!comment.isLiked;
   };
 
   const createCommentMutation = useMutation({
@@ -189,21 +189,16 @@ function PostDetailPageContent() {
   const post = postData?.data;
   const rawComments = commentsData?.data || [];
 
-  // Helper to get parent ID (handles both object and string)
-  const getParentId = (comment: any): string | null => {
-    if (!comment.parent) return null;
-    if (typeof comment.parent === 'string') return comment.parent;
-    if (typeof comment.parent === 'object' && comment.parent !== null) {
-      return comment.parent._id || null;
-    }
-    return null;
+  // Helper to get parent ID
+  const getParentId = (comment: Comment): string | null => {
+    return comment.parent || null;
   };
 
   // Build a map of all comments by ID for quick lookup
   const commentMap = new Map<string, Comment>();
   
   // First pass: collect all comments (including nested replies)
-  const flattenComments = (commentList: any[]): Comment[] => {
+  const flattenComments = (commentList: Comment[]): Comment[] => {
     const result: Comment[] = [];
     for (const comment of commentList) {
       result.push(comment);
@@ -266,7 +261,7 @@ function PostDetailPageContent() {
     
     // Get liked state using helper (handles optimistic updates)
     const isCommentLiked = getCommentIsLiked(comment);
-    const serverIsLiked = !!(comment as any).isLiked;
+    const serverIsLiked = !!comment.isLiked;
     const serverLikeCount = comment.likes || 0;
     
     // Adjust display count based on optimistic state vs server state
@@ -408,7 +403,7 @@ function PostDetailPageContent() {
               <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
                 {(() => {
                   const isPostLiked = getPostIsLiked(post);
-                  const serverPostIsLiked = !!(post as any).isLiked;
+                  const serverPostIsLiked = !!post.isLiked;
                   const serverPostLikeCount = post.likes || 0;
                   const displayPostLikeCount = (() => {
                     if (isPostLiked === serverPostIsLiked) return serverPostLikeCount;

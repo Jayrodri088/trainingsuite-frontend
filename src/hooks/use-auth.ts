@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores";
 import { authApi } from "@/lib/api";
-import type { User } from "@/types";
+import type { ApiError } from "@/types";
 
 export function useAuth() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export function useAuth() {
       const response = await authApi.getMe();
       return response.data;
     },
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: ApiError) => {
       // Don't retry on 401 (unauthorized) - that's a real auth failure
       if (error?.response?.status === 401) return false;
       // Retry up to 3 times for network errors (e.g., backend restart)
@@ -36,7 +36,7 @@ export function useAuth() {
     } else if (error) {
       // Only clear user on 401 Unauthorized errors
       // Don't clear on network errors (e.g., during backend restart)
-      const isUnauthorized = (error as any)?.response?.status === 401;
+      const isUnauthorized = (error as ApiError)?.response?.status === 401;
       if (isUnauthorized) {
         setUser(null);
       }

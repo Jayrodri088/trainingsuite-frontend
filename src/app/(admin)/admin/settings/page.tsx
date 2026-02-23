@@ -81,6 +81,8 @@ export default function SettingsPage() {
     },
   });
 
+  // Sync query data to local state for form editing
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (configData?.data) {
       setSiteConfig(configData.data);

@@ -225,7 +225,7 @@ export default function ForumDetailPage() {
                         <span>{post.user?.name || "Anonymous"}</span>
                         <div className="flex items-center gap-1">
                           <Heart className="h-4 w-4" />
-                          <span>{(post as any).likes || 0}</span>
+                          <span>{post.likes || 0}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Eye className="h-4 w-4" />

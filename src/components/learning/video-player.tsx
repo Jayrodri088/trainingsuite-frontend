@@ -37,6 +37,8 @@ export function LearningVideoPlayer({
   const [videoPoster, setVideoPoster] = useState<string | undefined>(undefined);
   const lastSaveRef = useRef(0);
 
+  // Derive video poster from lesson URL
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (lesson?.videoUrl) {
       setVideoPoster(getVideoThumbnail(lesson.videoUrl));
@@ -45,6 +47,8 @@ export function LearningVideoPlayer({
     }
   }, [lessonId, lesson?.videoUrl]);
 
+  // Load YouTube API script
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!window.YT) {

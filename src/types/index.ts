@@ -178,6 +178,7 @@ export interface Comment {
   likes?: number;
   likedBy?: string[];
   isLiked?: boolean;
+  replies?: Comment[];
   createdAt: string;
   updatedAt: string;
 }
@@ -413,4 +414,16 @@ export interface UserFilters {
   order?: "asc" | "desc";
   page?: number;
   limit?: number;
+}
+
+// API Error type for mutation handlers
+export interface ApiError {
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+      error?: string;
+    };
+  };
+  message?: string;
 }

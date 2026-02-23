@@ -7,7 +7,7 @@ export interface CreateModuleData {
   order?: number;
 }
 
-export interface UpdateModuleData extends Partial<CreateModuleData> {}
+export type UpdateModuleData = Partial<CreateModuleData>;
 
 export interface CreateLessonData {
   title: string;
@@ -20,7 +20,7 @@ export interface CreateLessonData {
   order?: number;
 }
 
-export interface UpdateLessonData extends Partial<CreateLessonData> {}
+export type UpdateLessonData = Partial<CreateLessonData>;
 
 export const modulesApi = {
   create: async (courseId: string, data: CreateModuleData) => {
