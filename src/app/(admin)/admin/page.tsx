@@ -37,7 +37,7 @@ import type { OverviewAnalytics, Course } from "@/types";
 interface StatCardProps {
   title: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
   isLoading?: boolean;
 }

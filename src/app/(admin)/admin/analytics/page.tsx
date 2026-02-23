@@ -104,7 +104,7 @@ const COLORS = ["#6366f1", "#f59e0b", "#10b981", "#ec4899", "#64748b", "#3b82f6"
 interface StatCardProps {
   title: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
 }
 
