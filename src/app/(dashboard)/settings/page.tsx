@@ -393,7 +393,7 @@ export default function SettingsPage() {
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <CardTitle className="font-sans font-bold text-black"><T>Active Sessions</T></CardTitle>
                 <CardDescription>
-                  <T>Manage devices where you're currently logged in</T>
+                  <T>Manage devices where you&apos;re currently logged in</T>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">

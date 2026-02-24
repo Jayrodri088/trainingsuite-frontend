@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Video, ExternalLink, AlertCircle, Loader2, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 // Dynamically import ReactPlayer to avoid SSR issues
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const ReactPlayer = dynamic(() => import("react-player"), {
   ssr: false,
   loading: () => (
@@ -162,11 +162,13 @@ export function LivestreamPlayer({
   const playerRef = useRef<HTMLVideoElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [streamType, setStreamType] = useState<StreamType>("unknown");
   
+  // Derive stream type from URL (no state needed)
+  const streamType = useMemo(() => detectStreamType(url), [url]);
+  
+  // Reset loading state when URL changes
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    const type = detectStreamType(url);
-    setStreamType(type);
     setError(null);
     setIsLoading(true);
     

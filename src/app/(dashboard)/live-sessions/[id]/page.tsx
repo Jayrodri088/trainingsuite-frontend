@@ -33,7 +33,7 @@ import { useAuth } from "@/hooks";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { getInitials } from "@/lib/utils";
 import { LivestreamPlayer, detectStreamType } from "@/components/livestream";
-import type { LiveSession } from "@/types";
+import type { LiveSession, ApiError } from "@/types";
 import { format, parseISO, differenceInSeconds, isPast } from "date-fns";
 import { T, useT } from "@/components/t";
 
@@ -68,7 +68,7 @@ export default function LiveSessionDetailPage() {
       setHasJoined(true);
       toast({ title: t("You've joined the session!") });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       // If session is not live yet, just mark as notified locally
       if (error?.response?.status === 400) {
         setHasJoined(true);
@@ -100,6 +100,7 @@ export default function LiveSessionDetailPage() {
   }, [session?.status, sessionId, hasJoined, refetch]);
 
   // Countdown timer for scheduled sessions
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (!session) return;
     
@@ -161,7 +162,7 @@ export default function LiveSessionDetailPage() {
         <Video className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <h2 className="text-lg font-medium"><T>Session not found</T></h2>
         <p className="text-muted-foreground mt-1">
-          <T>This session may have been removed or doesn't exist.</T>
+          <T>This session may have been removed or doesn&apos;t exist.</T>
         </p>
         <Button asChild className="mt-4">
           <Link href="/live-sessions"><T>Back to Sessions</T></Link>
@@ -284,7 +285,7 @@ export default function LiveSessionDetailPage() {
             {hasJoined && (
               <div className="flex items-center justify-center gap-2 text-green-400">
                 <CheckCircle className="h-5 w-5" />
-                <span><T>You'll be notified when the session starts</T></span>
+                <span><T>You&apos;ll be notified when the session starts</T></span>
               </div>
             )}
           </div>

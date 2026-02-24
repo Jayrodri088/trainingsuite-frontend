@@ -3,9 +3,11 @@
 import React from 'react';
 import { useTranslation } from '@/contexts/translation-context';
 
+type HTMLElementTag = 'span' | 'div' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label' | 'strong' | 'em' | 'small' | 'a' | 'button';
+
 interface TProps {
   children: string;
-  as?: string;
+  as?: HTMLElementTag;
   className?: string;
   [key: string]: unknown;
 }

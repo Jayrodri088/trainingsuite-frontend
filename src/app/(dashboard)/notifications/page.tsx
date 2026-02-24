@@ -25,7 +25,7 @@ import { formatDistanceToNow } from "date-fns";
 import type { Notification } from "@/types";
 import { T, useT } from "@/components/t";
 
-const notificationIcons: Record<string, React.ElementType> = {
+const notificationIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   course: BookOpen,
   certificate: Award,
   message: MessageSquare,
@@ -272,7 +272,7 @@ export default function NotificationsPage() {
                 </div>
                 <h3 className="text-xl font-sans font-bold text-black"><T>No notifications</T></h3>
                 <p className="font-sans text-gray-600 mt-2 text-sm">
-                  <T>You're all caught up! Check back later for updates.</T>
+                  <T>You&apos;re all caught up! Check back later for updates.</T>
                 </p>
               </CardContent>
             </Card>
@@ -338,7 +338,7 @@ export default function NotificationsPage() {
                 </div>
                 <h3 className="text-xl font-sans font-bold text-black"><T>No read notifications</T></h3>
                 <p className="font-sans text-gray-600 mt-2 text-sm">
-                  <T>Notifications you've read will appear here.</T>
+                  <T>Notifications you&apos;ve read will appear here.</T>
                 </p>
               </CardContent>
             </Card>

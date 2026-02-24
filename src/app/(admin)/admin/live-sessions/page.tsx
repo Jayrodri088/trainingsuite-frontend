@@ -71,7 +71,7 @@ import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { coursesApi } from "@/lib/api/courses";
 import { uploadApi } from "@/lib/api/upload";
 import { detectStreamType } from "@/components/livestream";
-import type { LiveSession, LiveSessionStatus, StreamProvider } from "@/types";
+import type { LiveSession, LiveSessionStatus, StreamProvider, ApiError } from "@/types";
 import { format, parseISO } from "date-fns";
 
 // Stream provider configuration for user guidance
@@ -177,7 +177,7 @@ export default function AdminLiveSessionsPage() {
       resetForm();
       toast({ title: "Live session created successfully" });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       const errorMessage = error?.response?.data?.message || error?.response?.data?.error || "Failed to create session";
       toast({ title: errorMessage, variant: "destructive" });
     },
@@ -193,7 +193,7 @@ export default function AdminLiveSessionsPage() {
       resetForm();
       toast({ title: "Session updated successfully" });
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       const errorMessage = error?.response?.data?.message || error?.response?.data?.error || "Failed to update session";
       toast({ title: errorMessage, variant: "destructive" });
     },

@@ -21,7 +21,7 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth, useEnrollments, useCertificates, useNotifications } from "@/hooks";
 import { formatDistanceToNow } from "date-fns";
-import type { Enrollment, Course } from "@/types";
+import type { Enrollment, Course, Notification, Certificate } from "@/types";
 import { T, useT } from "@/components/t";
 
 function StatCard({
@@ -33,7 +33,7 @@ function StatCard({
 }: {
   title: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
   description?: string;
 }) {
@@ -176,7 +176,7 @@ export default function DashboardPage() {
         </h1>
         <p className="font-sans text-gray-600 mt-1">
           {activeEnrollments.length > 0
-            ? <T>Continue your learning journey. You're making great progress!</T>
+            ? <T>Continue your learning journey. You&apos;re making great progress!</T>
             : <T>Start your learning journey today by enrolling in a course.</T>}
         </p>
       </div>
@@ -250,7 +250,7 @@ export default function DashboardPage() {
             <CardContent className="p-0">
               {notifications.length > 0 ? (
                 <div className="divide-y divide-gray-200">
-                  {notifications.slice(0, 5).map((notification: any) => (
+                  {notifications.slice(0, 5).map((notification: Notification) => (
                     <NotificationItem
                       key={notification._id}
                       title={notification.title}
@@ -288,7 +288,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {certificates.slice(0, 3).map((cert: any) => {
+            {certificates.slice(0, 3).map((cert: Certificate) => {
               const course = typeof cert.course === "object" ? cert.course : null;
               return (
                 <Card key={cert._id} className="rounded-[12px] border-amber-200 bg-amber-50/50 hover:border-amber-300 transition-colors group shadow-sm">

@@ -77,7 +77,7 @@ export default function CertificateDetailPage() {
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <Award className="h-16 w-16 text-gray-500" />
         <h2 className="text-xl font-sans font-bold text-black"><T>Certificate not found</T></h2>
-        <p className="font-sans text-gray-600"><T>The certificate you're looking for doesn't exist.</T></p>
+        <p className="font-sans text-gray-600"><T>The certificate you&apos;re looking for doesn&apos;t exist.</T></p>
         <Button asChild className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
           <Link href="/certificates">
             <ArrowLeft className="h-4 w-4 mr-2" />

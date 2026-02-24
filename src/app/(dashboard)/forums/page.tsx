@@ -102,7 +102,7 @@ function CommunityPageContent() {
     if (optimisticLikes.has(post._id)) {
       return optimisticLikes.get(post._id)!;
     }
-    return !!(post as any).isLiked;
+    return !!post.isLiked;
   };
 
   // Like/unlike post mutation - uses correct method based on current state
@@ -176,7 +176,7 @@ function CommunityPageContent() {
     })
     .sort((a, b) => {
       if (sortBy === "popular") {
-        return ((b as any).likes || 0) - ((a as any).likes || 0);
+        return (b.likes || 0) - (a.likes || 0);
       }
       if (sortBy === "unanswered") {
         // Posts with no comments first
@@ -192,12 +192,12 @@ function CommunityPageContent() {
   const PostCard = ({ post }: { post: ForumPost }) => {
     const author = post.user as User;
     const postForum = typeof post.forum === 'object' ? post.forum : null;
-    const forumInfo = postForum || forums.find(f => f._id === (post as any).forumId || f._id === post.forum);
+    const forumInfo = postForum || forums.find(f => f._id === post.forum);
     
     // Get liked state - uses optimistic state if available, otherwise server state
     const isLiked = getIsLiked(post);
-    const serverLikeCount = (post as any).likes || 0;
-    const serverIsLiked = !!(post as any).isLiked;
+    const serverLikeCount = post.likes || 0;
+    const serverIsLiked = !!post.isLiked;
     
     // Adjust display count based on optimistic state vs server state
     const displayCount = (() => {
@@ -240,7 +240,7 @@ function CommunityPageContent() {
 
             {/* Content Section */}
             <div className="flex-1 p-4">
-              <Link href={`/forums/${(post as any).forumId || forumInfo?._id}/posts/${post._id}`}>
+              <Link href={`/forums/${typeof post.forum === 'string' ? post.forum : forumInfo?._id}/posts/${post._id}`}>
                 <h3 className="font-sans font-bold text-gray-900 text-base hover:text-[#0052CC] transition-colors mb-2 line-clamp-2">
                   {post.title}
                 </h3>

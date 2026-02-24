@@ -189,7 +189,7 @@ export default function FAQPage() {
             <T>Frequently Asked Questions</T>
           </h1>
           <p className="font-sans text-base md:text-lg text-gray-600 max-w-2xl mx-auto mb-8">
-            <T>Find answers to common questions about the portal. Can't find what you're looking for? Contact our support team.</T>
+            <T>Find answers to common questions about the portal. Can&apos;t find what you&apos;re looking for? Contact our support team.</T>
           </p>
 
           {/* Search */}
@@ -282,7 +282,7 @@ export default function FAQPage() {
               </div>
               <CardTitle className="font-sans text-2xl font-bold text-black"><T>Still have questions?</T></CardTitle>
               <CardDescription className="font-sans text-gray-600">
-                <T>Can't find the answer you're looking for? Our support team is here to help.</T>
+                <T>Can&apos;t find the answer you&apos;re looking for? Our support team is here to help.</T>
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col sm:flex-row justify-center gap-4">
