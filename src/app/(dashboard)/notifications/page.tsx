@@ -71,7 +71,7 @@ function NotificationCard({
 }) {
   const { t } = useT();
   const type = notification.type || "info";
-  const Icon = notificationIcons[type] || Info;
+  const Icon = (notificationIcons[type] || Info) as React.ComponentType<{ className?: string }>;
   const colors = notificationColors[type] || notificationColors.info;
 
   const handleClick = () => {

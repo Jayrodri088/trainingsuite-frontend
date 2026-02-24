@@ -1,18 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const auth = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (auth.isLoading) return;
+    if (!auth.isAuthenticated) {
+      router.replace("/login?redirect=/dashboard");
+      return;
+    }
+    if (auth.user && !auth.user.portalAccessPaidAt) {
+      router.replace("/complete-access");
+    }
+  }, [auth.isLoading, auth.isAuthenticated, auth.user, router]);
+
+  if (!auth.isLoading && (!auth.isAuthenticated || !auth.user?.portalAccessPaidAt)) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] text-foreground">

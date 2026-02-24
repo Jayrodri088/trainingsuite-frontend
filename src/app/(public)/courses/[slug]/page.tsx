@@ -332,10 +332,16 @@ export default function CourseDetailPage({
         router.push(`/courses/${course.slug}/learn`);
       }
     },
-    onError: (error: Error & { response?: { data?: { message?: string }; status?: number } }) => {
-      const message = error?.response?.data?.message || t("Failed to enroll");
+    onError: (error: Error & { response?: { data?: { error?: string; message?: string }; status?: number } }) => {
+      const message = error?.response?.data?.error || error?.response?.data?.message || t("Failed to enroll");
       const status = error?.response?.status;
 
+      // Portal access required ($1 verification)
+      if (status === 402) {
+        toast({ title: message, variant: "destructive" });
+        router.push("/complete-access");
+        return;
+      }
       // If 400 error with "already enrolled" message, redirect to learn page
       if (status === 400 && message.toLowerCase().includes("already")) {
         toast({ title: t("You're already enrolled! Redirecting...") });
@@ -387,12 +393,7 @@ export default function CourseDetailPage({
       return;
     }
 
-    const isPaidCourse = (course.price || 0) > 0;
-    if (isPaidCourse) {
-      initializePaymentMutation.mutate(course._id);
-      return;
-    }
-
+    // All courses are free; enrollment requires portal access ($1) to be completed first
     enrollMutation.mutate(course._id);
   };
 
@@ -487,11 +488,9 @@ export default function CourseDetailPage({
                 <Badge className={`rounded-[9999px] ${levelColors[course.level as keyof typeof levelColors] || "bg-slate-600 text-white"}`}>
                   {t(course.level || "beginner")}
                 </Badge>
-                {(course.price || 0) > 0 && (
-                  <Badge className="rounded-[9999px] bg-emerald-600 text-white border-0">
-                    {(course.currency || "USD").toUpperCase()} {Number(course.price || 0).toFixed(2)}
-                  </Badge>
-                )}
+                <Badge className="rounded-[9999px] bg-emerald-600 text-white border-0">
+                  <T>Free</T>
+                </Badge>
                 {course.category && typeof course.category === "object" && (
                   <Badge variant="outline" className="rounded-[9999px] border-slate-400 text-slate-200">
                     {t(course.category.name)}
@@ -579,10 +578,10 @@ export default function CourseDetailPage({
                       size="lg"
                       className="w-full mb-3 rounded-[10px]"
                       onClick={handleEnroll}
-                      disabled={enrollMutation.isPending || initializePaymentMutation.isPending}
+                      disabled={enrollMutation.isPending}
                     >
-                      {(enrollMutation.isPending || initializePaymentMutation.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                      {(course.price || 0) > 0 ? <T>Buy Course</T> : <T>Start Training</T>}
+                      {enrollMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                      <T>Start Training</T>
                     </Button>
                   )}
 
@@ -747,7 +746,7 @@ export default function CourseDetailPage({
                             <T>Enroll in this course to leave a review</T>
                           </p>
                           <Button onClick={handleEnroll}>
-                            {(course.price || 0) > 0 ? <T>Buy Course</T> : <T>Start Training</T>}
+                            <T>Start Training</T>
                           </Button>
                         </div>
                       ) : (

@@ -558,7 +558,10 @@ export default function AnalyticsPage() {
     </div>
   );
 }
-function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
+function StatCard({ title, value, icon, color }: StatCardProps) {
+  // Ensure the icon component always accepts a `className` prop
+  const Icon = icon as React.ComponentType<{ className?: string }>;
+
   return (
     <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card shadow-none">
       <CardContent className="p-6">
@@ -567,7 +570,7 @@ function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{title}</p>
             <p className="text-3xl font-light mt-2 text-foreground">{value}</p>
           </div>
-          <div className={`h-10 w-10 ${color.replace('bg-', 'text-')} bg-opacity-10 bg-transparent flex items-center justify-center`}>
+          <div className={`h-10 w-10 ${color.replace("bg-", "text-")} bg-opacity-10 bg-transparent flex items-center justify-center`}>
             <Icon className="h-6 w-6" />
           </div>
         </div>

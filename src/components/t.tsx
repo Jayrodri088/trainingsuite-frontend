@@ -1,12 +1,13 @@
 "use client";
 
+import React from 'react';
 import { useTranslation } from '@/contexts/translation-context';
-import { ElementType } from 'react';
 
-interface TProps<C extends ElementType = 'span'> {
+interface TProps {
   children: string;
-  as?: C;
+  as?: string;
   className?: string;
+  [key: string]: unknown;
 }
 
 /**
@@ -16,18 +17,23 @@ interface TProps<C extends ElementType = 'span'> {
  *   <T>Welcome to our platform</T>
  *   <T as="h1" className="text-2xl">Page Title</T>
  */
-export function T<C extends ElementType = 'span'>({ 
+export function T({ 
   children, 
-  as, 
-  className 
-}: TProps<C>) {
+  as,
+  className,
+  ...rest
+}: TProps) {
   // Include translationVersion to force re-render when translations arrive
   const { t, translationVersion } = useTranslation();
-  const Component = as || 'span';
   
-  // The translationVersion is used implicitly to trigger re-renders
+  // Use React.createElement to avoid JSX polymorphic component type issues
+  // The translationVersion is used implicitly (via data-tv) to trigger re-renders
   // when new translations are fetched from the API
-  return <Component className={className} data-tv={translationVersion}>{t(children)}</Component>;
+  return React.createElement(
+    as || 'span',
+    { className, 'data-tv': translationVersion, ...rest },
+    t(children)
+  );
 }
 
 /**

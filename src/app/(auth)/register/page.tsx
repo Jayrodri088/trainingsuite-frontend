@@ -92,8 +92,8 @@ export default function RegisterPage() {
       });
       if (response.success && response.data) {
         setAuth(response.data.user, response.data.token);
-        toast.success(t("Welcome! Your account has been created. Check your email to verify your account."));
-        router.push("/dashboard");
+        toast.success(t("Welcome! Your account has been created. Complete the one-time verification to access the portal."));
+        router.push("/complete-access");
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError && error.response?.data) {

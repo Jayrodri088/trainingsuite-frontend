@@ -12,6 +12,8 @@ export interface User {
   title?: string;
   phone?: string;
   isVerified: boolean;
+  /** Set when user has paid the one-time $1 portal access (identity verification). */
+  portalAccessPaidAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

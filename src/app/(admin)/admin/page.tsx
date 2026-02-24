@@ -42,21 +42,24 @@ interface StatCardProps {
   isLoading?: boolean;
 }
 
-function StatCard({ title, value, icon: Icon, color, isLoading }: StatCardProps) {
+function StatCard({ title, value, icon, color, isLoading }: StatCardProps) {
+  // Ensure the icon component accepts a className prop
+  const Icon = icon as React.ComponentType<{ className?: string }>;
+
   return (
-    <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-sans text-gray-600">{title}</p>
+    <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-sans text-gray-600 truncate">{title}</p>
             {isLoading ? (
-              <Skeleton className="h-8 w-24 mt-1 rounded-[10px]" />
+              <Skeleton className="h-6 sm:h-7 w-20 mt-1 rounded-lg" />
             ) : (
-              <p className="text-2xl font-sans font-bold text-black mt-1">{value}</p>
+              <p className="text-lg sm:text-xl font-sans font-bold text-black mt-1">{value}</p>
             )}
           </div>
-          <div className={`h-12 w-12 rounded-[12px] ${color} flex items-center justify-center`}>
-            <Icon className="h-6 w-6 text-white" />
+          <div className={`h-9 w-9 sm:h-10 sm:w-10 rounded-lg ${color} flex items-center justify-center`}>
+            <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </div>
         </div>
       </CardContent>

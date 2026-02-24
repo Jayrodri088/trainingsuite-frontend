@@ -46,7 +46,7 @@ export default function LoginPage() {
       if (response.success && response.data) {
         setAuth(response.data.user, response.data.token);
         toast.success(t("Login successful"));
-        router.push("/dashboard");
+        router.push(response.data.user?.portalAccessPaidAt ? "/dashboard" : "/complete-access");
       }
     } catch (error: unknown) {
       toast.error(getErrorMessage(error));

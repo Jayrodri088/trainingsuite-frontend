@@ -27,7 +27,7 @@ import { T, useT } from "@/components/t";
 function StatCard({
   title,
   value,
-  icon: Icon,
+  icon,
   color,
   description,
 }: {
@@ -37,16 +37,19 @@ function StatCard({
   color: string;
   description?: string;
 }) {
+  // Ensure the icon component accepts a `className` prop
+  const Icon = icon as React.ComponentType<{ className?: string }>;
+
   return (
-    <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
-      <CardContent className="p-6">
-        <div className="flex items-center gap-4">
-          <div className={`flex h-12 w-12 items-center justify-center rounded-[12px] ${color}`}>
-            <Icon className="h-6 w-6" />
+    <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          <div className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl ${color}`}>
+            <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
           <div>
-            <p className="text-3xl font-sans font-bold text-black">{value}</p>
-            <p className="text-sm font-sans text-gray-600 mt-1">{title}</p>
+            <p className="text-xl sm:text-2xl font-sans font-bold text-black">{value}</p>
+            <p className="text-xs sm:text-sm font-sans text-gray-600 mt-0.5">{title}</p>
           </div>
         </div>
       </CardContent>
