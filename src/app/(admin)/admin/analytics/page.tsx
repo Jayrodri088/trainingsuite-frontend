@@ -187,9 +187,9 @@ export default function AnalyticsPage() {
             Track metrics and platform growth
           </p>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-[180px] rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <SelectTrigger className="w-full min-w-0 sm:w-[180px] rounded-[12px] border-gray-200 bg-white shadow-sm">
               <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
               <SelectValue placeholder="Select range" />
             </SelectTrigger>
@@ -246,7 +246,7 @@ export default function AnalyticsPage() {
         <TabsContent value="revenue" className="space-y-8 mt-0 pt-6">
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Revenue Chart */}
-            <Card className="lg:col-span-2 rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none">
+            <Card className="lg:col-span-2 rounded-[12px] border-gray-200 bg-white shadow-sm">
               <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
                 <CardTitle className="font-heading text-lg">Revenue Over Time</CardTitle>
                 <CardDescription>
@@ -315,7 +315,7 @@ export default function AnalyticsPage() {
             </Card>
 
             {/* Enrollment Status Distribution */}
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
               <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
                 <CardTitle className="font-heading text-lg">Enrollment Status</CardTitle>
                 <CardDescription>Distribution by status</CardDescription>
@@ -384,7 +384,7 @@ export default function AnalyticsPage() {
 
           {/* Revenue summary cards */}
           <div className="grid gap-4 md:grid-cols-3">
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none bg-gray-50">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Revenue</CardTitle>
               </CardHeader>
@@ -394,7 +394,7 @@ export default function AnalyticsPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none bg-gray-50">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Transactions</CardTitle>
               </CardHeader>
@@ -404,7 +404,7 @@ export default function AnalyticsPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none bg-gray-50">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Avg. Transaction</CardTitle>
               </CardHeader>
@@ -418,7 +418,7 @@ export default function AnalyticsPage() {
         </TabsContent>
 
         <TabsContent value="enrollments" className="space-y-8 mt-0 pt-6">
-          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none">
+          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
             <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
               <CardTitle className="font-heading text-lg">Enrollments Over Time</CardTitle>
               <CardDescription>Daily enrollment numbers</CardDescription>
@@ -467,7 +467,7 @@ export default function AnalyticsPage() {
         </TabsContent>
 
         <TabsContent value="courses" className="space-y-8 mt-0 pt-6">
-          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none">
+          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
             <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
               <CardTitle className="font-heading text-lg">Top Performing Courses</CardTitle>
               <CardDescription>Courses ranked by enrollment</CardDescription>
@@ -518,7 +518,7 @@ export default function AnalyticsPage() {
 
           {/* Revenue by Course */}
           {revenueData?.revenueByCourse && revenueData.revenueByCourse.length > 0 && (
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm shadow-none">
+            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
               <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
                 <CardTitle className="font-heading text-lg">Revenue by Course</CardTitle>
                 <CardDescription>Top courses by revenue generated</CardDescription>
@@ -557,7 +557,7 @@ function StatCard({ title, value, icon, color }: StatCardProps) {
   const Icon = icon as React.ComponentType<{ className?: string }>;
 
   return (
-    <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card shadow-none">
+    <Card className="rounded-[12px] border-gray-200 bg-card shadow-sm">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>

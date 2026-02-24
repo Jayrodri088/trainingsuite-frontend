@@ -208,7 +208,7 @@ export default function AdminDashboardPage() {
             <CardDescription>Administrative tasks</CardDescription>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <Button variant="outline" className="h-auto p-6 flex flex-col items-center gap-3 rounded-[12px] border-gray-200 bg-white shadow-sm hover:bg-muted" asChild>
                 <Link href="/admin/users">
                   <Users className="h-8 w-8 text-gray-600" />

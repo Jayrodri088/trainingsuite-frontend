@@ -114,7 +114,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-sans font-bold text-black font-bold uppercase tracking-tight">Site Settings</h1>
+          <h1 className="text-3xl font-sans font-bold text-black uppercase tracking-tight">Site Settings</h1>
           <p className="text-muted-foreground mt-1">
             Configure your platform settings and preferences.
           </p>
@@ -133,7 +133,7 @@ export default function SettingsPage() {
       )}
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="bg-transparent border-b border-gray-200 w-full justify-start rounded-[10px] h-auto p-0 gap-6">
+        <TabsList className="bg-transparent border-b border-gray-200 w-full justify-start rounded-[10px] h-auto p-0 gap-4 sm:gap-6 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="general"
             className="rounded-[10px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
@@ -219,7 +219,7 @@ export default function SettingsPage() {
               <Separator />
 
               <div>
-                <h4 className="font-sans font-bold text-black font-bold uppercase tracking-wide text-sm mb-6">Social Links</h4>
+                <h4 className="font-sans font-bold text-black uppercase tracking-wide text-sm mb-6">Social Links</h4>
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="facebook" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Facebook</Label>
@@ -366,7 +366,7 @@ export default function SettingsPage() {
               <Separator />
 
               <div>
-                <h4 className="font-sans font-bold text-black font-bold uppercase tracking-wide text-sm mb-6">Brand Colors</h4>
+                <h4 className="font-sans font-bold text-black uppercase tracking-wide text-sm mb-6">Brand Colors</h4>
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="primaryColor" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Primary Color</Label>

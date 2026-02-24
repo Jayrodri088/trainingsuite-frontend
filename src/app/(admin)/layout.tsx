@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -20,10 +20,11 @@ import {
   PlusCircle,
   Video,
   GraduationCap,
+  Menu,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -125,6 +126,12 @@ export default function AdminLayout({
   const { data: notificationsResponse } = useNotifications();
   const markAsRead = useMarkAsRead();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Close mobile menu when route changes (e.g. after navigation)
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   const notifications = notificationsResponse?.data || [];
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -140,43 +147,68 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
+      {/* Mobile backdrop */}
+      <button
+        type="button"
+        aria-label="Close menu"
+        onClick={() => setMobileMenuOpen(false)}
+        className={cn(
+          "fixed inset-0 z-30 bg-black/50 transition-opacity duration-300 lg:hidden",
+          mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+      />
+
       {/* Sidebar */}
       <aside
         className={cn(
           "fixed top-0 left-0 z-40 h-screen bg-[#FAFAFA] text-gray-900 transition-all duration-300 border-r border-gray-200",
-          collapsed ? "w-[70px]" : "w-[260px]"
+          "w-[260px] lg:w-[70px]",
+          !collapsed && "lg:w-[260px]",
+          "translate-x-0",
+          !mobileMenuOpen && "-translate-x-full lg:translate-x-0"
         )}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-4 sm:px-5 border-b border-gray-200">
-          {!collapsed && (
-            <Link href="/admin" className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-[10px] bg-[#0052CC] flex items-center justify-center">
-                <Shield className="h-4 w-4 text-white" />
-              </div>
-              <span className="font-sans font-bold tracking-tight text-sm text-black">Admin Panel</span>
-            </Link>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCollapsed(!collapsed)}
-            className="text-gray-600 hover:text-black hover:bg-gray-200 rounded-[10px] h-8 w-8"
-          >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </Button>
+        <div className="h-16 flex items-center justify-between px-4 sm:px-5 border-b border-gray-200 gap-2">
+          <Link href="/admin" className="flex items-center gap-3 min-w-0" onClick={() => setMobileMenuOpen(false)}>
+            <div className="h-8 w-8 shrink-0 rounded-[10px] bg-[#0052CC] flex items-center justify-center">
+              <Shield className="h-4 w-4 text-white" />
+            </div>
+            <span className={cn("font-sans font-bold tracking-tight text-sm text-black truncate", (collapsed && !mobileMenuOpen) && "hidden")}>
+              Admin Panel
+            </span>
+          </Link>
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-gray-600 hover:text-black hover:bg-gray-200 rounded-[10px] h-8 w-8 lg:hidden"
+              aria-label="Close menu"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCollapsed(!collapsed)}
+              className="text-gray-600 hover:text-black hover:bg-gray-200 rounded-[10px] h-8 w-8 hidden lg:flex"
+            >
+              {collapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-6 px-4">
+        <nav className="flex-1 overflow-y-auto py-6 px-4 pb-24 lg:pb-6">
           <div className="space-y-8">
             {adminNavSections.map((section) => (
               <div key={section.title}>
-                {!collapsed && (
+                {(!collapsed || mobileMenuOpen) && (
                   <h3 className="px-2 mb-4 text-xs font-sans font-semibold text-gray-500">
                     {section.title}
                   </h3>
@@ -196,12 +228,12 @@ export default function AdminLayout({
                           isActive
                             ? "border-[#0052CC] text-[#0052CC] bg-[#0052CC]/10 font-semibold"
                             : "text-gray-600 hover:text-gray-900",
-                          collapsed && "justify-center px-2 border-l-0"
+                          (collapsed && !mobileMenuOpen) && "justify-center px-2 border-l-0"
                         )}
-                        title={collapsed ? item.label : undefined}
+                        title={(collapsed && !mobileMenuOpen) ? item.label : undefined}
                       >
                         <Icon className={cn("h-4 w-4 shrink-0", isActive && "text-[#0052CC]")} />
-                        {!collapsed && <span>{item.label}</span>}
+                        {(!collapsed || mobileMenuOpen) && <span>{item.label}</span>}
                       </Link>
                     );
                   })}
@@ -213,7 +245,7 @@ export default function AdminLayout({
 
         {/* User Section */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-[#FAFAFA]">
-          {collapsed ? (
+          {(collapsed && !mobileMenuOpen) ? (
             <div className="flex justify-center">
               <Avatar className="h-9 w-9 border border-gray-200">
                 <AvatarImage src={user?.avatar} />
@@ -240,11 +272,20 @@ export default function AdminLayout({
       </aside>
 
       {/* Main Content */}
-      <div className={cn("transition-all duration-300 min-h-screen flex flex-col", collapsed ? "ml-[70px]" : "ml-[260px]")}>
+      <div className={cn("transition-all duration-300 min-h-screen flex flex-col", "ml-0", collapsed ? "lg:ml-[70px]" : "lg:ml-[260px]")}>
         {/* Header */}
-        <header className="h-14 sm:h-16 bg-[#FAFAFA] border-b border-gray-200 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div>
-            <h1 className="text-lg font-sans font-bold text-black">
+        <header className="h-14 sm:h-16 bg-[#FAFAFA] border-b border-gray-200 sticky top-0 z-20 flex items-center justify-between gap-3 px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="flex items-center gap-2 min-w-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden shrink-0 h-9 w-9 rounded-[10px] text-gray-600 hover:text-black hover:bg-gray-200"
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <h1 className="text-base sm:text-lg font-sans font-bold text-black truncate">
               {adminNavSections
                 .flatMap((section) => section.items)
                 .find((item) =>
@@ -254,7 +295,7 @@ export default function AdminLayout({
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
