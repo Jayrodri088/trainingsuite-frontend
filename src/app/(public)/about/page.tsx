@@ -29,7 +29,7 @@ const leadership = [
     image: "/Images/CEO.webp",
     name: "Pastor Yemisi Kudehinbu",
     titleKey: "Director, Rhapsody of Realities & Zonal Director, Christ Embassy Lagos Virtual Zone",
-    bioKey: "Pastor Yemisi Kudehinbu serves as the Director of Rhapsody of Realities, the best-selling daily devotional that has transformed lives across the globe. She also serves as Zonal Director of Christ Embassy Lagos Virtual Zone (CELVZ) and Director of Loveworld Publications. Pastor Yemisi is a recognized leader within the LoveWorld ministry, having been awarded the Partners' Department of the Year Award for Rhapsody of Realities and the Top Partnering Pastor Award in the Church Pastors/Directors category. She drives the vision of Rhapsody Omega Force—ensuring ministers across the globe have access to structured curriculum, live mentorship, and certification for the next level of impact.",
+    bioKey: "Pastor Yemisi Kudehinbu serves as the Director of Rhapsody of Realities, the best-selling daily devotional that has transformed lives across the globe. She also serves as Zonal Director of Christ Embassy Lagos Virtual Zone (CELVZ) and Director of Loveworld Publications. Pastor Yemisi is a recognized leader within the LoveWorld ministry, having been awarded the Partners' Department of the Year Award for Rhapsody of Realities. She drives the vision of Rhapsody Omega Force, ensuring ministers across the globe have access to a structured curriculum, live mentorship to equip them for the next level of impact.",
   },
 ];
 
