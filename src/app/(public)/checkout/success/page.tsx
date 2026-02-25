@@ -73,17 +73,34 @@ export default function CheckoutSuccessPage() {
     verifyThenPoll();
   }, [isPortalAccess, sessionId, queryClient, router]);
 
-  // Course enrollment: poll until enrolled then redirect to learn page
+  // Course enrollment: verify session once (creates enrollment on backend), then poll until enrolled and redirect
   useEffect(() => {
-    if (!courseRef || isPortalAccess) {
+    if (!courseRef || isPortalAccess || !sessionId) {
       if (!isPortalAccess && !courseRef) setIsChecking(false);
       return;
     }
 
+    let verified = false;
     let attempts = 0;
     const maxAttempts = 10;
 
-    const runCheck = async () => {
+    const verifyThenPoll = async () => {
+      if (!verified) {
+        try {
+          const verify = await paymentsApi.verifySession(sessionId);
+          if (!verify?.data?.paid) {
+            setVerifyError("Payment was not completed.");
+            setIsChecking(false);
+            return;
+          }
+          verified = true;
+        } catch {
+          setVerifyError("Could not verify payment.");
+          setIsChecking(false);
+          return;
+        }
+      }
+
       attempts += 1;
       try {
         const response = await enrollmentsApi.checkEnrollment(courseRef);
@@ -94,18 +111,18 @@ export default function CheckoutSuccessPage() {
           return;
         }
       } catch {
-        // Keep polling briefly for webhook completion.
+        // Keep polling
       }
 
       if (attempts >= maxAttempts) {
         setIsChecking(false);
+      } else {
+        setTimeout(verifyThenPoll, 2000);
       }
     };
 
-    runCheck();
-    const interval = setInterval(runCheck, 3000);
-    return () => clearInterval(interval);
-  }, [courseRef, isPortalAccess, router]);
+    verifyThenPoll();
+  }, [courseRef, isPortalAccess, sessionId, router]);
 
   const checkingMessage = isPortalAccess
     ? "Confirming your access..."

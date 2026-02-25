@@ -27,8 +27,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageLoader } from "@/components/ui/page-loader";
 import { CourseCardPublicSkeleton } from "@/components/courses/course-card-public";
+import { CourseDiscussionsTab } from "@/components/courses/course-discussions-tab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CourseChatPanel } from "@/components/courses/course-chat-panel";
 import {
   Accordion,
   AccordionContent,
@@ -393,7 +393,14 @@ export default function CourseDetailPage({
       return;
     }
 
-    // All courses are free; enrollment requires portal access ($1) to be completed first
+    // Paid courses: must purchase first (redirect to Stripe checkout)
+    const isPaidCourse = (course.price != null && course.price > 0) || course.isFree === false;
+    if (isPaidCourse && course.price != null && course.price > 0) {
+      initializePaymentMutation.mutate(course._id);
+      return;
+    }
+
+    // Free courses: enroll directly (portal access $1 must be completed first)
     enrollMutation.mutate(course._id);
   };
 
@@ -488,9 +495,16 @@ export default function CourseDetailPage({
                 <Badge className={`rounded-[9999px] ${levelColors[course.level as keyof typeof levelColors] || "bg-slate-600 text-white"}`}>
                   {t(course.level || "beginner")}
                 </Badge>
-                <Badge className="rounded-[9999px] bg-emerald-600 text-white border-0">
-                  <T>Free</T>
-                </Badge>
+                {(course.price == null || course.price === 0 || course.isFree) ? (
+                  <Badge className="rounded-[9999px] bg-emerald-600 text-white border-0">
+                    <T>Free</T>
+                  </Badge>
+                ) : (
+                  <Badge className="rounded-[9999px] bg-amber-600 text-white border-0">
+                    {course.currency === "USD" && "$"}
+                    {typeof course.price === "number" ? course.price.toFixed(0) : course.price}
+                  </Badge>
+                )}
                 {course.category && typeof course.category === "object" && (
                   <Badge variant="outline" className="rounded-[9999px] border-slate-400 text-slate-200">
                     {t(course.category.name)}
@@ -578,10 +592,12 @@ export default function CourseDetailPage({
                       size="lg"
                       className="w-full mb-3 rounded-[10px]"
                       onClick={handleEnroll}
-                      disabled={enrollMutation.isPending}
+                      disabled={enrollMutation.isPending || initializePaymentMutation.isPending}
                     >
-                      {enrollMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                      <T>Start Training</T>
+                      {(enrollMutation.isPending || initializePaymentMutation.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                      {(course.price != null && course.price > 0 && !course.isFree)
+                        ? (course.currency === "USD" ? t("Buy") + ` $${course.price}` : `${course.price} ${course.currency || ""}`)
+                        : t("Start Training")}
                     </Button>
                   )}
 
@@ -626,7 +642,7 @@ export default function CourseDetailPage({
                 <TabsTrigger value="curriculum" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Curriculum</T></TabsTrigger>
                 <TabsTrigger value="overview" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Overview</T></TabsTrigger>
                 <TabsTrigger value="reviews" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Reviews</T></TabsTrigger>
-                <TabsTrigger value="course-chat" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Course chat</T></TabsTrigger>
+                <TabsTrigger value="discussions" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Discussions</T></TabsTrigger>
               </TabsList>
 
               <TabsContent value="curriculum" className="mt-0">
@@ -811,10 +827,8 @@ export default function CourseDetailPage({
                 </Card>
               </TabsContent>
 
-              <TabsContent value="course-chat" className="mt-0">
-                <div className="max-w-2xl">
-                  <CourseChatPanel courseIdOrSlug={resolvedParams.slug} />
-                </div>
+              <TabsContent value="discussions" className="mt-0">
+                <CourseDiscussionsTab courseIdOrSlug={resolvedParams.slug} />
               </TabsContent>
             </Tabs>
           </div>

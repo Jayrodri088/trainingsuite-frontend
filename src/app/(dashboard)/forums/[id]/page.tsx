@@ -136,6 +136,9 @@ export default function ForumDetailPage() {
     );
   }
 
+  const course = typeof forum.course === "object" && forum.course ? forum.course : null;
+  const courseSlug = course && "slug" in course ? (course as { slug?: string }).slug : null;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -146,9 +149,16 @@ export default function ForumDetailPage() {
           </Link>
         </Button>
         <div className="flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-2xl font-bold">{forum.title}</h1>
             {forum.isGeneral && <Badge variant="secondary"><T>General</T></Badge>}
+            {courseSlug && (
+              <Button variant="outline" size="sm" asChild className="rounded-[10px]">
+                <Link href={`/courses/${courseSlug}`}>
+                  <T>Back to course</T>
+                </Link>
+              </Button>
+            )}
           </div>
           {forum.description && (
             <p className="text-muted-foreground">{forum.description}</p>

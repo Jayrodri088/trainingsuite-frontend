@@ -10,7 +10,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCourse, useCourseCurriculum, useEnrollment } from "@/hooks";
 import { LessonComments } from "@/components/lessons/lesson-comments";
 import { CourseCompletionDialog } from "@/components/courses/course-completion-dialog";
-import { CourseChatPanel } from "@/components/courses/course-chat-panel";
 import { useToast } from "@/hooks/use-toast";
 import { lessonsApi } from "@/lib/api/lessons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -34,7 +33,7 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
 
   const { data: courseResponse, isLoading: courseLoading } = useCourse(resolvedParams.slug);
   const { data: curriculumResponse, isLoading: curriculumLoading } = useCourseCurriculum(resolvedParams.slug);
-  const { data: enrollmentResponse } = useEnrollment(resolvedParams.slug);
+  const { data: enrollmentResponse, isLoading: enrollmentLoading } = useEnrollment(resolvedParams.slug);
 
   const baseCompletedFromEnrollment = useMemo(() => {
     const completed = enrollmentResponse?.data?.completedLessons;
@@ -79,11 +78,12 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
     }
   }
 
-  const isLoading = courseLoading || curriculumLoading;
+  const isLoading = courseLoading || curriculumLoading || enrollmentLoading;
   if (isLoading) return <PageLoader />;
 
   const course = courseResponse?.data as Course | undefined;
   const courseProgress = enrollmentResponse?.data?.progress || 0;
+  const isEnrolled = !!enrollmentResponse?.data;
 
   if (!course) {
     return (
@@ -97,6 +97,11 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
         </div>
       </div>
     );
+  }
+
+  if (!isEnrolled) {
+    router.replace(`/courses/${course.slug || course._id}`);
+    return null;
   }
 
   const allLessons = modules.flatMap((m) => (m.lessons || []) as Lesson[]);
@@ -179,10 +184,6 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
                 <MessageSquare className="h-4 w-4 mr-2" />
                 <T>Discussion</T>
               </TabsTrigger>
-              <TabsTrigger value="course-chat" className="shrink-0 rounded-[8px] font-sans font-medium text-gray-600 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm">
-                <MessageSquare className="h-4 w-4 mr-2" />
-                <T>Course chat</T>
-              </TabsTrigger>
               <TabsTrigger value="notes" className="shrink-0 rounded-[8px] font-sans font-medium text-gray-600 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm">
                 <FileText className="h-4 w-4 mr-2" />
                 <T>Notes</T>
@@ -195,9 +196,6 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
             </TabsContent>
             <TabsContent value="discussion" className="mt-0">
               <LessonComments lessonId={activeLesson?._id || ""} />
-            </TabsContent>
-            <TabsContent value="course-chat" className="mt-0 p-4">
-              <CourseChatPanel courseIdOrSlug={resolvedParams.slug} />
             </TabsContent>
             <TabsContent value="notes" className="mt-0 p-6">
               <div className="text-center py-12">

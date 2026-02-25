@@ -104,27 +104,11 @@ export const coursesApi = {
     return response.data;
   },
 
-  getChat: async (courseIdOrSlug: string, page = 1, limit = 50) => {
-    const response = await apiClient.get<PaginatedResponse<CourseChatMessage>>(
-      `/courses/${courseIdOrSlug}/chat?page=${page}&limit=${limit}`
-    );
-    return response.data;
-  },
-
-  sendChatMessage: async (courseIdOrSlug: string, message: string) => {
-    const response = await apiClient.post<ApiResponse<CourseChatMessage>>(
-      `/courses/${courseIdOrSlug}/chat`,
-      { message }
+  /** Get the discussion forum for a course (if one exists). */
+  getForum: async (courseIdOrSlug: string) => {
+    const response = await apiClient.get<ApiResponse<{ _id: string; title: string; description?: string; postCount?: number }>>(
+      `/courses/${courseIdOrSlug}/forum`
     );
     return response.data;
   },
 };
-
-export interface CourseChatMessage {
-  _id: string;
-  course: string;
-  user: { _id: string; name?: string; avatar?: string };
-  message: string;
-  createdAt: string;
-  updatedAt: string;
-}
