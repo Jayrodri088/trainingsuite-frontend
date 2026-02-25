@@ -122,16 +122,34 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout, ...auth } = useAuth();
   const { data: notificationsResponse } = useNotifications();
   const markAsRead = useMarkAsRead();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Restrict admin area to admin role only (no portal payment required for admins)
+  const isLoading = auth.isLoading;
+  const isAuthenticated = auth.isAuthenticated;
+  useEffect(() => {
+    if (isLoading) return;
+    if (!isAuthenticated) {
+      router.replace("/login?redirect=" + encodeURIComponent(pathname || "/admin"));
+      return;
+    }
+    if (user && user.role !== "admin") {
+      router.replace("/dashboard");
+    }
+  }, [isLoading, isAuthenticated, user, router, pathname]);
+
   // Close mobile menu when route changes (e.g. after navigation)
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
+
+  if (!isLoading && (!isAuthenticated || user?.role !== "admin")) {
+    return null;
+  }
 
   const notifications = notificationsResponse?.data || [];
   const unreadCount = notifications.filter((n) => !n.isRead).length;

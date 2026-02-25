@@ -594,6 +594,7 @@ export default function SettingsPage() {
                     <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                       <SelectItem value="youtube">YouTube</SelectItem>
                       <SelectItem value="vimeo">Vimeo</SelectItem>
+                      <SelectItem value="hls">HLS</SelectItem>
                       <SelectItem value="custom">Custom</SelectItem>
                     </SelectContent>
                   </Select>

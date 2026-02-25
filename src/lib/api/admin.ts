@@ -120,6 +120,20 @@ export const adminApi = {
     return response.data;
   },
 
+  createUser: async (data: {
+    name: string;
+    email: string;
+    password: string;
+    role: "admin" | "instructor" | "user";
+    network?: string;
+  }) => {
+    const response = await apiClient.post<ApiResponse<User>>(
+      "/admin/users",
+      data
+    );
+    return response.data;
+  },
+
   // Analytics
   getOverview: async () => {
     const response = await apiClient.get<ApiResponse<OverviewAnalytics>>(

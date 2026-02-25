@@ -26,6 +26,12 @@ export interface UpdateProfileData {
   avatar?: string;
 }
 
+export interface ChangePasswordData {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
 export const authApi = {
   login: async (credentials: LoginCredentials) => {
     const response = await apiClient.post<ApiResponse<{ user: User; token: string }>>(
@@ -75,6 +81,14 @@ export const authApi = {
   updateProfile: async (data: UpdateProfileData) => {
     const response = await apiClient.put<ApiResponse<User>>(
       "/auth/profile",
+      data
+    );
+    return response.data;
+  },
+
+  changePassword: async (data: ChangePasswordData) => {
+    const response = await apiClient.post<ApiResponse<null>>(
+      "/auth/change-password",
       data
     );
     return response.data;

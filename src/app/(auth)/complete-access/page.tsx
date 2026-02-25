@@ -25,6 +25,12 @@ export default function CompleteAccessPage() {
     return null;
   }
 
+  // Admins are not required to pay; send them to admin or dashboard
+  if (!auth.isLoading && auth.user?.role === "admin") {
+    router.replace("/admin");
+    return null;
+  }
+
   // If already has portal access, go to dashboard
   if (!auth.isLoading && auth.user?.portalAccessPaidAt) {
     router.replace("/dashboard");

@@ -95,9 +95,17 @@ export default function UsersPage() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [editRole, setEditRole] = useState<UserRole>("user");
+  const [editForm, setEditForm] = useState({ name: "", email: "", role: "user" as UserRole });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+  const [newUserForm, setNewUserForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "user" as UserRole,
+    network: "",
+  });
 
   // Fetch users from API
   const { data: usersResponse, isLoading } = useQuery({
@@ -144,7 +152,7 @@ export default function UsersPage() {
 
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
-    setEditRole(user.role);
+    setEditForm({ name: user.name || "", email: user.email || "", role: user.role });
     setEditDialogOpen(true);
   };
 
@@ -152,8 +160,42 @@ export default function UsersPage() {
     if (!selectedUser) return;
     updateUserMutation.mutate({
       id: selectedUser._id,
-      data: { role: editRole },
+      data: {
+        name: editForm.name.trim(),
+        email: editForm.email.trim(),
+        role: editForm.role,
+      },
     });
+  };
+
+  // Create user mutation
+  const createUserMutation = useMutation({
+    mutationFn: (data: typeof newUserForm) =>
+      adminApi.createUser({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+        network: data.network || undefined,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      setAddUserDialogOpen(false);
+      setNewUserForm({ name: "", email: "", password: "", role: "user", network: "" });
+      toast({ title: "User created successfully" });
+    },
+    onError: (err: { response?: { data?: { error?: string } } }) => {
+      const msg = err?.response?.data?.error || "Failed to create user";
+      toast({ title: msg, variant: "destructive" });
+    },
+  });
+
+  const handleAddUser = () => {
+    if (!newUserForm.name.trim() || !newUserForm.email.trim() || !newUserForm.password) {
+      toast({ title: "Name, email and password are required", variant: "destructive" });
+      return;
+    }
+    createUserMutation.mutate(newUserForm);
   };
 
   // Verify user mutation
@@ -243,7 +285,20 @@ export default function UsersPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
             <CardTitle className="font-heading text-lg">User Management</CardTitle>
             <div className="flex gap-2 w-full sm:w-auto">
-              <Button variant="outline" size="sm" className="rounded-[12px] border-gray-200 bg-white shadow-sm ml-auto">
+              <Button
+                onClick={() => setAddUserDialogOpen(true)}
+                size="sm"
+                className="rounded-[12px] bg-[#0052CC] hover:bg-[#003d99] text-white ml-auto"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Add User
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                onClick={() => toast({ title: "Coming soon", description: "Export will be available in a future update." })}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
@@ -290,7 +345,12 @@ export default function UsersPage() {
                 {selectedUsers.length} users selected
               </span>
               <div className="h-4 w-px bg-border mx-2" />
-              <Button variant="ghost" size="sm" className="rounded-[10px] h-8 text-gray-600 hover:text-foreground">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-[10px] h-8 text-gray-600 hover:text-foreground"
+                onClick={() => toast({ title: "Coming soon", description: "Bulk email will be available in a future update." })}
+              >
                 <Mail className="h-4 w-4 mr-2" />
                 Send Email
               </Button>
@@ -391,7 +451,10 @@ export default function UsersPage() {
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit Role
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="rounded-[10px] cursor-pointer">
+                              <DropdownMenuItem
+                                className="rounded-[10px] cursor-pointer"
+                                onClick={() => toast({ title: "Coming soon", description: "Send email will be available in a future update." })}
+                              >
                                 <Mail className="h-4 w-4 mr-2" />
                                 Send Email
                               </DropdownMenuItem>
@@ -462,19 +525,121 @@ export default function UsersPage() {
         </CardContent>
       </Card>
 
+      {/* Add User Dialog */}
+      <Dialog open={addUserDialogOpen} onOpenChange={setAddUserDialogOpen}>
+        <DialogContent className="rounded-[12px] border-gray-200 bg-white shadow-sm max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-heading">Add User</DialogTitle>
+            <DialogDescription>
+              Create a new user account. They will be able to sign in with the email and password you set.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Name</Label>
+              <Input
+                value={newUserForm.name}
+                onChange={(e) => setNewUserForm({ ...newUserForm, name: e.target.value })}
+                placeholder="Full name"
+                className="rounded-[12px] border-gray-200"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Email</Label>
+              <Input
+                type="email"
+                value={newUserForm.email}
+                onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
+                placeholder="email@example.com"
+                className="rounded-[12px] border-gray-200"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Password</Label>
+              <Input
+                type="password"
+                value={newUserForm.password}
+                onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })}
+                placeholder="Min 8 chars, 1 upper, 1 lower, 1 number"
+                className="rounded-[12px] border-gray-200"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Role</Label>
+              <Select
+                value={newUserForm.role}
+                onValueChange={(v) => setNewUserForm({ ...newUserForm, role: v as UserRole })}
+              >
+                <SelectTrigger className="rounded-[12px] border-gray-200">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-[10px]">
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="instructor">Instructor</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Network (optional)</Label>
+              <Input
+                value={newUserForm.network}
+                onChange={(e) => setNewUserForm({ ...newUserForm, network: e.target.value })}
+                placeholder="e.g. REON, TNI"
+                className="rounded-[12px] border-gray-200"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddUserDialogOpen(false)} className="rounded-[12px] border-gray-200">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddUser}
+              disabled={createUserMutation.isPending}
+              className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99]"
+            >
+              {createUserMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : null}
+              Create User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit User Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
           <DialogHeader>
-            <DialogTitle className="font-heading">Edit User Role</DialogTitle>
+            <DialogTitle className="font-heading">Edit User</DialogTitle>
             <DialogDescription>
-              Change permission level for <span className="font-semibold text-foreground">{selectedUser?.name}</span>
+              Update name, email, or role for this user.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-6">
-            <div className="space-y-3">
-              <Label className="text-xs font-bold uppercase tracking-wide">Role Assignment</Label>
-              <Select value={editRole} onValueChange={(v) => setEditRole(v as UserRole)}>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Name</Label>
+              <Input
+                value={editForm.name}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                placeholder="Full name"
+                className="rounded-[12px] border-gray-200"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Email</Label>
+              <Input
+                type="email"
+                value={editForm.email}
+                onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                placeholder="email@example.com"
+                className="rounded-[12px] border-gray-200"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Role</Label>
+              <Select value={editForm.role} onValueChange={(v) => setEditForm({ ...editForm, role: v as UserRole })}>
                 <SelectTrigger className="rounded-[12px] border-gray-200 bg-white shadow-sm">
                   <SelectValue />
                 </SelectTrigger>

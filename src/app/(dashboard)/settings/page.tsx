@@ -54,6 +54,12 @@ export default function SettingsPage() {
     phone: "",
   });
 
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  });
+
   useEffect(() => {
     if (user) {
       const nameParts = user.name?.split(" ") || [];
@@ -161,6 +167,30 @@ export default function SettingsPage() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const changePasswordMutation = useMutation({
+    mutationFn: (data: { currentPassword: string; newPassword: string; confirmNewPassword: string }) =>
+      authApi.changePassword(data),
+    onSuccess: () => {
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
+      toast({ title: t("Password updated successfully") });
+    },
+    onError: (error) => {
+      toast({ title: getErrorMessage(error), variant: "destructive" });
+    },
+  });
+
+  const handleChangePassword = () => {
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmNewPassword) {
+      toast({ title: t("Please fill in all password fields"), variant: "destructive" });
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmNewPassword) {
+      toast({ title: t("New passwords do not match"), variant: "destructive" });
+      return;
+    }
+    changePasswordMutation.mutate(passwordForm);
   };
 
   return (
@@ -343,6 +373,8 @@ export default function SettingsPage() {
                   <Input
                     id="currentPassword"
                     type="password"
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
                     placeholder={t("Enter current password")}
                     className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
                   />
@@ -352,6 +384,8 @@ export default function SettingsPage() {
                   <Input
                     id="newPassword"
                     type="password"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                     placeholder={t("Enter new password")}
                     className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
                   />
@@ -361,11 +395,20 @@ export default function SettingsPage() {
                   <Input
                     id="confirmPassword"
                     type="password"
+                    value={passwordForm.confirmNewPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, confirmNewPassword: e.target.value })}
                     placeholder={t("Confirm new password")}
                     className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
                   />
                 </div>
-                <Button className="rounded-[10px] font-bold bg-[#0052CC] hover:bg-[#003d99] text-white"><T>Update Password</T></Button>
+                <Button
+                  onClick={handleChangePassword}
+                  disabled={changePasswordMutation.isPending}
+                  className="rounded-[10px] font-bold bg-[#0052CC] hover:bg-[#003d99] text-white"
+                >
+                  {changePasswordMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                  <T>Update Password</T>
+                </Button>
               </CardContent>
             </Card>
 
@@ -384,8 +427,9 @@ export default function SettingsPage() {
                       <T>Secure your account with two-factor authentication</T>
                     </p>
                   </div>
-                  <Switch />
+                  <Switch disabled />
                 </div>
+                <p className="text-xs text-gray-500 mt-2"><T>Coming soon</T></p>
               </CardContent>
             </Card>
 
@@ -402,13 +446,17 @@ export default function SettingsPage() {
                     <div>
                       <p className="font-bold text-sm"><T>Current Device</T></p>
                       <p className="text-xs text-gray-600 mt-1">
-                        Chrome on macOS • <T>Last active now</T>
+                        <T>This device</T> • <T>Current session</T>
                       </p>
                     </div>
                     <Badge variant="secondary" className="rounded-[8px] bg-[#0052CC]/10 text-[#0052CC] border-0 font-semibold text-[10px]"><T>Current</T></Badge>
                   </div>
                 </div>
-                <Button variant="outline" className="mt-6 rounded-[12px] border-gray-200 bg-white shadow-sm uppercase text-xs font-bold tracking-wider">
+                <Button
+                  variant="outline"
+                  onClick={() => toast({ title: t("Coming soon"), description: t("Session management is not available yet.") })}
+                  className="mt-6 rounded-[12px] border-gray-200 bg-white shadow-sm uppercase text-xs font-bold tracking-wider"
+                >
                   <T>Sign out of all other devices</T>
                 </Button>
               </CardContent>
@@ -492,8 +540,10 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <Button onClick={handleSave} disabled={isSaving} className="rounded-[10px] font-bold bg-[#0052CC] hover:bg-[#003d99] text-white">
-                {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              <Button
+                onClick={() => toast({ title: t("Coming soon"), description: t("Notification preferences will be saved here.") })}
+                className="rounded-[10px] font-bold bg-[#0052CC] hover:bg-[#003d99] text-white"
+              >
                 <T>Save Preferences</T>
               </Button>
             </CardContent>
@@ -611,8 +661,10 @@ export default function SettingsPage() {
                   </Select>
                 </div>
 
-                <Button onClick={handleSave} disabled={isSaving} className="mt-4 rounded-[10px] font-bold bg-[#0052CC] hover:bg-[#003d99] text-white">
-                  {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                <Button
+                  onClick={() => toast({ title: t("Coming soon"), description: t("Learning preferences will be saved here.") })}
+                  className="mt-4 rounded-[10px] font-bold bg-[#0052CC] hover:bg-[#003d99] text-white"
+                >
                   <T>Save Preferences</T>
                 </Button>
               </CardContent>
