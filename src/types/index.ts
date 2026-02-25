@@ -411,6 +411,8 @@ export interface CourseFilters {
 export interface UserFilters {
   role?: UserRole;
   isVerified?: boolean;
+  /** Filter by portal access payment: "paid" | "unpaid" */
+  portalAccess?: "paid" | "unpaid";
   search?: string;
   sort?: "createdAt" | "name" | "email";
   order?: "asc" | "desc";

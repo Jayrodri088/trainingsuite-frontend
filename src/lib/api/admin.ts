@@ -120,6 +120,14 @@ export const adminApi = {
     return response.data;
   },
 
+  /** Waive portal access payment for a user (grant access without payment). */
+  waivePortalAccess: async (id: string) => {
+    const response = await apiClient.post<ApiResponse<User>>(
+      `/admin/users/${id}/waive-portal-access`
+    );
+    return response.data;
+  },
+
   createUser: async (data: {
     name: string;
     email: string;

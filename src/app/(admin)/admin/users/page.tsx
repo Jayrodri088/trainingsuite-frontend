@@ -4,20 +4,19 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Search,
-  Filter,
   MoreHorizontal,
   UserPlus,
   Mail,
   Shield,
   ShieldCheck,
-  ShieldX,
-  Eye,
   Edit,
   Trash2,
   Download,
   ChevronLeft,
   ChevronRight,
   Loader2,
+  CircleDollarSign,
+  Banknote,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -92,6 +91,7 @@ export default function UsersPage() {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
+  const [portalAccessFilter, setPortalAccessFilter] = useState<"all" | "paid" | "unpaid">("all");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -109,12 +109,13 @@ export default function UsersPage() {
 
   // Fetch users from API
   const { data: usersResponse, isLoading } = useQuery({
-    queryKey: ["admin-users", page, searchQuery, roleFilter],
+    queryKey: ["admin-users", page, searchQuery, roleFilter, portalAccessFilter],
     queryFn: () => adminApi.getUsers({
       page,
       limit: 10,
       search: searchQuery || undefined,
       role: roleFilter !== "all" ? (roleFilter as UserRole) : undefined,
+      portalAccess: portalAccessFilter !== "all" ? portalAccessFilter : undefined,
     }),
   });
 
@@ -214,6 +215,22 @@ export default function UsersPage() {
     verifyUserMutation.mutate(userId);
   };
 
+  // Waive portal access payment
+  const waivePortalAccessMutation = useMutation({
+    mutationFn: (id: string) => adminApi.waivePortalAccess(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast({ title: "Portal access granted. User can now access the app." });
+    },
+    onError: () => {
+      toast({ title: "Failed to waive payment", variant: "destructive" });
+    },
+  });
+
+  const handleWaivePortalAccess = (userId: string) => {
+    waivePortalAccessMutation.mutate(userId);
+  };
+
   const handleDeleteUser = (user: User) => {
     setUserToDelete(user);
     setDeleteDialogOpen(true);
@@ -239,11 +256,13 @@ export default function UsersPage() {
     );
   };
 
-  // Compute stats from real data
+  // Compute stats from real data (current page/filter)
   const totalUsers = pagination?.total || 0;
   const activeUsers = users.filter((u) => u.isVerified).length;
   const instructorCount = users.filter((u) => u.role === "instructor").length;
   const pendingVerification = users.filter((u) => !u.isVerified).length;
+  const portalPaidCount = users.filter((u) => u.portalAccessPaidAt).length;
+  const portalUnpaidCount = users.filter((u) => !u.portalAccessPaidAt).length;
 
   if (isLoading) {
     return <PageLoader />;
@@ -252,7 +271,7 @@ export default function UsersPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="text-3xl font-light text-foreground">{totalUsers}</div>
@@ -275,6 +294,18 @@ export default function UsersPage() {
           <CardContent className="p-6">
             <div className="text-3xl font-light text-amber-600">{pendingVerification}</div>
             <p className="text-sm font-medium uppercase tracking-wide text-gray-600 mt-1">Pending Action</p>
+          </CardContent>
+        </Card>
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+          <CardContent className="p-6">
+            <div className="text-3xl font-light text-emerald-600">{portalPaidCount}</div>
+            <p className="text-sm font-medium uppercase tracking-wide text-gray-600 mt-1">Portal paid (this page)</p>
+          </CardContent>
+        </Card>
+        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+          <CardContent className="p-6">
+            <div className="text-3xl font-light text-orange-600">{portalUnpaidCount}</div>
+            <p className="text-sm font-medium uppercase tracking-wide text-gray-600 mt-1">Portal unpaid (this page)</p>
           </CardContent>
         </Card>
       </div>
@@ -336,6 +367,22 @@ export default function UsersPage() {
                 <SelectItem value="user">User</SelectItem>
               </SelectContent>
             </Select>
+            <Select
+              value={portalAccessFilter}
+              onValueChange={(value: "all" | "paid" | "unpaid") => {
+                setPortalAccessFilter(value);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="w-full md:w-[200px] rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20">
+                <SelectValue placeholder="Portal access" />
+              </SelectTrigger>
+              <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="paid">Portal paid</SelectItem>
+                <SelectItem value="unpaid">Portal unpaid</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Bulk Actions */}
@@ -376,6 +423,7 @@ export default function UsersPage() {
                     <TableHead className="font-bold uppercase text-xs tracking-wider">User</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider">Role</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider">Status</TableHead>
+                    <TableHead className="font-bold uppercase text-xs tracking-wider">Portal access</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider">Joined</TableHead>
                     <TableHead className="w-[50px] pr-6"></TableHead>
                   </TableRow>
@@ -383,7 +431,7 @@ export default function UsersPage() {
                 <TableBody>
                   {users.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-12 text-gray-600">
+                      <TableCell colSpan={7} className="text-center py-12 text-gray-600">
                         No users found matching your criteria
                       </TableCell>
                     </TableRow>
@@ -434,6 +482,19 @@ export default function UsersPage() {
                             </div>
                           )}
                         </TableCell>
+                        <TableCell>
+                          {user.portalAccessPaidAt ? (
+                            <div className="flex items-center gap-2 text-emerald-600 text-xs font-medium uppercase tracking-wide">
+                              <CircleDollarSign className="h-4 w-4" />
+                              <span>Paid</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 text-orange-600 text-xs font-medium uppercase tracking-wide">
+                              <Banknote className="h-4 w-4" />
+                              <span>Not paid</span>
+                            </div>
+                          )}
+                        </TableCell>
                         <TableCell className="text-sm text-gray-600 font-mono">
                           {formatDate(user.createdAt)}
                         </TableCell>
@@ -470,6 +531,20 @@ export default function UsersPage() {
                                     <ShieldCheck className="h-4 w-4 mr-2" />
                                   )}
                                   Verify User
+                                </DropdownMenuItem>
+                              )}
+                              {!user.portalAccessPaidAt && (
+                                <DropdownMenuItem
+                                  onClick={() => handleWaivePortalAccess(user._id)}
+                                  disabled={waivePortalAccessMutation.isPending}
+                                  className="rounded-[10px] cursor-pointer"
+                                >
+                                  {waivePortalAccessMutation.isPending ? (
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  ) : (
+                                    <Banknote className="h-4 w-4 mr-2" />
+                                  )}
+                                  Waive portal payment
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator />
