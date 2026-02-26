@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     MessageSquare,
@@ -39,6 +39,213 @@ interface Comment {
     replies?: Comment[];
 }
 
+interface CommentItemProps {
+    comment: Comment;
+    isReply?: boolean;
+    user: { _id: string; name?: string; avatar?: string } | null;
+    isAuthenticated: boolean;
+    replyingTo: string | null;
+    setReplyingTo: (id: string | null) => void;
+    replyContent: string;
+    setReplyContent: (v: string) => void;
+    editingId: string | null;
+    setEditingId: (id: string | null) => void;
+    editContent: string;
+    setEditContent: (v: string) => void;
+    createMutation: { mutate: (p: { content: string; parent?: string }) => void; isPending: boolean };
+    deleteMutation: { mutate: (id: string) => void };
+    editMutation: { mutate: (p: { commentId: string; content: string }) => void; isPending: boolean };
+    formatDate: (date: string) => string;
+    handleReply: (parentId: string) => void;
+    handleEdit: (commentId: string) => void;
+    replyFormRef: React.RefObject<HTMLDivElement | null>;
+}
+
+function CommentItem({
+    comment,
+    isReply = false,
+    user,
+    isAuthenticated,
+    replyingTo,
+    setReplyingTo,
+    replyContent,
+    setReplyContent,
+    editingId,
+    setEditingId,
+    editContent,
+    setEditContent,
+    createMutation,
+    deleteMutation,
+    editMutation,
+    formatDate,
+    handleReply,
+    handleEdit,
+    replyFormRef,
+}: CommentItemProps) {
+    const { t } = useT();
+    const isOwner = user?._id === comment.user?._id;
+    const isEditing = editingId === comment._id;
+
+    return (
+        <div className={`flex gap-3 ${isReply ? "ml-12 mt-3" : ""}`}>
+            <Avatar className="h-8 w-8 shrink-0">
+                <AvatarImage src={comment.user?.avatar} />
+                <AvatarFallback className="text-xs">
+                    {getInitials(comment.user?.name || "U")}
+                </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                    <span className="font-medium text-sm">{comment.user?.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                        {formatDate(comment.createdAt)}
+                    </span>
+                    {isOwner && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto">
+                                    <MoreVertical className="h-3 w-3" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        setEditingId(comment._id);
+                                        setEditContent(comment.content);
+                                    }}
+                                >
+                                    <Edit2 className="h-4 w-4 mr-2" />
+                                    <T>Edit</T>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="text-destructive"
+                                    onClick={() => deleteMutation.mutate(comment._id)}
+                                >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    <T>Delete</T>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
+                </div>
+
+                {isEditing ? (
+                    <div className="mt-2 space-y-2">
+                        <Textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            rows={2}
+                            className="text-sm"
+                        />
+                        <div className="flex gap-2">
+                            <Button
+                                size="sm"
+                                onClick={() => handleEdit(comment._id)}
+                                disabled={editMutation.isPending}
+                            >
+                                {editMutation.isPending && (
+                                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                )}
+                                <T>Save</T>
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                    setEditingId(null);
+                                    setEditContent("");
+                                }}
+                            >
+                                <T>Cancel</T>
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <p className="text-sm mt-1">{comment.content}</p>
+                        {!isReply && isAuthenticated && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 mt-1 text-xs"
+                                onClick={() => {
+                                    setReplyingTo(replyingTo === comment._id ? null : comment._id);
+                                    setReplyContent("");
+                                }}
+                            >
+                                <Reply className="h-3 w-3 mr-1" />
+                                <T>Reply</T>
+                            </Button>
+                        )}
+                    </>
+                )}
+
+                {/* Reply form - ref only on the open one so scroll targets it */}
+                {replyingTo === comment._id && (
+                    <div ref={replyFormRef} className="mt-3 flex gap-2">
+                        <Textarea
+                            placeholder={t("Write a reply...")}
+                            value={replyContent}
+                            onChange={(e) => setReplyContent(e.target.value)}
+                            rows={2}
+                            className="text-sm"
+                        />
+                        <div className="flex flex-col gap-1">
+                            <Button
+                                size="sm"
+                                onClick={() => handleReply(comment._id)}
+                                disabled={createMutation.isPending || !replyContent.trim()}
+                            >
+                                {createMutation.isPending ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Send className="h-4 w-4" />
+                                )}
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setReplyingTo(null)}
+                            >
+                                <T>Cancel</T>
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {comment.replies && comment.replies.length > 0 && (
+                    <div className="mt-3 space-y-3">
+                        {comment.replies.map((reply) => (
+                            <CommentItem
+                                key={reply._id}
+                                comment={reply}
+                                isReply
+                                user={user}
+                                isAuthenticated={isAuthenticated}
+                                replyingTo={replyingTo}
+                                setReplyingTo={setReplyingTo}
+                                replyContent={replyContent}
+                                setReplyContent={setReplyContent}
+                                editingId={editingId}
+                                setEditingId={setEditingId}
+                                editContent={editContent}
+                                setEditContent={setEditContent}
+                                createMutation={createMutation}
+                                deleteMutation={deleteMutation}
+                                editMutation={editMutation}
+                                formatDate={formatDate}
+                                handleReply={handleReply}
+                                handleEdit={handleEdit}
+                                replyFormRef={replyFormRef}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 interface LessonCommentsProps {
     lessonId: string;
 }
@@ -48,11 +255,19 @@ export function LessonComments({ lessonId }: LessonCommentsProps) {
     const { toast } = useToast();
     const { t } = useT();
     const queryClient = useQueryClient();
+    const replyFormRef = useRef<HTMLDivElement>(null);
     const [newComment, setNewComment] = useState("");
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
     const [replyContent, setReplyContent] = useState("");
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editContent, setEditContent] = useState("");
+
+    // Scroll reply form into view when opened so it's not hidden below the fold
+    useEffect(() => {
+        if (replyingTo && replyFormRef.current) {
+            replyFormRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+    }, [replyingTo]);
 
     // Fetch comments
     const { data: commentsResponse, isLoading } = useQuery({
@@ -153,150 +368,6 @@ export function LessonComments({ lessonId }: LessonCommentsProps) {
         return d.toLocaleDateString();
     };
 
-    const CommentItem = ({ comment, isReply = false }: { comment: Comment; isReply?: boolean }) => {
-        const isOwner = user?._id === comment.user?._id;
-        const isEditing = editingId === comment._id;
-
-        return (
-            <div className={`flex gap-3 ${isReply ? "ml-12 mt-3" : ""}`}>
-                <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarImage src={comment.user?.avatar} />
-                    <AvatarFallback className="text-xs">
-                        {getInitials(comment.user?.name || "U")}
-                    </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm">{comment.user?.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                            {formatDate(comment.createdAt)}
-                        </span>
-                        {isOwner && (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto">
-                                        <MoreVertical className="h-3 w-3" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem
-                                            onClick={() => {
-                                                setEditingId(comment._id);
-                                                setEditContent(comment.content);
-                                            }}
-                                        >
-                                            <Edit2 className="h-4 w-4 mr-2" />
-                                            <T>Edit</T>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            className="text-destructive"
-                                            onClick={() => deleteMutation.mutate(comment._id)}
-                                        >
-                                            <Trash2 className="h-4 w-4 mr-2" />
-                                            <T>Delete</T>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                            </DropdownMenu>
-                        )}
-                    </div>
-
-                    {isEditing ? (
-                        <div className="mt-2 space-y-2">
-                            <Textarea
-                                value={editContent}
-                                onChange={(e) => setEditContent(e.target.value)}
-                                rows={2}
-                                className="text-sm"
-                            />
-                                <div className="flex gap-2">
-                                    <Button
-                                        size="sm"
-                                        onClick={() => handleEdit(comment._id)}
-                                        disabled={editMutation.isPending}
-                                    >
-                                        {editMutation.isPending && (
-                                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                        )}
-                                        <T>Save</T>
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => {
-                                            setEditingId(null);
-                                            setEditContent("");
-                                        }}
-                                    >
-                                        <T>Cancel</T>
-                                    </Button>
-                                </div>
-                        </div>
-                    ) : (
-                        <>
-                            <p className="text-sm mt-1">{comment.content}</p>
-                            {!isReply && isAuthenticated && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-7 px-2 mt-1 text-xs"
-                                    onClick={() => {
-                                        setReplyingTo(replyingTo === comment._id ? null : comment._id);
-                                        setReplyContent("");
-                                    }}
-                                >
-                                    <Reply className="h-3 w-3 mr-1" />
-                                    <T>Reply</T>
-                                </Button>
-                            )}
-                        </>
-                    )}
-
-                    {/* Reply form */}
-                    {replyingTo === comment._id && (
-                        <div className="mt-3 flex gap-2">
-                            <Textarea
-                                placeholder={t("Write a reply...")}
-                                value={replyContent}
-                                onChange={(e) => setReplyContent(e.target.value)}
-                                rows={2}
-                                className="text-sm"
-                            />
-                            <div className="flex flex-col gap-1">
-                                <Button
-                                    size="sm"
-                                    onClick={() => handleReply(comment._id)}
-                                    disabled={createMutation.isPending || !replyContent.trim()}
-                                >
-                                    {createMutation.isPending ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <Send className="h-4 w-4" />
-                                    )}
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setReplyingTo(null)}
-                                >
-                                    <T>Cancel</T>
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Replies */}
-                    {comment.replies && comment.replies.length > 0 && (
-                        <div className="mt-3 space-y-3">
-                            {comment.replies.map((reply) => (
-                                <CommentItem key={reply._id} comment={reply} isReply />
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
-        );
-    };
-
     if (isLoading) {
         return (
             <div className="p-6 space-y-6">
@@ -382,7 +453,27 @@ export function LessonComments({ lessonId }: LessonCommentsProps) {
                 ) : (
                     <div className="space-y-6">
                         {comments.map((comment) => (
-                            <CommentItem key={comment._id} comment={comment} />
+                            <CommentItem
+                                key={comment._id}
+                                comment={comment}
+                                user={user}
+                                isAuthenticated={isAuthenticated}
+                                replyingTo={replyingTo}
+                                setReplyingTo={setReplyingTo}
+                                replyContent={replyContent}
+                                setReplyContent={setReplyContent}
+                                editingId={editingId}
+                                setEditingId={setEditingId}
+                                editContent={editContent}
+                                setEditContent={setEditContent}
+                                createMutation={createMutation}
+                                deleteMutation={deleteMutation}
+                                editMutation={editMutation}
+                                formatDate={formatDate}
+                                handleReply={handleReply}
+                                handleEdit={handleEdit}
+                                replyFormRef={replyFormRef}
+                            />
                         ))}
                     </div>
                 )}

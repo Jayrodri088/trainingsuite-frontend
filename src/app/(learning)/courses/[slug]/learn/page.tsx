@@ -19,6 +19,7 @@ import { PageLoader } from "@/components/ui/page-loader";
 import { LearningVideoPlayer } from "@/components/learning/video-player";
 import { CurriculumSidebar } from "@/components/learning/curriculum-sidebar";
 import { LessonContent } from "@/components/learning/lesson-content";
+import { LessonNotesPanel } from "@/components/learning/lesson-notes-panel";
 
 export default function CourseLearnPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
@@ -91,7 +92,7 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
         <div className="text-center">
           <h1 className="text-2xl font-sans font-bold text-black"><T>Course not found</T></h1>
           <p className="font-sans text-gray-600 mt-2"><T>The course you are looking for does not exist.</T></p>
-          <Button className="mt-4 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-sans font-bold" onClick={() => router.push("/courses")}>
+          <Button className="mt-4 rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-sans font-bold" onClick={() => router.push("/courses")}>
             <T>Browse Courses</T>
           </Button>
         </div>
@@ -110,105 +111,112 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
   const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f5f5f5]">
-      <header className="h-14 border-b border-gray-200 bg-white flex items-center justify-between px-4 shrink-0 shadow-sm">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="rounded-[10px] font-sans font-medium text-gray-700 hover:text-[#0052CC] hover:bg-[#0052CC]/5"
-            onClick={() => router.push(`/courses/${course.slug || course._id}`)}
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            <T>Back to Course</T>
-          </Button>
-          <div className="hidden sm:block">
-            <h1 className="font-sans font-semibold text-sm text-black line-clamp-1">{t(course.title)}</h1>
+    <div className="min-h-screen flex flex-col bg-gray-100">
+      <header className="h-14 shrink-0 border-b border-gray-200 bg-white shadow-sm">
+        <div className="h-full max-w-[1600px] mx-auto px-4 sm:px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-lg font-sans font-medium text-gray-700 hover:text-[#0052CC] hover:bg-[#0052CC]/5 shrink-0"
+              onClick={() => router.push(`/courses/${course.slug || course._id}`)}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              <T>Back to Course</T>
+            </Button>
+            <div className="hidden sm:block min-w-0">
+              <h1 className="font-sans font-semibold text-sm text-black truncate">{t(course.title)}</h1>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500 font-sans">
-            <span>{courseProgress}% <T>complete</T></span>
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500 font-sans">
+              <span>{courseProgress}% <T>complete</T></span>
+            </div>
+            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="lg:hidden rounded-lg border-gray-200 font-sans font-medium">
+                  <Menu className="h-4 w-4 mr-2" />
+                  <T>Curriculum</T>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-80 p-0 border-gray-200 bg-white">
+                <CurriculumSidebar
+                  modules={modules}
+                  currentLessonId={activeLesson?._id || null}
+                  onSelectLesson={(lesson) => {
+                    setCurrentLesson(lesson);
+                    setSidebarOpen(false);
+                  }}
+                  courseProgress={courseProgress}
+                  completedLessonIds={completedLessonIds}
+                />
+              </SheetContent>
+            </Sheet>
           </div>
-          <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="lg:hidden rounded-[10px] border-gray-200 font-sans font-medium">
-                <Menu className="h-4 w-4 mr-2" />
-                <T>Curriculum</T>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-80 p-0 border-gray-200 bg-white">
-              <CurriculumSidebar
-                modules={modules}
-                currentLessonId={activeLesson?._id || null}
-                onSelectLesson={(lesson) => {
-                  setCurrentLesson(lesson);
-                  setSidebarOpen(false);
-                }}
-                courseProgress={courseProgress}
-                completedLessonIds={completedLessonIds}
-              />
-            </SheetContent>
-          </Sheet>
         </div>
       </header>
 
-      <div className="flex-1 flex">
-        <div className="flex-1 flex flex-col">
-          <LearningVideoPlayer lesson={activeLesson} onVideoEnd={handleVideoEnd} lessonId={activeLesson?._id} />
+      <div className="flex-1 flex min-h-0">
+        <div className="flex-1 flex flex-col min-w-0 max-w-[1600px] w-full mx-auto">
+          <div className="px-4 sm:px-6 pt-4 sm:pt-5">
+            <LearningVideoPlayer lesson={activeLesson} onVideoEnd={handleVideoEnd} lessonId={activeLesson?._id} />
+          </div>
 
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
-            <Button variant="ghost" size="sm" disabled={!prevLesson} className="rounded-[10px] font-sans" onClick={() => prevLesson && setCurrentLesson(prevLesson)}>
+          <div className="flex items-center justify-between px-4 sm:px-6 py-3 mt-1 bg-white border-y border-gray-200">
+            <Button variant="ghost" size="sm" disabled={!prevLesson} className="rounded-lg font-sans" onClick={() => prevLesson && setCurrentLesson(prevLesson)}>
               <ChevronLeft className="h-4 w-4 mr-1" />
               <T>Previous</T>
             </Button>
             {completedLessonIds.has(activeLesson?._id || "") && (
-              <div className="flex items-center text-sm text-green-600 font-sans">
+              <div className="flex items-center gap-2 text-sm text-green-600 font-sans">
                 <CheckCircle className="h-4 w-4 mr-2" />
                 <T>Completed</T>
               </div>
             )}
-            <Button variant="ghost" size="sm" disabled={!nextLesson} className="rounded-[10px] font-sans" onClick={() => nextLesson && setCurrentLesson(nextLesson)}>
+            <Button variant="ghost" size="sm" disabled={!nextLesson} className="rounded-lg font-sans" onClick={() => nextLesson && setCurrentLesson(nextLesson)}>
               <T>Next</T>
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
 
-          <Tabs defaultValue="content" className="flex-1">
-            <TabsList className="w-full justify-start rounded-[10px] border border-gray-200 bg-gray-100 h-12 px-4 overflow-x-auto flex-nowrap gap-2">
-              <TabsTrigger value="content" className="shrink-0 rounded-md data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm font-sans font-medium text-gray-600 data-[state=active]:font-semibold">
-                <BookOpen className="h-4 w-4 mr-2" />
-                <T>Content</T>
-              </TabsTrigger>
-              <TabsTrigger value="discussion" className="shrink-0 rounded-[8px] font-sans font-medium text-gray-600 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm">
-                <MessageSquare className="h-4 w-4 mr-2" />
-                <T>Discussion</T>
-              </TabsTrigger>
-              <TabsTrigger value="notes" className="shrink-0 rounded-[8px] font-sans font-medium text-gray-600 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm">
-                <FileText className="h-4 w-4 mr-2" />
-                <T>Notes</T>
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="content" className="mt-0 flex-1">
-              <ScrollArea className="h-[calc(100vh-400px)]">
-                <LessonContent lesson={activeLesson} />
+          <Tabs defaultValue="content" className="flex-1 flex flex-col min-h-0 mt-1 bg-white border-t border-gray-200">
+            <div className="px-4 sm:px-6 pt-4">
+              <TabsList className="w-full justify-start rounded-xl border border-gray-200 bg-gray-100 h-12 px-2 overflow-x-auto flex-nowrap gap-1">
+                <TabsTrigger value="content" className="shrink-0 rounded-lg px-4 data-[state=active]:bg-white data-[state=active]:text-[#0052CC] data-[state=active]:shadow-sm font-sans font-medium text-gray-600 data-[state=active]:font-semibold">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  <T>Content</T>
+                </TabsTrigger>
+                <TabsTrigger value="discussion" className="shrink-0 rounded-lg px-4 font-sans font-medium text-gray-600 data-[state=active]:bg-white data-[state=active]:text-[#0052CC] data-[state=active]:shadow-sm data-[state=active]:font-semibold">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  <T>Discussion</T>
+                </TabsTrigger>
+                <TabsTrigger value="notes" className="shrink-0 rounded-lg px-4 font-sans font-medium text-gray-600 data-[state=active]:bg-white data-[state=active]:text-[#0052CC] data-[state=active]:shadow-sm data-[state=active]:font-semibold">
+                  <FileText className="h-4 w-4 mr-2" />
+                  <T>Notes</T>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            <TabsContent value="content" className="mt-0 flex-1 min-h-0 px-4 sm:px-6 pb-6 overflow-hidden">
+              <ScrollArea className="h-[calc(100vh-420px)] min-h-[280px] rounded-xl border border-gray-200 bg-gray-50/50">
+                <div className="p-4 sm:p-5">
+                  <LessonContent lesson={activeLesson} />
+                </div>
               </ScrollArea>
             </TabsContent>
-            <TabsContent value="discussion" className="mt-0">
-              <LessonComments lessonId={activeLesson?._id || ""} />
+            <TabsContent value="discussion" className="mt-0 flex-1 min-h-0 overflow-auto">
+              <div className="px-4 sm:px-6 pb-6">
+                <LessonComments lessonId={activeLesson?._id || ""} />
+              </div>
             </TabsContent>
-            <TabsContent value="notes" className="mt-0 p-6">
-              <div className="text-center py-12">
-                <FileText className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                <h3 className="font-sans font-semibold text-black"><T>Your Notes</T></h3>
-                <p className="font-sans text-gray-600 mt-2"><T>Take notes while watching the lesson.</T></p>
-                <Button className="mt-4 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] font-sans font-medium"><T>Add Note</T></Button>
+            <TabsContent value="notes" className="mt-0 flex-1 min-h-0 overflow-auto px-4 sm:px-6 pb-6">
+              <div className="h-full min-h-[320px]">
+                <LessonNotesPanel lessonId={activeLesson?._id || ""} />
               </div>
             </TabsContent>
           </Tabs>
         </div>
 
-        <aside className="w-80 border-l border-gray-200 bg-white hidden lg:block">
+        <aside className="w-72 xl:w-80 shrink-0 border-l border-gray-200 bg-white hidden lg:block overflow-hidden">
           <CurriculumSidebar
             modules={modules}
             currentLessonId={activeLesson?._id || null}
