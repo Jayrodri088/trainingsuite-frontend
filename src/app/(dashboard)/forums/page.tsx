@@ -214,7 +214,7 @@ function CommunityPageContent() {
     };
     
     return (
-      <Card className="hover:shadow-md transition-all border border-gray-200 rounded-[12px] bg-white text-gray-900 shadow-sm">
+      <Card className="hover:shadow-md transition-all border border-gray-200 rounded-xl bg-white text-gray-900 shadow-sm">
         <CardContent className="p-0">
           <div className="flex">
             {/* Vote Section */}
@@ -222,7 +222,7 @@ function CommunityPageContent() {
               <Button 
                 variant="ghost" 
                 size="sm"
-                className={`h-auto py-2 px-2 sm:px-3 rounded-[8px] flex flex-col sm:flex-row items-center gap-1 ${
+                className={`h-auto py-2 px-2 sm:px-3 rounded-lg flex flex-col sm:flex-row items-center gap-1 ${
                   isLiked 
                     ? "text-primary bg-primary/10" 
                     : "text-gray-600 hover:text-primary hover:bg-primary/10"
@@ -271,7 +271,7 @@ function CommunityPageContent() {
 
                 <div className="flex items-center gap-3">
                   {forumInfo && (
-                    <Badge variant="outline" className="text-xs rounded-[6px] border-gray-300 text-gray-700">
+                    <Badge variant="outline" className="text-xs rounded-md border-gray-300 text-gray-700">
                       {forumInfo.title}
                     </Badge>
                   )}
@@ -298,7 +298,7 @@ function CommunityPageContent() {
             <T>Ask questions, share knowledge, and connect with others.</T>
           </p>
         </div>
-        <Button onClick={() => setDialogOpen(true)} className="shrink-0 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
+        <Button onClick={() => setDialogOpen(true)} className="shrink-0 rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
           <Plus className="h-4 w-4 mr-2" />
           <T>Ask Question</T>
         </Button>
@@ -313,7 +313,7 @@ function CommunityPageContent() {
             placeholder={t("Search questions...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 rounded-[10px] border-gray-200"
+            className="pl-9 rounded-lg border-gray-200"
           />
         </div>
 
@@ -362,9 +362,9 @@ function CommunityPageContent() {
       {isLoading ? (
         <PageLoader />
       ) : filteredPosts.length === 0 ? (
-        <Card className="rounded-[12px] border-gray-200 border-dashed bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 border-dashed bg-white shadow-sm">
           <CardContent className="py-16 text-center">
-            <div className="h-16 w-16 mx-auto mb-4 rounded-[12px] bg-gray-50 flex items-center justify-center">
+            <div className="h-16 w-16 mx-auto mb-4 rounded-xl bg-gray-50 flex items-center justify-center">
               <MessageSquare className="h-8 w-8 text-gray-500" />
             </div>
             <h3 className="text-lg font-sans font-bold text-black mb-2">
@@ -377,7 +377,7 @@ function CommunityPageContent() {
               }
             </p>
             {!searchQuery && (
-              <Button onClick={() => setDialogOpen(true)} className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
+              <Button onClick={() => setDialogOpen(true)} className="rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
                 <Plus className="h-4 w-4 mr-2" />
                 <T>Ask Question</T>
               </Button>
@@ -408,7 +408,7 @@ function CommunityPageContent() {
 
       {/* Ask Question Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg rounded-[12px] border-gray-200 shadow-lg">
+        <DialogContent className="sm:max-w-lg rounded-xl border-gray-200 shadow-lg">
           <DialogHeader>
             <DialogTitle className="font-sans font-bold text-black"><T>Ask a Question</T></DialogTitle>
             <DialogDescription className="font-sans text-gray-600">
@@ -458,7 +458,7 @@ function CommunityPageContent() {
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                 <T>Cancel</T>
               </Button>
-              <Button type="submit" disabled={createPostMutation.isPending} className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
+              <Button type="submit" disabled={createPostMutation.isPending} className="rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
                 {createPostMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

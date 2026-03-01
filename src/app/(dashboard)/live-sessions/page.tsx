@@ -121,7 +121,7 @@ export default function LiveSessionsPage() {
       {upcomingSessions.some((s) => s.status === "live") && (() => {
         const liveSession = upcomingSessions.find((s) => s.status === "live");
         return (
-          <Card className="rounded-[12px] bg-linear-to-r from-red-600 to-red-500 text-white border-0 shadow-sm overflow-hidden">
+          <Card className="rounded-xl bg-linear-to-r from-red-600 to-red-500 text-white border-0 shadow-sm overflow-hidden">
             <CardContent className="py-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -150,7 +150,7 @@ export default function LiveSessionsPage() {
       })()}
 
       {/* Tabs and Search */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-[12px]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="upcoming">
@@ -161,7 +161,7 @@ export default function LiveSessionsPage() {
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        <div className="relative w-full sm:w-64 rounded-[12px]">
+        <div className="relative w-full sm:w-64 rounded-xl">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("Search sessions...")}
@@ -176,7 +176,7 @@ export default function LiveSessionsPage() {
       {isLoading ? (
         <PageLoader />
       ) : filteredSessions.length === 0 ? (
-        <Card className="py-12 rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="py-12 rounded-xl border-gray-200 bg-white shadow-sm">
           <CardContent className="text-center">
             <Video className="h-12 w-12 mx-auto text-gray-500 mb-4" />
             <h3 className="text-lg font-sans font-bold text-black"><T>No sessions found</T></h3>
@@ -193,7 +193,7 @@ export default function LiveSessionsPage() {
         /* Upcoming Sessions Grid */
         <div id="live-sessions" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredSessions.map((session) => (
-            <Card key={session._id} className="flex flex-col overflow-hidden rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card key={session._id} className="flex flex-col overflow-hidden rounded-xl border-gray-200 bg-white shadow-sm">
               {/* Thumbnail */}
               <div className="relative aspect-video bg-muted overflow-hidden">
                 {(() => {
@@ -277,7 +277,7 @@ export default function LiveSessionsPage() {
 
               <CardFooter className="pt-0 flex flex-col gap-2">
                 {session.status === "live" ? (
-                  <Button className="w-full rounded-[10px] bg-red-600 hover:bg-red-700" asChild>
+                  <Button className="w-full rounded-lg bg-red-600 hover:bg-red-700" asChild>
                     <Link href={`/live-sessions/${session._id}`}>
                       <Play className="h-4 w-4 mr-2" />
                       <T>Join Live</T>
@@ -286,7 +286,7 @@ export default function LiveSessionsPage() {
                 ) : (
                   <>
                     <div className="flex gap-2 w-full">
-                      <Button className="flex-1 rounded-[10px] border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] font-semibold" variant="outline" asChild>
+                      <Button className="flex-1 rounded-lg border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] font-semibold" variant="outline" asChild>
                         <Link href={`/live-sessions/${session._id}`}>
                           <T>View Details</T>
                         </Link>
@@ -296,7 +296,7 @@ export default function LiveSessionsPage() {
                           type="button"
                           variant="outline"
                           size="icon"
-                          className="rounded-[10px] border-gray-200 hover:bg-[#0052CC]/10 hover:text-[#0052CC] hover:border-[#0052CC]/30 shrink-0"
+                          className="rounded-lg border-gray-200 hover:bg-[#0052CC]/10 hover:text-[#0052CC] hover:border-[#0052CC]/30 shrink-0"
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -316,7 +316,7 @@ export default function LiveSessionsPage() {
         </div>
       ) : (
         /* Past Sessions History List */
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-sans font-bold text-black">
               <History className="h-5 w-5" />

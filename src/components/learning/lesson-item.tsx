@@ -34,7 +34,7 @@ export function LessonItem({
       onClick={onClick}
       disabled={isLocked}
       className={
-        "w-full text-left p-2 sm:p-3 rounded-[10px] transition-colors font-sans " +
+        "w-full text-left p-2 sm:p-3 rounded-lg transition-colors font-sans " +
         (isActive ? "bg-[#0052CC]/10 border border-[#0052CC]/30 " : isLocked ? "opacity-50 cursor-not-allowed " : "hover:bg-gray-100 ")
       }
     >
@@ -52,7 +52,7 @@ export function LessonItem({
               </span>
             ) : null}
             {lesson.isFree && !isLocked ? (
-              <Badge variant="outline" className="text-xs h-5 rounded-[8px] border-gray-200">
+              <Badge variant="outline" className="text-xs h-5 rounded-lg border-gray-200">
                 <T>Preview</T>
               </Badge>
             ) : null}

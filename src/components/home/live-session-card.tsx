@@ -81,7 +81,7 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
 
           <div className="mt-auto pt-4">
             {isLive ? (
-              <Button className="w-full rounded-[10px] h-9 text-xs uppercase tracking-wide bg-red-600 hover:bg-red-700 text-white">
+              <Button className="w-full rounded-lg h-9 text-xs uppercase tracking-wide bg-red-600 hover:bg-red-700 text-white">
                 <Radio className="h-3 w-3 mr-2 animate-pulse" />
                 <T>Join Live</T>
               </Button>
@@ -106,14 +106,14 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
 
 export function LiveSessionCardSkeleton() {
   return (
-    <div className="border border-gray-200 rounded-[12px] h-full bg-white shadow-sm overflow-hidden">
+    <div className="border border-gray-200 rounded-xl h-full bg-white shadow-sm overflow-hidden">
       <Skeleton className="aspect-video w-full rounded-t-[12px] rounded-b-none" />
       <div className="p-6 space-y-4">
-        <Skeleton className="h-4 w-24 rounded-[10px]" />
-        <Skeleton className="h-6 w-full rounded-[10px]" />
-        <Skeleton className="h-4 w-3/4 rounded-[10px]" />
+        <Skeleton className="h-4 w-24 rounded-lg" />
+        <Skeleton className="h-6 w-full rounded-lg" />
+        <Skeleton className="h-4 w-3/4 rounded-lg" />
         <div className="pt-4 mt-auto">
-          <Skeleton className="h-9 w-full rounded-[10px]" />
+          <Skeleton className="h-9 w-full rounded-lg" />
         </div>
       </div>
     </div>

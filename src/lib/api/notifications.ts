@@ -1,9 +1,9 @@
 import { apiClient } from "./client";
-import type { ApiResponse, PaginatedResponse, Notification } from "@/types";
+import type { ApiResponse, Notification, NotificationsListResponse } from "@/types";
 
 export const notificationsApi = {
   getAll: async (page = 1, limit = 20) => {
-    const response = await apiClient.get<PaginatedResponse<Notification>>(
+    const response = await apiClient.get<NotificationsListResponse>(
       `/notifications?page=${page}&limit=${limit}`
     );
     return response.data;

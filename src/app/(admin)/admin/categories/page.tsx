@@ -155,7 +155,7 @@ export default function CategoriesPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-violet-200 bg-violet-50 text-violet-600">
@@ -168,7 +168,7 @@ export default function CategoriesPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-green-200 bg-green-50 text-green-600">
@@ -181,7 +181,7 @@ export default function CategoriesPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-blue-200 bg-blue-50 text-blue-600">
@@ -197,7 +197,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* Categories Table */}
-      <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+      <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
         <CardHeader className="pb-4 border-b border-gray-200 bg-muted/5">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
             <div>
@@ -211,10 +211,10 @@ export default function CategoriesPage() {
                   placeholder="Search categories..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
+                  className="pl-9 rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
                 />
               </div>
-              <Button onClick={handleAdd} className="rounded-[10px]">
+              <Button onClick={handleAdd} className="rounded-lg">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Category
               </Button>
@@ -246,7 +246,7 @@ export default function CategoriesPage() {
                             : "No categories found"}
                         </p>
                         {!searchQuery && (
-                          <Button className="mt-4 rounded-[10px]" onClick={handleAdd}>
+                          <Button className="mt-4 rounded-lg" onClick={handleAdd}>
                             <Plus className="h-4 w-4 mr-2" />
                             Add First Category
                           </Button>
@@ -296,12 +296,12 @@ export default function CategoriesPage() {
                       </TableCell>
                       <TableCell>
                         {category.isActive !== false ? (
-                          <Badge variant="outline" className="rounded-[10px] border-green-200 bg-green-50 text-green-700 uppercase text-[10px] font-bold tracking-wide">
+                          <Badge variant="outline" className="rounded-lg border-green-200 bg-green-50 text-green-700 uppercase text-[10px] font-bold tracking-wide">
                             <Eye className="h-3 w-3 mr-1" />
                             Active
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="rounded-[10px] border-muted bg-muted/50 text-gray-600 uppercase text-[10px] font-bold tracking-wide">
+                          <Badge variant="outline" className="rounded-lg border-muted bg-muted/50 text-gray-600 uppercase text-[10px] font-bold tracking-wide">
                             <EyeOff className="h-3 w-3 mr-1" />
                             Hidden
                           </Badge>
@@ -310,18 +310,18 @@ export default function CategoriesPage() {
                       <TableCell className="pr-6">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-[10px] hover:bg-muted">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                          <DropdownMenuContent align="end" className="rounded-xl border-gray-200 bg-white shadow-sm">
                             <DropdownMenuLabel className="font-sans font-bold text-black font-bold text-xs uppercase tracking-wider">Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleEdit(category)} className="rounded-[10px] cursor-pointer">
+                            <DropdownMenuItem onClick={() => handleEdit(category)} className="rounded-lg cursor-pointer">
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleToggleActive(category)} className="rounded-[10px] cursor-pointer">
+                            <DropdownMenuItem onClick={() => handleToggleActive(category)} className="rounded-lg cursor-pointer">
                               {category.isActive !== false ? (
                                 <>
                                   <EyeOff className="h-4 w-4 mr-2" />
@@ -336,7 +336,7 @@ export default function CategoriesPage() {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              className="text-destructive focus:text-destructive rounded-[10px] cursor-pointer"
+                              className="text-destructive focus:text-destructive rounded-lg cursor-pointer"
                               onClick={() => handleDelete(category)}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -364,7 +364,7 @@ export default function CategoriesPage() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <AlertDialogContent className="rounded-xl border-gray-200 bg-white shadow-sm">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-sans font-bold text-black">Delete Category</AlertDialogTitle>
             <AlertDialogDescription>
@@ -379,10 +379,10 @@ export default function CategoriesPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-[12px] border-gray-200 bg-white shadow-sm">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl border-gray-200 bg-white shadow-sm">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-destructive hover:bg-destructive/90 rounded-[10px] text-destructive-foreground"
+              className="bg-destructive hover:bg-destructive/90 rounded-lg text-destructive-foreground"
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending && (
@@ -402,37 +402,37 @@ function CategoriesTableSkeleton() {
       <div className="grid gap-4 sm:grid-cols-3">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="border border-gray-200 p-6 bg-card">
-            <Skeleton className="h-8 w-12 mb-2 rounded-[10px]" />
-            <Skeleton className="h-4 w-24 rounded-[10px]" />
+            <Skeleton className="h-8 w-12 mb-2 rounded-lg" />
+            <Skeleton className="h-4 w-24 rounded-lg" />
           </div>
         ))}
       </div>
       <div className="border border-gray-200 bg-background">
         <div className="p-6 border-b border-gray-200 flex justify-between">
           <div>
-            <Skeleton className="h-6 w-40 rounded-[10px]" />
-            <Skeleton className="h-4 w-60 mt-2 rounded-[10px]" />
+            <Skeleton className="h-6 w-40 rounded-lg" />
+            <Skeleton className="h-4 w-60 mt-2 rounded-lg" />
           </div>
           <div className="flex gap-2">
-            <Skeleton className="h-10 w-[200px] rounded-[10px]" />
-            <Skeleton className="h-10 w-32 rounded-[10px]" />
+            <Skeleton className="h-10 w-[200px] rounded-lg" />
+            <Skeleton className="h-10 w-32 rounded-lg" />
           </div>
         </div>
         <div className="p-0">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="flex items-center gap-4 p-4 border-b border-gray-200 last:border-0">
-              <Skeleton className="h-4 w-4 rounded-[10px]" />
+              <Skeleton className="h-4 w-4 rounded-lg" />
               <div className="flex items-center gap-3 flex-1">
-                <Skeleton className="h-10 w-10 rounded-[10px]" />
+                <Skeleton className="h-10 w-10 rounded-lg" />
                 <div className="space-y-2">
-                  <Skeleton className="h-4 w-32 rounded-[10px]" />
-                  <Skeleton className="h-3 w-24 rounded-[10px]" />
+                  <Skeleton className="h-4 w-32 rounded-lg" />
+                  <Skeleton className="h-3 w-24 rounded-lg" />
                 </div>
               </div>
-              <Skeleton className="h-4 w-48 rounded-[10px] hidden sm:block" />
-              <Skeleton className="h-4 w-12 rounded-[10px]" />
-              <Skeleton className="h-6 w-16 rounded-[10px]" />
-              <Skeleton className="h-8 w-8 rounded-[10px]" />
+              <Skeleton className="h-4 w-48 rounded-lg hidden sm:block" />
+              <Skeleton className="h-4 w-12 rounded-lg" />
+              <Skeleton className="h-6 w-16 rounded-lg" />
+              <Skeleton className="h-8 w-8 rounded-lg" />
             </div>
           ))}
         </div>
@@ -519,7 +519,7 @@ function CategoryDialogForm({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Web Development"
-              className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+              className="rounded-xl border-gray-200 bg-white shadow-sm"
             />
           </div>
           <div className="grid gap-2">
@@ -530,7 +530,7 @@ function CategoryDialogForm({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description of the category"
               rows={3}
-              className="rounded-[12px] border-gray-200 bg-white shadow-sm resize-none"
+              className="rounded-xl border-gray-200 bg-white shadow-sm resize-none"
             />
           </div>
           <div className="grid gap-2">
@@ -541,7 +541,7 @@ function CategoryDialogForm({
               onChange={(e) => setIcon(e.target.value)}
               placeholder="e.g., 💻"
               maxLength={4}
-              className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+              className="rounded-xl border-gray-200 bg-white shadow-sm"
             />
           </div>
           <div className="flex items-center justify-between p-4 border border-gray-200 bg-muted/5">
@@ -559,10 +559,10 @@ function CategoryDialogForm({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl border-gray-200 bg-white shadow-sm">
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isPending} className="rounded-[10px]">
+          <Button onClick={handleSave} disabled={isPending} className="rounded-lg">
             {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
             {isEdit ? "Save Changes" : "Create Category"}
           </Button>
@@ -584,7 +584,7 @@ function CategoryDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] rounded-[12px] border-gray-200 bg-white shadow-sm">
+      <DialogContent className="sm:max-w-[500px] rounded-xl border-gray-200 bg-white shadow-sm">
         {open && (
           <CategoryDialogForm
             key={category?._id ?? "new"}

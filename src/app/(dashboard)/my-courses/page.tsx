@@ -44,7 +44,7 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
 
   return (
     <Link href={`/courses/${course.slug || course._id}/learn`}>
-      <Card className="rounded-[12px] border-gray-200 group cursor-pointer h-full hover:border-gray-300 transition-colors bg-white shadow-sm overflow-hidden">
+      <Card className="rounded-xl border-gray-200 group cursor-pointer h-full hover:border-gray-300 transition-colors bg-white shadow-sm overflow-hidden">
         <div className={`h-32 ${colorClass} border-b border-gray-200 relative flex items-center justify-center overflow-hidden rounded-t-[12px]`}>
           {course.thumbnail ? (
             <Image
@@ -58,13 +58,13 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
             <PlayCircle className="h-10 w-10 opacity-50 group-hover:scale-110 group-hover:opacity-100 transition-all" />
           )}
           <div className="absolute top-3 left-3">
-            <Badge variant="secondary" className="rounded-[8px] text-[10px] font-semibold border-0 bg-white/90 text-gray-800 backdrop-blur-sm">
+            <Badge variant="secondary" className="rounded-lg text-[10px] font-semibold border-0 bg-white/90 text-gray-800 backdrop-blur-sm">
               {t(course.level || "beginner")}
             </Badge>
           </div>
           {isCompleted && (
             <div className="absolute top-3 right-3">
-              <Badge className="rounded-[8px] bg-green-600 hover:bg-green-600 text-[10px] font-semibold border-0">
+              <Badge className="rounded-lg bg-green-600 hover:bg-green-600 text-[10px] font-semibold border-0">
                 <CheckCircle className="h-3 w-3 mr-1" />
                 <T>Completed</T>
               </Badge>
@@ -93,7 +93,7 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
             ) : (
               <div />
             )}
-            <Button size="sm" className="h-8 rounded-[10px] text-xs font-semibold border border-gray-300 bg-gray-50 text-gray-800 hover:bg-gray-100">
+            <Button size="sm" className="h-8 rounded-lg text-xs font-semibold border border-gray-300 bg-gray-50 text-gray-800 hover:bg-gray-100">
               {isCompleted ? <T>Review</T> : <T>Continue</T>}
             </Button>
           </div>
@@ -114,16 +114,16 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
 
   return (
     <Link href={`/courses/${course.slug || course._id}/learn`}>
-      <Card className="rounded-[12px] border-gray-200 group hover:border-gray-300 transition-colors bg-white shadow-sm">
+      <Card className="rounded-xl border-gray-200 group hover:border-gray-300 transition-colors bg-white shadow-sm">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
-            <div className={`h-32 sm:h-24 w-full sm:w-36 ${colorClass} border border-gray-200 relative shrink-0 flex items-center justify-center overflow-hidden rounded-[10px]`}>
+            <div className={`h-32 sm:h-24 w-full sm:w-36 ${colorClass} border border-gray-200 relative shrink-0 flex items-center justify-center overflow-hidden rounded-lg`}>
               {course.thumbnail ? (
                 <Image
                   src={course.thumbnail}
                   alt={t(course.title)}
                   fill
-                  className="object-cover rounded-[10px]"
+                  className="object-cover rounded-lg"
                   sizes="(min-width: 640px) 9rem, 100vw"
                 />
               ) : (
@@ -139,16 +139,16 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className="rounded-[8px] text-[10px] font-semibold border-gray-200">
+                    <Badge variant="outline" className="rounded-lg text-[10px] font-semibold border-gray-200">
                       {t(course.level || "beginner")}
                     </Badge>
                     {isCompleted && (
-                      <Badge className="rounded-[8px] bg-green-100 text-green-800 text-[10px] font-semibold border-0"><T>Completed</T></Badge>
+                      <Badge className="rounded-lg bg-green-100 text-green-800 text-[10px] font-semibold border-0"><T>Completed</T></Badge>
                     )}
                   </div>
                   <h3 className="font-sans font-bold text-black text-base line-clamp-1 group-hover:text-[#0052CC] transition-colors">{t(course.title)}</h3>
                 </div>
-                <Button size="sm" className="rounded-[10px] text-xs font-semibold h-8 w-full sm:w-auto border border-gray-300 bg-gray-50 text-gray-800 hover:bg-gray-100">
+                <Button size="sm" className="rounded-lg text-xs font-semibold h-8 w-full sm:w-auto border border-gray-300 bg-gray-50 text-gray-800 hover:bg-gray-100">
                   {isCompleted ? <T>Review</T> : <T>Continue</T>}
                 </Button>
               </div>
@@ -168,15 +168,15 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
 
 function CourseCardSkeleton() {
   return (
-    <Card className="rounded-[12px] border-gray-200 overflow-hidden bg-white">
+    <Card className="rounded-xl border-gray-200 overflow-hidden bg-white">
       <Skeleton className="h-32 w-full rounded-t-[12px]" />
       <CardContent className="p-5 space-y-4">
-        <Skeleton className="h-5 w-full rounded-[10px]" />
-        <Skeleton className="h-4 w-3/4 rounded-[10px]" />
+        <Skeleton className="h-5 w-full rounded-lg" />
+        <Skeleton className="h-4 w-3/4 rounded-lg" />
         <Skeleton className="h-2 w-full mt-2 rounded-full" />
         <div className="flex justify-between pt-4 border-t border-gray-200">
-          <Skeleton className="h-4 w-12 rounded-[10px]" />
-          <Skeleton className="h-8 w-20 rounded-[10px]" />
+          <Skeleton className="h-4 w-12 rounded-lg" />
+          <Skeleton className="h-8 w-20 rounded-lg" />
         </div>
       </CardContent>
     </Card>
@@ -223,10 +223,10 @@ export default function MyCoursesPage() {
             placeholder={t("Search your courses...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 rounded-[10px] border-gray-200 bg-white focus:ring-2 focus:ring-[#0052CC]/30"
+            className="pl-9 rounded-lg border-gray-200 bg-white focus:ring-2 focus:ring-[#0052CC]/30"
           />
         </div>
-        <div className="flex border border-gray-200 bg-white rounded-[10px] overflow-hidden">
+        <div className="flex border border-gray-200 bg-white rounded-lg overflow-hidden">
           <Button
             variant={viewMode === "grid" ? "secondary" : "ghost"}
             size="icon"
@@ -250,24 +250,24 @@ export default function MyCoursesPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="bg-gray-100 border border-gray-200 w-full justify-start rounded-[10px] h-auto p-1 gap-1 overflow-x-auto flex-nowrap">
+        <TabsList className="bg-gray-100 border border-gray-200 w-full justify-start rounded-lg h-auto p-1 gap-1 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="all"
-            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
+            className="rounded-lg border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
-            <T>All</T> <Badge className="ml-2 rounded-[6px] bg-gray-200 text-gray-700 border-0 text-[10px]">{filteredEnrollments.length}</Badge>
+            <T>All</T> <Badge className="ml-2 rounded-md bg-gray-200 text-gray-700 border-0 text-[10px]">{filteredEnrollments.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="in-progress"
-            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
+            className="rounded-lg border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
-            <T>In Progress</T> <Badge className="ml-2 rounded-[6px] bg-gray-200 text-gray-700 border-0 text-[10px]">{activeEnrollments.length}</Badge>
+            <T>In Progress</T> <Badge className="ml-2 rounded-md bg-gray-200 text-gray-700 border-0 text-[10px]">{activeEnrollments.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="completed"
-            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
+            className="rounded-lg border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
-            <T>Completed</T> <Badge className="ml-2 rounded-[6px] bg-gray-200 text-gray-700 border-0 text-[10px]">{completedEnrollments.length}</Badge>
+            <T>Completed</T> <Badge className="ml-2 rounded-md bg-gray-200 text-gray-700 border-0 text-[10px]">{completedEnrollments.length}</Badge>
           </TabsTrigger>
         </TabsList>
 
@@ -293,7 +293,7 @@ export default function MyCoursesPage() {
               </div>
             )
           ) : (
-            <div className="text-center py-20 rounded-[12px] border border-dashed border-gray-200 bg-white">
+            <div className="text-center py-20 rounded-xl border border-dashed border-gray-200 bg-white">
               <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-sans font-bold text-black"><T>No courses found</T></h3>
               <p className="font-sans text-gray-600 mt-2 text-sm">
@@ -301,7 +301,7 @@ export default function MyCoursesPage() {
                   ? <T>Try a different search term</T>
                   : <T>You haven&apos;t enrolled in any courses yet</T>}
               </p>
-              <Button className="mt-6 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" asChild>
+              <Button className="mt-6 rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" asChild>
                 <Link href="/courses"><T>Browse Courses</T></Link>
               </Button>
             </div>
@@ -330,13 +330,13 @@ export default function MyCoursesPage() {
               </div>
             )
           ) : (
-            <div className="text-center py-20 rounded-[12px] border border-dashed border-gray-200 bg-white">
+            <div className="text-center py-20 rounded-xl border border-dashed border-gray-200 bg-white">
               <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-sans font-bold text-black"><T>No courses in progress</T></h3>
               <p className="font-sans text-gray-600 mt-2 text-sm">
                 <T>Start a new course or resume a completed one</T>
               </p>
-              <Button className="mt-6 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" asChild>
+              <Button className="mt-6 rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" asChild>
                 <Link href="/courses"><T>Browse Courses</T></Link>
               </Button>
             </div>
@@ -365,7 +365,7 @@ export default function MyCoursesPage() {
               </div>
             )
           ) : (
-            <div className="text-center py-20 rounded-[12px] border border-dashed border-gray-200 bg-white">
+            <div className="text-center py-20 rounded-xl border border-dashed border-gray-200 bg-white">
               <CheckCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-sans font-bold text-black"><T>No completed courses</T></h3>
               <p className="font-sans text-gray-600 mt-2 text-sm">

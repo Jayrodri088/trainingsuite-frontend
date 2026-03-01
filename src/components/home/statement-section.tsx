@@ -45,7 +45,7 @@ export function StatementSection({ isAuthenticated, statementItems }: StatementS
                 />
               </div>
               {/* Container 2 – course.png only (separate container, in front) */}
-              <div className="absolute top-6 left-6 right-4 bottom-4 rounded-[12px] overflow-hidden shadow-xl z-10">
+              <div className="absolute top-6 left-6 right-4 bottom-4 rounded-xl overflow-hidden shadow-xl z-10">
                 <Image
                   src="/Images/course.png"
                   alt=""
@@ -88,7 +88,7 @@ export function StatementSection({ isAuthenticated, statementItems }: StatementS
               ) : (
                 <Button
                   size="lg"
-                  className="h-12 px-8 rounded-[12px] bg-white text-black hover:bg-white/90 font-medium text-sm w-full sm:w-auto"
+                  className="h-12 px-8 rounded-xl bg-white text-black hover:bg-white/90 font-medium text-sm w-full sm:w-auto"
                   asChild
                 >
                   <Link href="/register"><T>Register Now</T></Link>

@@ -99,12 +99,12 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
 
   return (
     <>
-      <Card className="overflow-hidden rounded-[12px] border-gray-200 group hover:border-gray-300 transition-colors bg-white shadow-sm">
+      <Card className="overflow-hidden rounded-xl border-gray-200 group hover:border-gray-300 transition-colors bg-white shadow-sm">
         <div className="bg-amber-50/80 p-6 border-b border-gray-200 text-center relative">
-          <Badge className="absolute top-3 left-3 rounded-[8px] bg-amber-600 hover:bg-amber-600 border-0 text-[10px] font-semibold"><T>Verified</T></Badge>
+          <Badge className="absolute top-3 left-3 rounded-lg bg-amber-600 hover:bg-amber-600 border-0 text-[10px] font-semibold"><T>Verified</T></Badge>
           <div className="flex items-center justify-center py-4">
             <div className="relative">
-              <div className="h-20 w-20 rounded-[12px] border-2 border-amber-200 bg-amber-100/80 flex items-center justify-center">
+              <div className="h-20 w-20 rounded-xl border-2 border-amber-200 bg-amber-100/80 flex items-center justify-center">
                 <Award className="h-10 w-10 text-amber-600" />
               </div>
               <div className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-green-600 flex items-center justify-center border-2 border-white">
@@ -135,7 +135,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 rounded-[10px] border-gray-200 text-xs font-semibold h-9 hover:bg-gray-50"
+              className="flex-1 rounded-lg border-gray-200 text-xs font-semibold h-9 hover:bg-gray-50"
               onClick={handleDownload}
               disabled={isDownloading}
             >
@@ -149,7 +149,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 rounded-[10px] border-gray-200 text-xs font-semibold h-9 hover:bg-gray-50"
+              className="flex-1 rounded-lg border-gray-200 text-xs font-semibold h-9 hover:bg-gray-50"
               onClick={() => setShareDialogOpen(true)}
             >
               <Share2 className="h-3 w-3 mr-2" />
@@ -157,7 +157,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
             </Button>
           </div>
 
-          <Button variant="ghost" size="sm" className="w-full mt-2 rounded-[10px] text-xs font-semibold h-9 hover:bg-transparent hover:text-[#0052CC]" asChild>
+          <Button variant="ghost" size="sm" className="w-full mt-2 rounded-lg text-xs font-semibold h-9 hover:bg-transparent hover:text-[#0052CC]" asChild>
             <Link href={`/certificates/${certificate._id}`}>
               <T>View Certificate</T> <ExternalLink className="h-3 w-3 ml-2" />
             </Link>
@@ -167,7 +167,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
 
       {/* Share Dialog */}
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-        <DialogContent className="sm:max-w-md rounded-[12px] border-gray-200 shadow-lg">
+        <DialogContent className="sm:max-w-md rounded-xl border-gray-200 shadow-lg">
           <DialogHeader>
             <DialogTitle className="font-sans font-bold text-black"><T>Share Certificate</T></DialogTitle>
             <DialogDescription className="font-sans text-gray-600">
@@ -179,9 +179,9 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
               <Input
                 value={certificateUrl}
                 readOnly
-                className="flex-1 rounded-[10px] border-gray-200 font-sans text-xs"
+                className="flex-1 rounded-lg border-gray-200 font-sans text-xs"
               />
-              <Button size="sm" onClick={handleCopyLink} className="rounded-[10px] h-10 w-10 p-0 bg-[#0052CC] hover:bg-[#003d99] text-white">
+              <Button size="sm" onClick={handleCopyLink} className="rounded-lg h-10 w-10 p-0 bg-[#0052CC] hover:bg-[#003d99] text-white">
                 {copied ? (
                   <Check className="h-4 w-4" />
                 ) : (
@@ -192,7 +192,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
             <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
               <Button
                 variant="outline"
-                className="flex-1 rounded-[10px] border-gray-200 font-sans text-xs font-semibold hover:bg-gray-50"
+                className="flex-1 rounded-lg border-gray-200 font-sans text-xs font-semibold hover:bg-gray-50"
                 onClick={() => handleShareSocial("twitter")}
               >
                 <Twitter className="h-4 w-4 mr-2" />
@@ -200,7 +200,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
               </Button>
               <Button
                 variant="outline"
-                className="flex-1 rounded-[10px] border-gray-200 font-sans text-xs font-semibold hover:bg-gray-50"
+                className="flex-1 rounded-lg border-gray-200 font-sans text-xs font-semibold hover:bg-gray-50"
                 onClick={() => handleShareSocial("linkedin")}
               >
                 <Linkedin className="h-4 w-4 mr-2" />
@@ -208,7 +208,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
               </Button>
               <Button
                 variant="outline"
-                className="flex-1 rounded-[10px] border-gray-200 font-sans text-xs font-semibold hover:bg-gray-50"
+                className="flex-1 rounded-lg border-gray-200 font-sans text-xs font-semibold hover:bg-gray-50"
                 onClick={() => handleShareSocial("facebook")}
               >
                 <Facebook className="h-4 w-4 mr-2" />
@@ -224,29 +224,29 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
 
 function CertificateCardSkeleton() {
   return (
-    <Card className="overflow-hidden rounded-[12px] border-gray-200">
+    <Card className="overflow-hidden rounded-xl border-gray-200">
       <div className="bg-gray-50 p-6 border-b border-gray-200">
         <div className="flex items-center justify-center">
-          <Skeleton className="h-20 w-20 rounded-[12px]" />
+          <Skeleton className="h-20 w-20 rounded-xl" />
         </div>
       </div>
       <CardContent className="p-5 space-y-4">
-        <Skeleton className="h-5 w-full rounded-[10px]" />
+        <Skeleton className="h-5 w-full rounded-lg" />
         <div className="space-y-2">
           <div className="flex justify-between">
-            <Skeleton className="h-3 w-12 rounded-[10px]" />
-            <Skeleton className="h-3 w-20 rounded-[10px]" />
+            <Skeleton className="h-3 w-12 rounded-lg" />
+            <Skeleton className="h-3 w-20 rounded-lg" />
           </div>
           <div className="flex justify-between">
-            <Skeleton className="h-3 w-8 rounded-[10px]" />
-            <Skeleton className="h-3 w-24 rounded-[10px]" />
+            <Skeleton className="h-3 w-8 rounded-lg" />
+            <Skeleton className="h-3 w-24 rounded-lg" />
           </div>
         </div>
         <div className="flex gap-2">
-          <Skeleton className="h-9 flex-1 rounded-[10px]" />
-          <Skeleton className="h-9 flex-1 rounded-[10px]" />
+          <Skeleton className="h-9 flex-1 rounded-lg" />
+          <Skeleton className="h-9 flex-1 rounded-lg" />
         </div>
-        <Skeleton className="h-8 w-full mt-2 rounded-[10px]" />
+        <Skeleton className="h-8 w-full mt-2 rounded-lg" />
       </CardContent>
     </Card>
   );
@@ -269,9 +269,9 @@ export default function CertificatesPage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardContent className="p-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-[12px] border border-amber-200 bg-amber-50 text-amber-600 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-xl border border-amber-200 bg-amber-50 text-amber-600 flex items-center justify-center">
               <Award className="h-6 w-6" />
             </div>
             <div>
@@ -280,9 +280,9 @@ export default function CertificatesPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardContent className="p-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-[12px] border border-green-200 bg-green-50 text-green-600 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-xl border border-green-200 bg-green-50 text-green-600 flex items-center justify-center">
               <BookOpen className="h-6 w-6" />
             </div>
             <div>
@@ -291,9 +291,9 @@ export default function CertificatesPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardContent className="p-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-[12px] border border-blue-200 bg-blue-50 text-blue-600 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-xl border border-blue-200 bg-blue-50 text-blue-600 flex items-center justify-center">
               <Share2 className="h-6 w-6" />
             </div>
             <div>
@@ -318,16 +318,16 @@ export default function CertificatesPage() {
           ))}
         </div>
       ) : (
-        <Card className="rounded-[12px] border-gray-200 border-dashed bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 border-dashed bg-white shadow-sm">
           <CardContent className="py-20 text-center">
-            <div className="h-16 w-16 mx-auto mb-6 rounded-[12px] border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500">
+            <div className="h-16 w-16 mx-auto mb-6 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500">
               <Award className="h-8 w-8" />
             </div>
             <h3 className="text-xl font-sans font-bold text-black"><T>No certificates yet</T></h3>
             <p className="font-sans text-gray-600 mt-2 max-w-md mx-auto text-sm">
               <T>Complete courses to earn certificates that showcase your achievements.</T>
             </p>
-            <Button className="mt-8 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" asChild>
+            <Button className="mt-8 rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" asChild>
               <Link href="/courses"><T>Browse Courses</T></Link>
             </Button>
           </CardContent>

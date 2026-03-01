@@ -1,6 +1,15 @@
 // User & Authentication Types
 export type UserRole = "user" | "instructor" | "admin";
 
+export interface NotificationPreferences {
+  emailCourseUpdates?: boolean;
+  emailNewCourses?: boolean;
+  emailPromotions?: boolean;
+  emailWeeklyProgress?: boolean;
+  emailLiveSessionReminders?: boolean;
+  emailCertificateEarned?: boolean;
+}
+
 export interface User {
   _id: string;
   name: string;
@@ -14,6 +23,7 @@ export interface User {
   isVerified: boolean;
   /** Set when user has paid the one-time $1 portal access (identity verification). */
   portalAccessPaidAt?: string | null;
+  notificationPreferences?: NotificationPreferences;
   createdAt: string;
   updatedAt: string;
 }
@@ -355,6 +365,11 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
     totalPages: number;
     hasMore: boolean;
   };
+}
+
+/** GET /notifications response includes unreadCount */
+export interface NotificationsListResponse extends PaginatedResponse<Notification> {
+  unreadCount: number;
 }
 
 // Analytics Types

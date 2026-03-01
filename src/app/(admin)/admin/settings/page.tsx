@@ -123,7 +123,7 @@ export default function SettingsPage() {
 
       {/* Maintenance Mode Warning */}
       {siteConfig.maintenanceMode && (
-        <Alert variant="destructive" className="rounded-[10px] border-destructive/20 bg-destructive/5">
+        <Alert variant="destructive" className="rounded-lg border-destructive/20 bg-destructive/5">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle className="uppercase font-bold tracking-wide">Maintenance Mode Active</AlertTitle>
           <AlertDescription>
@@ -133,31 +133,31 @@ export default function SettingsPage() {
       )}
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="bg-transparent border-b border-gray-200 w-full justify-start rounded-[10px] h-auto p-0 gap-4 sm:gap-6 overflow-x-auto flex-nowrap">
+        <TabsList className="bg-transparent border-b border-gray-200 w-full justify-start rounded-lg h-auto p-0 gap-4 sm:gap-6 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="general"
-            className="rounded-[10px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-lg border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
           >
             <Globe className="h-3.5 w-3.5 mr-2" />
             General
           </TabsTrigger>
           <TabsTrigger
             value="appearance"
-            className="rounded-[10px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-lg border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
           >
             <Palette className="h-3.5 w-3.5 mr-2" />
             Appearance
           </TabsTrigger>
           <TabsTrigger
             value="features"
-            className="rounded-[10px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-lg border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
           >
             <Settings className="h-3.5 w-3.5 mr-2" />
             Features
           </TabsTrigger>
           <TabsTrigger
             value="payments"
-            className="rounded-[10px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+            className="rounded-lg border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
           >
             <CreditCard className="h-3.5 w-3.5 mr-2" />
             Payments
@@ -166,7 +166,7 @@ export default function SettingsPage() {
 
         {/* General Settings */}
         <TabsContent value="general">
-          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+          <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
             <CardHeader className="bg-muted/5 border-b border-gray-200">
               <CardTitle className="font-sans font-bold text-black uppercase tracking-wide">General Settings</CardTitle>
               <CardDescription>
@@ -184,7 +184,7 @@ export default function SettingsPage() {
                       setSiteConfig({ ...siteConfig, siteName: e.target.value })
                     }
                     placeholder="My Learning Platform"
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                    className="rounded-xl border-gray-200 bg-white shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -197,7 +197,7 @@ export default function SettingsPage() {
                       setSiteConfig({ ...siteConfig, contactEmail: e.target.value })
                     }
                     placeholder="contact@example.com"
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                    className="rounded-xl border-gray-200 bg-white shadow-sm"
                   />
                 </div>
               </div>
@@ -212,7 +212,7 @@ export default function SettingsPage() {
                   }
                   placeholder="A brief description of your platform..."
                   rows={3}
-                  className="rounded-[12px] border-gray-200 bg-white shadow-sm resize-none"
+                  className="rounded-xl border-gray-200 bg-white shadow-sm resize-none"
                 />
               </div>
 
@@ -233,7 +233,7 @@ export default function SettingsPage() {
                         })
                       }
                       placeholder="https://facebook.com/..."
-                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                      className="rounded-xl border-gray-200 bg-white shadow-sm"
                     />
                   </div>
                   <div className="space-y-2">
@@ -248,7 +248,7 @@ export default function SettingsPage() {
                         })
                       }
                       placeholder="https://twitter.com/..."
-                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                      className="rounded-xl border-gray-200 bg-white shadow-sm"
                     />
                   </div>
                   <div className="space-y-2">
@@ -263,7 +263,7 @@ export default function SettingsPage() {
                         })
                       }
                       placeholder="https://instagram.com/..."
-                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                      className="rounded-xl border-gray-200 bg-white shadow-sm"
                     />
                   </div>
                   <div className="space-y-2">
@@ -278,7 +278,7 @@ export default function SettingsPage() {
                         })
                       }
                       placeholder="https://youtube.com/..."
-                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                      className="rounded-xl border-gray-200 bg-white shadow-sm"
                     />
                   </div>
                 </div>
@@ -288,7 +288,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={handleSaveSiteConfig}
                   disabled={updateConfigMutation.isPending}
-                  className="rounded-[10px]"
+                  className="rounded-lg"
                 >
                   {updateConfigMutation.isPending ? (
                     <>
@@ -309,7 +309,7 @@ export default function SettingsPage() {
 
         {/* Appearance Settings */}
         <TabsContent value="appearance">
-          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+          <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
             <CardHeader className="bg-muted/5 border-b border-gray-200">
               <CardTitle className="font-sans font-bold text-black uppercase tracking-wide">Appearance Settings</CardTitle>
               <CardDescription>
@@ -328,9 +328,9 @@ export default function SettingsPage() {
                         setSiteConfig({ ...siteConfig, logo: e.target.value })
                       }
                       placeholder="https://example.com/logo.png"
-                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                      className="rounded-xl border-gray-200 bg-white shadow-sm"
                     />
-                    <Button variant="outline" size="icon" className="rounded-[12px] border-gray-200 bg-white shadow-sm aspect-square h-10 w-10">
+                    <Button variant="outline" size="icon" className="rounded-xl border-gray-200 bg-white shadow-sm aspect-square h-10 w-10">
                       <Upload className="h-4 w-4" />
                     </Button>
                   </div>
@@ -354,9 +354,9 @@ export default function SettingsPage() {
                         setSiteConfig({ ...siteConfig, favicon: e.target.value })
                       }
                       placeholder="https://example.com/favicon.ico"
-                      className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                      className="rounded-xl border-gray-200 bg-white shadow-sm"
                     />
-                    <Button variant="outline" size="icon" className="rounded-[12px] border-gray-200 bg-white shadow-sm aspect-square h-10 w-10">
+                    <Button variant="outline" size="icon" className="rounded-xl border-gray-200 bg-white shadow-sm aspect-square h-10 w-10">
                       <Upload className="h-4 w-4" />
                     </Button>
                   </div>
@@ -378,7 +378,7 @@ export default function SettingsPage() {
                         onChange={(e) =>
                           setSiteConfig({ ...siteConfig, primaryColor: e.target.value })
                         }
-                        className="w-12 h-10 p-1 cursor-pointer rounded-[12px] border-gray-200 bg-white shadow-sm"
+                        className="w-12 h-10 p-1 cursor-pointer rounded-xl border-gray-200 bg-white shadow-sm"
                       />
                       <Input
                         value={siteConfig.primaryColor || "#7c3aed"}
@@ -386,7 +386,7 @@ export default function SettingsPage() {
                           setSiteConfig({ ...siteConfig, primaryColor: e.target.value })
                         }
                         placeholder="#7c3aed"
-                        className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
+                        className="rounded-xl border-gray-200 bg-white shadow-sm font-mono"
                       />
                     </div>
                   </div>
@@ -400,7 +400,7 @@ export default function SettingsPage() {
                         onChange={(e) =>
                           setSiteConfig({ ...siteConfig, secondaryColor: e.target.value })
                         }
-                        className="w-12 h-10 p-1 cursor-pointer rounded-[12px] border-gray-200 bg-white shadow-sm"
+                        className="w-12 h-10 p-1 cursor-pointer rounded-xl border-gray-200 bg-white shadow-sm"
                       />
                       <Input
                         value={siteConfig.secondaryColor || "#f59e0b"}
@@ -408,7 +408,7 @@ export default function SettingsPage() {
                           setSiteConfig({ ...siteConfig, secondaryColor: e.target.value })
                         }
                         placeholder="#f59e0b"
-                        className="rounded-[12px] border-gray-200 bg-white shadow-sm font-mono"
+                        className="rounded-xl border-gray-200 bg-white shadow-sm font-mono"
                       />
                     </div>
                   </div>
@@ -419,7 +419,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={handleSaveSiteConfig}
                   disabled={updateConfigMutation.isPending}
-                  className="rounded-[10px]"
+                  className="rounded-lg"
                 >
                   {updateConfigMutation.isPending ? (
                     <>
@@ -440,7 +440,7 @@ export default function SettingsPage() {
 
         {/* Feature Toggles */}
         <TabsContent value="features">
-          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+          <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
             <CardHeader className="bg-muted/5 border-b border-gray-200">
               <CardTitle className="font-sans font-bold text-black uppercase tracking-wide">Feature Toggles</CardTitle>
               <CardDescription>
@@ -588,10 +588,10 @@ export default function SettingsPage() {
                       setSiteConfig({ ...siteConfig, defaultStreamProvider: value })
                     }
                   >
-                    <SelectTrigger className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                    <SelectTrigger className="rounded-xl border-gray-200 bg-white shadow-sm">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                    <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                       <SelectItem value="youtube">YouTube</SelectItem>
                       <SelectItem value="vimeo">Vimeo</SelectItem>
                       <SelectItem value="hls">HLS</SelectItem>
@@ -605,7 +605,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={handleSaveSiteConfig}
                   disabled={updateConfigMutation.isPending}
-                  className="rounded-[10px]"
+                  className="rounded-lg"
                 >
                   {updateConfigMutation.isPending ? (
                     <>
@@ -627,7 +627,7 @@ export default function SettingsPage() {
         {/* Payment Settings */}
         <TabsContent value="payments">
           <div className="space-y-6">
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-muted/5 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
@@ -647,10 +647,10 @@ export default function SettingsPage() {
                       setSiteConfig({ ...siteConfig, defaultPaymentProvider: value })
                     }
                   >
-                    <SelectTrigger className="w-48 rounded-[12px] border-gray-200 bg-white shadow-sm">
+                    <SelectTrigger className="w-48 rounded-xl border-gray-200 bg-white shadow-sm">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                    <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                       <SelectItem value="stripe">Stripe</SelectItem>
                       <SelectItem value="paystack">Paystack</SelectItem>
                     </SelectContent>
@@ -659,14 +659,14 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-muted/5 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2 font-sans font-bold text-black uppercase tracking-wide">
                       Stripe Configuration
                       {siteConfig.defaultPaymentProvider === "stripe" && (
-                        <Badge variant="secondary" className="rounded-[10px] text-[10px] bg-primary/10 text-primary border-0">Default</Badge>
+                        <Badge variant="secondary" className="rounded-lg text-[10px] bg-primary/10 text-primary border-0">Default</Badge>
                       )}
                     </CardTitle>
                     <CardDescription>
@@ -682,14 +682,14 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-muted/5 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2 font-sans font-bold text-black uppercase tracking-wide">
                       Paystack Configuration
                       {siteConfig.defaultPaymentProvider === "paystack" && (
-                        <Badge variant="secondary" className="rounded-[10px] text-[10px] bg-primary/10 text-primary border-0">Default</Badge>
+                        <Badge variant="secondary" className="rounded-lg text-[10px] bg-primary/10 text-primary border-0">Default</Badge>
                       )}
                     </CardTitle>
                     <CardDescription>
@@ -709,7 +709,7 @@ export default function SettingsPage() {
               <Button
                 onClick={handleSaveSiteConfig}
                 disabled={updateConfigMutation.isPending}
-                className="rounded-[10px]"
+                className="rounded-lg"
               >
                 {updateConfigMutation.isPending ? (
                   <>

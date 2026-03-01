@@ -19,7 +19,7 @@ export function CourseCard({ course, enrollment }: { course: Course; enrollment?
 
   return (
     <Link href={`/courses/${course.slug || course._id}`} className="block h-full group">
-      <div className="h-full flex flex-col bg-white border border-gray-200 rounded-[12px] overflow-hidden transition-colors hover:border-gray-300">
+      <div className="h-full flex flex-col bg-white border border-gray-200 rounded-xl overflow-hidden transition-colors hover:border-gray-300">
         <div className="relative aspect-video bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-xl">
           <Image
             src={thumbnailSrc}
@@ -71,7 +71,7 @@ export function CourseCard({ course, enrollment }: { course: Course; enrollment?
               </div>
             ) : (
               <span
-                className="inline-flex w-full justify-center rounded-[12px] border border-[#D4D4D4] bg-white py-2.5 text-sm font-medium text-gray-800 shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.1),0px_1px_3px_0px_rgba(0,0,0,0.1)] outline-1 outline-white/10 outline-offset-0 group-hover:bg-gray-50 transition-colors"
+                className="inline-flex w-full justify-center rounded-xl border border-[#D4D4D4] bg-white py-2.5 text-sm font-medium text-gray-800 shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.1),0px_1px_3px_0px_rgba(0,0,0,0.1)] outline-1 outline-white/10 outline-offset-0 group-hover:bg-gray-50 transition-colors"
               >
                 {isPaidCourse ? <T>Buy Course</T> : <T>Start Learning</T>}
               </span>
@@ -85,17 +85,17 @@ export function CourseCard({ course, enrollment }: { course: Course; enrollment?
 
 export function CourseCardSkeleton() {
   return (
-    <div className="border border-gray-200 rounded-[12px] overflow-hidden h-full bg-white shadow-sm">
+    <div className="border border-gray-200 rounded-xl overflow-hidden h-full bg-white shadow-sm">
       <Skeleton className="aspect-video w-full rounded-t-xl rounded-b-none" />
       <div className="p-5 space-y-3">
         <div className="flex justify-between">
-          <Skeleton className="h-4 w-12 rounded-[10px]" />
-          <Skeleton className="h-4 w-20 rounded-[10px]" />
+          <Skeleton className="h-4 w-12 rounded-lg" />
+          <Skeleton className="h-4 w-20 rounded-lg" />
         </div>
-        <Skeleton className="h-5 w-full rounded-[10px]" />
-        <Skeleton className="h-5 w-4/5 rounded-[10px]" />
+        <Skeleton className="h-5 w-full rounded-lg" />
+        <Skeleton className="h-5 w-4/5 rounded-lg" />
         <div className="pt-2">
-          <Skeleton className="h-10 w-full rounded-[10px]" />
+          <Skeleton className="h-10 w-full rounded-lg" />
         </div>
       </div>
     </div>

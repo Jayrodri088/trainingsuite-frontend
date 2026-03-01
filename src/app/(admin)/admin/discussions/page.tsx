@@ -185,7 +185,7 @@ export default function AdminDiscussionsPage() {
             Manage discussion forums across the platform.
           </p>
         </div>
-        <Button onClick={() => { resetForm(); setSelectedForum(null); setDialogOpen(true); }} className="rounded-[10px]">
+        <Button onClick={() => { resetForm(); setSelectedForum(null); setDialogOpen(true); }} className="rounded-lg">
           <Plus className="h-4 w-4 mr-2" />
           Create Forum
         </Button>
@@ -193,7 +193,7 @@ export default function AdminDiscussionsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-primary/20 bg-primary/5 text-primary">
@@ -206,7 +206,7 @@ export default function AdminDiscussionsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-blue-200 bg-blue-50 text-blue-600">
@@ -219,7 +219,7 @@ export default function AdminDiscussionsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-green-200 bg-green-50 text-green-600">
@@ -232,7 +232,7 @@ export default function AdminDiscussionsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-amber-200 bg-amber-50 text-amber-600">
@@ -248,7 +248,7 @@ export default function AdminDiscussionsPage() {
       </div>
 
       {/* Forums Table */}
-      <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+      <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
         <CardHeader className="pb-4 border-b border-gray-200 bg-muted/5">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -264,14 +264,14 @@ export default function AdminDiscussionsPage() {
                   placeholder="Search forums..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
+                  className="pl-9 rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
                 />
               </div>
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-36 rounded-[12px] border-gray-200 bg-white shadow-sm">
+                <SelectTrigger className="w-36 rounded-xl border-gray-200 bg-white shadow-sm">
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
-                <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="general">General</SelectItem>
                   <SelectItem value="course">Course</SelectItem>
@@ -293,7 +293,7 @@ export default function AdminDiscussionsPage() {
                   : "Create your first discussion forum"}
               </p>
               {!searchQuery && typeFilter === "all" && (
-                <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="mt-4 rounded-[10px]">
+                <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="mt-4 rounded-lg">
                   <Plus className="h-4 w-4 mr-2" />
                   Create Forum
                 </Button>
@@ -327,9 +327,9 @@ export default function AdminDiscussionsPage() {
                       </TableCell>
                       <TableCell>
                         {forum.isGeneral ? (
-                          <Badge variant="outline" className="rounded-[10px] border-blue-200 bg-blue-50 text-blue-700 font-bold uppercase text-[10px] tracking-wide">General</Badge>
+                          <Badge variant="outline" className="rounded-lg border-blue-200 bg-blue-50 text-blue-700 font-bold uppercase text-[10px] tracking-wide">General</Badge>
                         ) : (
-                          <Badge variant="outline" className="rounded-[10px] border-green-200 bg-green-50 text-green-700 font-bold uppercase text-[10px] tracking-wide">Course</Badge>
+                          <Badge variant="outline" className="rounded-lg border-green-200 bg-green-50 text-green-700 font-bold uppercase text-[10px] tracking-wide">Course</Badge>
                         )}
                       </TableCell>
                       <TableCell>
@@ -350,12 +350,12 @@ export default function AdminDiscussionsPage() {
                       <TableCell className="text-right pr-6">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-[10px] hover:bg-muted">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="rounded-[12px] border-gray-200 bg-white shadow-sm">
-                            <DropdownMenuItem onClick={() => handleEdit(forum)} className="rounded-[10px] cursor-pointer">
+                          <DropdownMenuContent align="end" className="rounded-xl border-gray-200 bg-white shadow-sm">
+                            <DropdownMenuItem onClick={() => handleEdit(forum)} className="rounded-lg cursor-pointer">
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
@@ -365,7 +365,7 @@ export default function AdminDiscussionsPage() {
                                 setSelectedForum(forum);
                                 setDeleteDialogOpen(true);
                               }}
-                              className="text-destructive focus:text-destructive rounded-[10px] cursor-pointer"
+                              className="text-destructive focus:text-destructive rounded-lg cursor-pointer"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete
@@ -384,7 +384,7 @@ export default function AdminDiscussionsPage() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <DialogContent className="max-w-lg rounded-xl border-gray-200 bg-white shadow-sm">
           <DialogHeader>
             <DialogTitle className="font-sans font-bold text-black uppercase tracking-wide">
               {selectedForum ? "Edit Forum" : "Create Forum"}
@@ -405,7 +405,7 @@ export default function AdminDiscussionsPage() {
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Forum title"
                   required
-                  className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                  className="rounded-xl border-gray-200 bg-white shadow-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -416,7 +416,7 @@ export default function AdminDiscussionsPage() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Forum description..."
                   rows={3}
-                  className="rounded-[12px] border-gray-200 bg-white shadow-sm resize-none"
+                  className="rounded-xl border-gray-200 bg-white shadow-sm resize-none"
                 />
               </div>
               {!selectedForum && (
@@ -439,10 +439,10 @@ export default function AdminDiscussionsPage() {
                         value={formData.course}
                         onValueChange={(value) => setFormData({ ...formData, course: value })}
                       >
-                        <SelectTrigger className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                        <SelectTrigger className="rounded-xl border-gray-200 bg-white shadow-sm">
                           <SelectValue placeholder="Select a course" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                        <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                           {courses.map((course) => (
                             <SelectItem key={course._id} value={course._id}>
                               {course.title}
@@ -456,13 +456,13 @@ export default function AdminDiscussionsPage() {
               )}
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="rounded-xl border-gray-200 bg-white shadow-sm">
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="rounded-[10px]"
+                className="rounded-lg"
               >
                 {createMutation.isPending || updateMutation.isPending
                   ? "Saving..."
@@ -477,7 +477,7 @@ export default function AdminDiscussionsPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <DialogContent className="rounded-xl border-gray-200 bg-white shadow-sm">
           <DialogHeader>
             <DialogTitle className="font-sans font-bold text-black uppercase tracking-wide">Delete Forum</DialogTitle>
             <DialogDescription>
@@ -486,11 +486,11 @@ export default function AdminDiscussionsPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="rounded-xl border-gray-200 bg-white shadow-sm">
               Cancel
             </Button>
             <Button
-              className="bg-destructive hover:bg-destructive/90 rounded-[10px] text-destructive-foreground"
+              className="bg-destructive hover:bg-destructive/90 rounded-lg text-destructive-foreground"
               onClick={() => {
                 setDeleteDialogOpen(false);
                 setSelectedForum(null);

@@ -85,7 +85,7 @@ export default function LoginPage() {
                     placeholder="name@rhapsodyofrealities.org"
                     autoComplete="email"
                     disabled={isLoading}
-                    className="rounded-[10px] h-11 border-gray-200"
+                    className="rounded-lg h-11 border-gray-200"
                     {...field}
                   />
                 </FormControl>
@@ -109,14 +109,14 @@ export default function LoginPage() {
                       placeholder="••••••••"
                       autoComplete="current-password"
                       disabled={isLoading}
-                      className="rounded-[10px] h-11 pr-10 border-gray-200"
+                      className="rounded-lg h-11 pr-10 border-gray-200"
                       {...field}
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-0 top-0 h-11 w-11 rounded-[10px] hover:bg-transparent text-gray-500 hover:text-gray-900"
+                      className="absolute right-0 top-0 h-11 w-11 rounded-lg hover:bg-transparent text-gray-500 hover:text-gray-900"
                       onClick={() => setShowPassword(!showPassword)}
                       disabled={isLoading}
                     >
@@ -138,7 +138,7 @@ export default function LoginPage() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Checkbox id="remember" className="rounded-[6px] border-gray-300" />
+              <Checkbox id="remember" className="rounded-md border-gray-300" />
               <label
                 htmlFor="remember"
                 className="text-sm font-sans text-gray-600 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium"
@@ -154,7 +154,7 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <Button type="submit" className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold" disabled={isLoading}>
+          <Button type="submit" className="w-full h-11 rounded-lg bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <T>Access Portal</T>
           </Button>

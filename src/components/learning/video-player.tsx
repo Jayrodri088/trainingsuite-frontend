@@ -145,7 +145,7 @@ export function LearningVideoPlayer({
 
   if (!lesson) {
     return (
-      <div className="aspect-video bg-gray-800 flex items-center justify-center rounded-[12px]">
+      <div className="aspect-video bg-gray-800 flex items-center justify-center rounded-xl">
         <p className="text-gray-400 font-sans"><T>Select a lesson to start learning</T></p>
       </div>
     );
@@ -153,7 +153,7 @@ export function LearningVideoPlayer({
 
   if (!lesson.videoUrl) {
     return (
-      <div className="aspect-video bg-gray-800 flex items-center justify-center rounded-[12px]">
+      <div className="aspect-video bg-gray-800 flex items-center justify-center rounded-xl">
         <div className="text-center">
           <Video className="h-16 w-16 text-gray-500 mx-auto mb-4" />
           <p className="text-gray-400 font-sans"><T>No video for this lesson</T></p>
@@ -170,7 +170,7 @@ export function LearningVideoPlayer({
   if (type === "youtube") {
     const containerId = `youtube-player-${lessonId || "default"}`;
     return (
-      <div className="aspect-video bg-gray-900 rounded-[12px] overflow-hidden">
+      <div className="aspect-video bg-gray-900 rounded-xl overflow-hidden">
         <div id={containerId} className="w-full h-full" />
       </div>
     );
@@ -178,7 +178,7 @@ export function LearningVideoPlayer({
 
   if (type === "vimeo") {
     return (
-      <div className="aspect-video bg-gray-900 rounded-[12px] overflow-hidden">
+      <div className="aspect-video bg-gray-900 rounded-xl overflow-hidden">
         <iframe
           src={`${embedUrl}?api=1&autoplay=1`}
           className="w-full h-full"
@@ -192,7 +192,7 @@ export function LearningVideoPlayer({
 
   if (embedUrl.includes("drive.google.com") || embedUrl.includes("loom.com")) {
     return (
-      <div className="aspect-video bg-gray-900 rounded-[12px] overflow-hidden">
+      <div className="aspect-video bg-gray-900 rounded-xl overflow-hidden">
         <iframe
           src={embedUrl}
           className="w-full h-full"
@@ -205,7 +205,7 @@ export function LearningVideoPlayer({
   }
 
   return (
-    <div className="aspect-video bg-gray-900 relative group rounded-[12px] overflow-hidden">
+    <div className="aspect-video bg-gray-900 relative group rounded-xl overflow-hidden">
       <video
         ref={videoRef}
         className="w-full h-full"

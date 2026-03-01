@@ -128,6 +128,44 @@ export const adminApi = {
     return response.data;
   },
 
+  /** Export users as CSV (uses same filters as getUsers). Returns blob. */
+  exportUsers: async (filters?: UserFilters): Promise<Blob> => {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, String(value));
+        }
+      });
+    }
+    const response = await apiClient.get<Blob>(`/admin/users/export?${params.toString()}`, {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  sendEmailToUser: async (
+    id: string,
+    data: { subject: string; body: string }
+  ) => {
+    const response = await apiClient.post<ApiResponse<null>>(
+      `/admin/users/${id}/email`,
+      data
+    );
+    return response.data;
+  },
+
+  sendBulkEmail: async (data: {
+    userIds: string[];
+    subject: string;
+    body: string;
+  }) => {
+    const response = await apiClient.post<
+      ApiResponse<{ sent: number; total: number; errors: string[] }>
+    >("/admin/users/bulk-email", data);
+    return response.data;
+  },
+
   createUser: async (data: {
     name: string;
     email: string;

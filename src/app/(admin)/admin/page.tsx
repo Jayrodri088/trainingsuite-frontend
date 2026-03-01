@@ -121,14 +121,14 @@ export default function AdminDashboardPage() {
 
       {/* Quick Stats Row */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardHeader className="p-6 pb-2">
             <CardTitle className="text-base font-bold uppercase tracking-wide">New Users</CardTitle>
             <CardDescription>Joined this month</CardDescription>
           </CardHeader>
           <CardContent className="p-6 pt-2">
             {analyticsLoading ? (
-              <Skeleton className="h-10 w-20 rounded-[10px]" />
+              <Skeleton className="h-10 w-20 rounded-lg" />
             ) : (
               <div className="text-4xl font-light text-blue-600">
                 {analytics?.users?.newThisMonth || 0}
@@ -137,14 +137,14 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardHeader className="p-6 pb-2">
             <CardTitle className="text-base font-bold uppercase tracking-wide">Active Learners</CardTitle>
             <CardDescription>Currently enrolled</CardDescription>
           </CardHeader>
           <CardContent className="p-6 pt-2">
             {analyticsLoading ? (
-              <Skeleton className="h-10 w-20 rounded-[10px]" />
+              <Skeleton className="h-10 w-20 rounded-lg" />
             ) : (
               <div className="text-4xl font-light text-green-600">
                 {analytics?.enrollments?.active || 0}
@@ -153,14 +153,14 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardHeader className="p-6 pb-2">
             <CardTitle className="text-base font-bold uppercase tracking-wide">Certificates</CardTitle>
             <CardDescription>Total awarded</CardDescription>
           </CardHeader>
           <CardContent className="p-6 pt-2">
             {analyticsLoading ? (
-              <Skeleton className="h-10 w-20 rounded-[10px]" />
+              <Skeleton className="h-10 w-20 rounded-lg" />
             ) : (
               <div className="text-4xl font-light text-amber-600">
                 {analytics?.enrollments?.completed || 0}
@@ -172,7 +172,7 @@ export default function AdminDashboardPage() {
 
       {/* Additional Stats */}
       <div className="grid gap-8 lg:grid-cols-2">
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
             <CardTitle className="font-sans font-bold text-black text-lg">Platform Overview</CardTitle>
             <CardDescription>Key metrics at a glance</CardDescription>
@@ -193,7 +193,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="flex justify-between items-center p-4 hover:bg-gray-50 transition-colors">
                   <span className="text-sm font-medium text-gray-600">Live Sessions Now</span>
-                  <Badge variant={analytics?.liveSessions?.live ? "default" : "secondary"} className="rounded-[8px]">
+                  <Badge variant={analytics?.liveSessions?.live ? "default" : "secondary"} className="rounded-lg">
                     {analytics?.liveSessions?.live || 0}
                   </Badge>
                 </div>
@@ -202,32 +202,32 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardHeader className="p-6 border-b border-gray-200 bg-gray-50">
             <CardTitle className="font-sans font-bold text-black text-lg">Quick Actions</CardTitle>
             <CardDescription>Administrative tasks</CardDescription>
           </CardHeader>
           <CardContent className="p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <Button variant="outline" className="h-auto p-6 flex flex-col items-center gap-3 rounded-[12px] border-gray-200 bg-white shadow-sm hover:bg-muted" asChild>
+              <Button variant="outline" className="h-auto p-6 flex flex-col items-center gap-3 rounded-xl border-gray-200 bg-white shadow-sm hover:bg-muted" asChild>
                 <Link href="/admin/users">
                   <Users className="h-8 w-8 text-gray-600" />
                   <span className="text-xs font-sans font-semibold">Manage Users</span>
                 </Link>
               </Button>
-              <Button variant="outline" className="h-auto p-6 flex flex-col items-center gap-3 rounded-[12px] border-gray-200 bg-white shadow-sm hover:bg-muted" asChild>
+              <Button variant="outline" className="h-auto p-6 flex flex-col items-center gap-3 rounded-xl border-gray-200 bg-white shadow-sm hover:bg-muted" asChild>
                 <Link href="/admin/courses">
                   <BookOpen className="h-8 w-8 text-gray-600" />
                   <span className="text-xs font-sans font-semibold">Manage Courses</span>
                 </Link>
               </Button>
-              <Button variant="outline" className="h-auto p-6 flex flex-col items-center gap-3 rounded-[12px] border-gray-200 bg-white shadow-sm hover:bg-muted" asChild>
+              <Button variant="outline" className="h-auto p-6 flex flex-col items-center gap-3 rounded-xl border-gray-200 bg-white shadow-sm hover:bg-muted" asChild>
                 <Link href="/admin/categories">
                   <TrendingUp className="h-8 w-8 text-gray-600" />
                   <span className="text-xs font-sans font-semibold">Categories</span>
                 </Link>
               </Button>
-              <Button variant="outline" className="h-auto p-6 flex flex-col items-center gap-3 rounded-[12px] border-gray-200 bg-white shadow-sm hover:bg-muted" asChild>
+              <Button variant="outline" className="h-auto p-6 flex flex-col items-center gap-3 rounded-xl border-gray-200 bg-white shadow-sm hover:bg-muted" asChild>
                 <Link href="/admin/announcements">
                   <Megaphone className="h-8 w-8 text-gray-600" />
                   <span className="text-xs font-sans font-semibold">Announcements</span>
@@ -239,13 +239,13 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Top Courses */}
-      <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+      <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
         <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 border-b border-gray-200 bg-gray-50">
           <div>
             <CardTitle className="font-sans font-bold text-black text-lg">Top Performing Courses</CardTitle>
             <CardDescription>Highest enrollment counts</CardDescription>
           </div>
-          <Button variant="outline" size="sm" className="rounded-[10px] border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold" asChild>
+          <Button variant="outline" size="sm" className="rounded-lg border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold" asChild>
             <Link href="/admin/courses">View All Courses</Link>
           </Button>
         </CardHeader>
@@ -272,7 +272,7 @@ export default function AdminDashboardPage() {
                     <TableRow key={course._id} className="border-gray-200 hover:bg-gray-50">
                       <TableCell className="pl-6 py-4">
                         <div className="flex items-center gap-4">
-                          <div className="h-12 w-16 bg-muted flex items-center justify-center overflow-hidden border border-gray-200 rounded-[10px]">
+                          <div className="h-12 w-16 bg-muted flex items-center justify-center overflow-hidden border border-gray-200 rounded-lg">
                             {course.thumbnail ? (
                               <img
                                 src={course.thumbnail}
@@ -285,7 +285,7 @@ export default function AdminDashboardPage() {
                           </div>
                           <div>
                             <p className="font-medium line-clamp-1">{course.title}</p>
-                            <Badge variant={course.status === "published" ? "default" : "secondary"} className="mt-1 rounded-[8px] text-[10px] h-5 font-semibold">
+                            <Badge variant={course.status === "published" ? "default" : "secondary"} className="mt-1 rounded-lg text-[10px] h-5 font-semibold">
                               {course.status}
                             </Badge>
                           </div>
@@ -295,13 +295,13 @@ export default function AdminDashboardPage() {
                         {(course.enrollmentCount || 0).toLocaleString()}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Badge variant="outline" className="rounded-[8px] font-sans font-medium text-gray-600 border-gray-200">{course.level || "All Levels"}</Badge>
+                        <Badge variant="outline" className="rounded-lg font-sans font-medium text-gray-600 border-gray-200">{course.level || "All Levels"}</Badge>
                       </TableCell>
                       <TableCell className="text-right font-mono">
                         {course.rating?.toFixed(1) || "N/A"}
                       </TableCell>
                       <TableCell className="pr-6">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-[10px] hover:bg-[#0052CC]/10 hover:text-[#0052CC]" asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-[#0052CC]/10 hover:text-[#0052CC]" asChild>
                           <Link href={`/courses/${course.slug}`}>
                             <Eye className="h-4 w-4" />
                           </Link>

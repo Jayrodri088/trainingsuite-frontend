@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useState, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
@@ -18,6 +18,7 @@ import {
   Loader2,
   Send,
   ThumbsUp,
+  ChevronRight,
 } from "lucide-react";
 import { T, useT } from "@/components/t";
 import { ProtectedRoute } from "@/components/auth/protected-route";
@@ -36,13 +37,30 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks";
 import { forumsApi } from "@/lib/api/forums";
-import { getInitials } from "@/lib/utils";
+import { getInitials, getErrorMessage } from "@/lib/utils";
 import type { ForumPost, Comment, User } from "@/types";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 
@@ -54,20 +72,28 @@ function PostDetailPageContent() {
   const { user } = useAuth();
   const { t } = useT();
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
+  const [commentSort, setCommentSort] = useState<"latest" | "oldest" | "mostLiked">("oldest");
   // Track optimistic updates - maps id to optimistic liked state
   const [optimisticPostLikes, setOptimisticPostLikes] = useState<Map<string, boolean>>(new Map());
   const [optimisticCommentLikes, setOptimisticCommentLikes] = useState<Map<string, boolean>>(new Map());
 
-  const { data: postData, isLoading: postLoading } = useQuery({
+  const { data: postData, isLoading: postLoading, isError: postError, refetch: refetchPost } = useQuery({
     queryKey: ["post", postId],
     queryFn: () => forumsApi.getPost(postId),
   });
 
-  const { data: commentsData, isLoading: commentsLoading } = useQuery({
-    queryKey: ["post-comments", postId],
-    queryFn: () => forumsApi.getComments(postId, 1, 100),
+  const { data: forumData } = useQuery({
+    queryKey: ["forum", forumId],
+    queryFn: () => forumsApi.getById(forumId),
+    enabled: !!forumId,
+  });
+
+  const { data: commentsData, isLoading: commentsLoading, isError: commentsError, refetch: refetchComments } = useQuery({
+    queryKey: ["post-comments", postId, commentSort],
+    queryFn: () => forumsApi.getComments(postId, 1, 100, commentSort),
   });
 
   // Helper to get effective liked state for post
@@ -86,17 +112,19 @@ function PostDetailPageContent() {
     return !!comment.isLiked;
   };
 
+  const commentTextareaRef = useRef<HTMLTextAreaElement>(null);
   const createCommentMutation = useMutation({
     mutationFn: ({ content, parentId }: { content: string; parentId?: string }) =>
       forumsApi.createComment(postId, content, parentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["post-comments", postId] });
       setNewComment("");
-      setReplyTo(null);
+      // Keep replyTo so the reply form stays visible and thread doesn't collapse
       toast({ title: t("Comment added!") });
+      setTimeout(() => commentTextareaRef.current?.focus(), 100);
     },
-    onError: () => {
-      toast({ title: t("Failed to add comment"), variant: "destructive" });
+    onError: (err) => {
+      toast({ title: getErrorMessage(err), description: t("Something went wrong. Try again."), variant: "destructive" });
     },
   });
 
@@ -126,14 +154,13 @@ function PostDetailPageContent() {
       });
       queryClient.invalidateQueries({ queryKey: ["post", postId] });
     },
-    onError: (_, { id }) => {
-      // Clear optimistic state on error - revert to server state
+    onError: (err, { id }) => {
       setOptimisticPostLikes((prev) => {
         const newMap = new Map(prev);
         newMap.delete(id);
         return newMap;
       });
-      toast({ title: t("Failed to update vote"), variant: "destructive" });
+      toast({ title: getErrorMessage(err), description: t("Something went wrong. Try again."), variant: "destructive" });
     },
   });
 
@@ -163,14 +190,13 @@ function PostDetailPageContent() {
       });
       queryClient.invalidateQueries({ queryKey: ["post-comments", postId] });
     },
-    onError: (_, { commentId }) => {
-      // Clear optimistic state on error - revert to server state
+    onError: (err, { commentId }) => {
       setOptimisticCommentLikes((prev) => {
         const newMap = new Map(prev);
         newMap.delete(commentId);
         return newMap;
       });
-      toast({ title: t("Failed to update vote"), variant: "destructive" });
+      toast({ title: getErrorMessage(err), description: t("Something went wrong. Try again."), variant: "destructive" });
     },
   });
 
@@ -185,6 +211,33 @@ function PostDetailPageContent() {
       parentId: replyTo?._id,
     });
   };
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: (commentId: string) => forumsApi.deleteComment(commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["post-comments", postId] });
+      queryClient.invalidateQueries({ queryKey: ["post", postId] });
+      toast({ title: t("Comment deleted") });
+    },
+    onError: (err) => {
+      toast({ title: getErrorMessage(err), variant: "destructive" });
+    },
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: () => forumsApi.deletePost(postId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["forum-posts", forumId] });
+      toast({ title: t("Post deleted") });
+      router.push(`/forums/${forumId}`);
+    },
+    onError: (err) => {
+      toast({ title: getErrorMessage(err), variant: "destructive" });
+    },
+  });
+
+  const [commentToDelete, setCommentToDelete] = useState<Comment | null>(null);
+  const [showDeletePostConfirm, setShowDeletePostConfirm] = useState(false);
 
   const post = postData?.data;
   const rawComments = commentsData?.data || [];
@@ -227,6 +280,11 @@ function PostDetailPageContent() {
   };
 
   const isLoading = postLoading || commentsLoading;
+  const hasError = postError || commentsError;
+  const refetchAll = () => {
+    refetchPost();
+    refetchComments();
+  };
 
   if (isLoading) {
     return (
@@ -234,6 +292,26 @@ function PostDetailPageContent() {
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-64 w-full" />
         <Skeleton className="h-32 w-full" />
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="space-y-4">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-muted-foreground">
+          <Link href="/forums" className="hover:text-foreground"><T>Forums</T></Link>
+          <ChevronRight className="h-4 w-4" />
+          <span className="text-foreground font-medium"><T>Post</T></span>
+        </nav>
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <p className="font-medium"><T>Something went wrong</T></p>
+            <p className="text-sm text-muted-foreground mt-1"><T>We couldn&apos;t load this page. Please try again.</T></p>
+            <Button className="mt-4" onClick={refetchAll}><T>Try again</T></Button>
+            <Button variant="outline" className="mt-3 ml-2" asChild><Link href={`/forums/${forumId}`}><T>Back to Forum</T></Link></Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -253,8 +331,19 @@ function PostDetailPageContent() {
     );
   }
 
-  const CommentCard = ({ comment, depth = 0 }: { comment: Comment; depth?: number }) => {
+  const CommentCard = ({
+    comment,
+    depth = 0,
+    onDeleteComment,
+    canDeleteComment,
+  }: {
+    comment: Comment;
+    depth?: number;
+    onDeleteComment?: (c: Comment) => void;
+    canDeleteComment?: (c: Comment) => boolean;
+  }) => {
     const isOwner = user?._id === (comment.user as User)?._id;
+    const canDelete = canDeleteComment?.(comment) ?? false;
     const replies = getChildComments(comment._id);
     const parentId = getParentId(comment);
     const parentComment = parentId ? commentMap.get(parentId) : null;
@@ -320,7 +409,7 @@ function PostDetailPageContent() {
                   <Reply className="h-3 w-3 mr-1" />
                   <T>Reply</T>
                 </Button>
-                {isOwner && (
+                {(isOwner || canDelete) && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -328,14 +417,21 @@ function PostDetailPageContent() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
-                      <DropdownMenuItem>
-                        <Edit className="h-4 w-4 mr-2" />
-                        <T>Edit</T>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        <T>Delete</T>
-                      </DropdownMenuItem>
+                      {isOwner && (
+                        <DropdownMenuItem>
+                          <Edit className="h-4 w-4 mr-2" />
+                          <T>Edit</T>
+                        </DropdownMenuItem>
+                      )}
+                      {(isOwner || canDelete) && (
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive cursor-pointer"
+                          onClick={() => onDeleteComment?.(comment)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          <T>Delete</T>
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}
@@ -353,7 +449,13 @@ function PostDetailPageContent() {
             )}
             <div className="space-y-0">
               {replies.map((reply) => (
-                <CommentCard key={reply._id} comment={reply} depth={depth + 1} />
+                <CommentCard
+                  key={reply._id}
+                  comment={reply}
+                  depth={depth + 1}
+                  onDeleteComment={onDeleteComment}
+                  canDeleteComment={canDeleteComment}
+                />
               ))}
             </div>
           </div>
@@ -362,8 +464,25 @@ function PostDetailPageContent() {
     );
   };
 
+  const forum = forumData?.data;
+  const isPostOwner = !!post && !!user && String((post.user as User)?._id ?? post.user) === user._id;
+  const isAdmin = user?.role === "admin";
+  const canModeratePost = isPostOwner || isAdmin;
+  const canDeleteCommentFn = (c: Comment) =>
+    !!user && (String((c.user as User)?._id ?? c.user) === user._id || user.role === "admin");
+  const onDeleteCommentFn = (c: Comment) => setCommentToDelete(c);
+
   return (
     <div className="space-y-6">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-muted-foreground font-sans">
+        <Link href="/forums" className="hover:text-foreground transition-colors"><T>Forums</T></Link>
+        <ChevronRight className="h-4 w-4 shrink-0" />
+        <Link href={`/forums/${forumId}`} className="hover:text-foreground transition-colors truncate max-w-[180px] sm:max-w-none">
+          {forum?.title ?? t("Forum")}
+        </Link>
+        <ChevronRight className="h-4 w-4 shrink-0" />
+        <span className="text-foreground font-medium truncate">{post.title}</span>
+      </nav>
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
@@ -371,11 +490,29 @@ function PostDetailPageContent() {
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </Button>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             {post.isPinned && <Pin className="h-4 w-4 text-primary fill-primary" />}
             {post.isLocked && <Lock className="h-4 w-4 text-muted-foreground" />}
-            <h1 className="text-2xl font-bold">{post.title}</h1>
+            <h1 className="text-2xl font-bold truncate">{post.title}</h1>
+            {canModeratePost && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive cursor-pointer"
+                    onClick={() => setShowDeletePostConfirm(true)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    <T>Delete post</T>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>
@@ -469,6 +606,7 @@ function PostDetailPageContent() {
                 </div>
               )}
               <Textarea
+                ref={commentTextareaRef}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder={t("Write your comment...")}
@@ -496,10 +634,20 @@ function PostDetailPageContent() {
 
       {/* Comments */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-lg">
             <T>Comments</T> ({comments.length})
           </CardTitle>
+          <Select value={commentSort} onValueChange={(v: "latest" | "oldest" | "mostLiked") => setCommentSort(v)}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="oldest"><T>Oldest first</T></SelectItem>
+              <SelectItem value="latest"><T>Latest first</T></SelectItem>
+              <SelectItem value="mostLiked"><T>Most liked</T></SelectItem>
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent>
           {comments.length === 0 ? (
@@ -510,12 +658,65 @@ function PostDetailPageContent() {
           ) : (
             <div className="divide-y">
               {rootComments.map((comment) => (
-                <CommentCard key={comment._id} comment={comment} />
+                <CommentCard
+                  key={comment._id}
+                  comment={comment}
+                  onDeleteComment={onDeleteCommentFn}
+                  canDeleteComment={canDeleteCommentFn}
+                />
               ))}
             </div>
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={showDeletePostConfirm} onOpenChange={setShowDeletePostConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle><T>Delete post?</T></AlertDialogTitle>
+            <AlertDialogDescription>
+              <T>This will permanently delete the post and all its comments. This action cannot be undone.</T>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel><T>Cancel</T></AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                deletePostMutation.mutate();
+                setShowDeletePostConfirm(false);
+              }}
+            >
+              {deletePostMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <T>Delete</T>}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!commentToDelete} onOpenChange={(open) => !open && setCommentToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle><T>Delete comment?</T></AlertDialogTitle>
+            <AlertDialogDescription>
+              <T>This will permanently delete this comment and any replies. This action cannot be undone.</T>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel><T>Cancel</T></AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (commentToDelete) {
+                  deleteCommentMutation.mutate(commentToDelete._id);
+                  setCommentToDelete(null);
+                }
+              }}
+            >
+              {deleteCommentMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <T>Delete</T>}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

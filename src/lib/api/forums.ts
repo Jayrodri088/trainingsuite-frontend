@@ -24,9 +24,11 @@ export const forumsApi = {
     return response.data;
   },
 
-  getPosts: async (id: string, page = 1, limit = 10) => {
+  getPosts: async (id: string, page = 1, limit = 10, sort?: "latest" | "oldest" | "mostLiked") => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (sort) params.set("sort", sort);
     const response = await apiClient.get<PaginatedResponse<ForumPost>>(
-      `/forums/${id}/posts?page=${page}&limit=${limit}`
+      `/forums/${id}/posts?${params.toString()}`
     );
     return response.data;
   },
@@ -54,10 +56,17 @@ export const forumsApi = {
     return response.data;
   },
 
-  getComments: async (postId: string, page = 1, limit = 20) => {
+  getComments: async (postId: string, page = 1, limit = 20, sort?: "latest" | "oldest" | "mostLiked") => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (sort) params.set("sort", sort);
     const response = await apiClient.get<PaginatedResponse<Comment>>(
-      `/posts/${postId}/comments?page=${page}&limit=${limit}`
+      `/posts/${postId}/comments?${params.toString()}`
     );
+    return response.data;
+  },
+
+  deleteComment: async (commentId: string) => {
+    const response = await apiClient.delete<ApiResponse<null>>(`/comments/${commentId}`);
     return response.data;
   },
 

@@ -90,7 +90,7 @@ function CoursesContent() {
             placeholder={t("Search training materials...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 w-full rounded-[10px] border-gray-200 bg-white text-black placeholder:text-gray-500 focus:ring-2 focus:ring-[#0052CC]/30"
+              className="pl-9 w-full rounded-lg border-gray-200 bg-white text-black placeholder:text-gray-500 focus:ring-2 focus:ring-[#0052CC]/30"
           />
           {searchQuery && (
             <Button
@@ -110,12 +110,12 @@ function CoursesContent() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="lg:hidden h-9 rounded-[10px] border-gray-200 bg-white text-gray-700 hover:bg-gray-50 font-sans font-medium"
+                  className="lg:hidden h-9 rounded-lg border-gray-200 bg-white text-gray-700 hover:bg-gray-50 font-sans font-medium"
                 >
                 <Filter className="h-4 w-4 mr-2" />
                 <T>Filters</T>
                 {activeFiltersCount > 0 && (
-                    <Badge variant="secondary" className="ml-2 h-5 px-1.5 rounded-[8px] bg-gray-100 text-gray-700">
+                    <Badge variant="secondary" className="ml-2 h-5 px-1.5 rounded-lg bg-gray-100 text-gray-700">
                     {activeFiltersCount}
                   </Badge>
                 )}
@@ -135,7 +135,7 @@ function CoursesContent() {
             value={filters.sort}
               onValueChange={(value) => setFilters({ ...filters, sort: value as CourseFilters["sort"] })}
           >
-              <SelectTrigger className="w-[140px] sm:w-[180px] h-9 rounded-[10px] border-gray-200 bg-white text-gray-700 font-sans">
+              <SelectTrigger className="w-[140px] sm:w-[180px] h-9 rounded-lg border-gray-200 bg-white text-gray-700 font-sans">
               <SelectValue placeholder={t("Sort by")} />
             </SelectTrigger>
             <SelectContent>
@@ -147,11 +147,11 @@ function CoursesContent() {
             </SelectContent>
           </Select>
 
-            <div className="flex border border-gray-200 rounded-[10px] overflow-hidden ml-auto bg-white">
+            <div className="flex border border-gray-200 rounded-lg overflow-hidden ml-auto bg-white">
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon"
-                className={`rounded-[10px] h-9 w-9 ${viewMode === "grid" ? "bg-[#0052CC]/10 text-[#0052CC]" : "text-gray-600 hover:bg-gray-100"}`}
+                className={`rounded-lg h-9 w-9 ${viewMode === "grid" ? "bg-[#0052CC]/10 text-[#0052CC]" : "text-gray-600 hover:bg-gray-100"}`}
               onClick={() => setViewMode("grid")}
             >
               <Grid3X3 className="h-4 w-4" />
@@ -159,7 +159,7 @@ function CoursesContent() {
             <Button
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="icon"
-                className={`rounded-[10px] h-9 w-9 ${viewMode === "list" ? "bg-[#0052CC]/10 text-[#0052CC]" : "text-gray-600 hover:bg-gray-100"}`}
+                className={`rounded-lg h-9 w-9 ${viewMode === "list" ? "bg-[#0052CC]/10 text-[#0052CC]" : "text-gray-600 hover:bg-gray-100"}`}
               onClick={() => setViewMode("list")}
             >
               <List className="h-4 w-4" />
@@ -171,11 +171,11 @@ function CoursesContent() {
       <div className="flex gap-8">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:block w-[200px] shrink-0">
-            <div className="sticky top-20 rounded-[12px] border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="sticky top-20 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="font-sans font-semibold text-black"><T>Filters</T></h3>
               {activeFiltersCount > 0 && (
-                  <Badge variant="secondary" className="rounded-[8px] bg-gray-100 text-gray-700">
+                  <Badge variant="secondary" className="rounded-lg bg-gray-100 text-gray-700">
                     {activeFiltersCount}
                   </Badge>
                 )}
@@ -223,14 +223,14 @@ function CoursesContent() {
               ))}
             </div>
           ) : (
-              <div className="rounded-[12px] border border-gray-200 bg-white p-12 text-center shadow-sm">
+              <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
                 <p className="font-sans text-gray-600"><T>No training materials found.</T></p>
                 <p className="text-sm font-sans text-gray-500 mt-1">
                 <T>Try adjusting your search or filters.</T>
               </p>
               <Button
                 variant="outline"
-                  className="mt-4 rounded-[10px] border-gray-200 bg-white text-gray-700 hover:bg-gray-50 font-sans font-medium"
+                  className="mt-4 rounded-lg border-gray-200 bg-white text-gray-700 hover:bg-gray-50 font-sans font-medium"
                 onClick={() => {
                   setSearchQuery("");
                   setFilters({ status: "published" });

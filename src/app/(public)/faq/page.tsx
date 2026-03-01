@@ -47,12 +47,12 @@ const faqs = [
   {
     category: "getting-started",
     question: "Is Training Suite free to use?",
-    answer: "Yes! All training materials on our platform are completely free. Simply create an account and start learning immediately.",
+    answer: "Some courses are free and others require purchase. Free courses can be started right away after sign-up; paid courses require a one-time payment before you get access. Course pages show whether a course is free or paid.",
   },
   {
     category: "getting-started",
     question: "How do I enroll in a course?",
-    answer: "To enroll in a course, navigate to the course page and click the 'Start Training' button. You'll have immediate access to all course materials once enrolled.",
+    answer: "Go to the course page and click 'Start Training' (free courses) or complete the purchase flow (paid courses). Once enrolled, you have access to all course materials.",
   },
   {
     category: "getting-started",
@@ -67,7 +67,7 @@ const faqs = [
   {
     category: "account",
     question: "Can I change my email address?",
-    answer: "Yes, you can change your email address in your account settings. Go to Settings > Profile and update your email. You'll need to verify your new email address before the change takes effect.",
+    answer: "No. Your email address cannot be changed after registration. It is used to sign in and is tied to your account, enrollments, and certificates. If you need to use a different email, you would need to create a new account.",
   },
   {
     category: "account",
@@ -199,7 +199,7 @@ export default function FAQPage() {
               placeholder={t("Search for answers...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-[10px] border-gray-200"
+              className="pl-12 h-12 rounded-lg border-gray-200"
             />
           </div>
         </div>
@@ -275,7 +275,7 @@ export default function FAQPage() {
 
       <section className="py-14 sm:py-16 bg-[#f5f5f5]">
         <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Card className="max-w-2xl mx-auto border-gray-200 rounded-[12px] shadow-sm">
+          <Card className="max-w-2xl mx-auto border-gray-200 rounded-xl shadow-sm">
             <CardHeader className="text-center">
               <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-[#0052CC]/10 flex items-center justify-center">
                 <MessageSquare className="h-8 w-8 text-[#0052CC]" />
@@ -286,7 +286,7 @@ export default function FAQPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" asChild className="rounded-[10px] h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold">
+              <Button size="lg" asChild className="rounded-lg h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold">
                 <Link href="/contact"><T>Contact Support</T></Link>
               </Button>
             </CardContent>

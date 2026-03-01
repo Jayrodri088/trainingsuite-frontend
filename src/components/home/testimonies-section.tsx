@@ -12,7 +12,7 @@ export type TestimonialItem = {
 
 function TestimonialCard({ quote, name, role, avatarUrl }: TestimonialItem) {
   return (
-    <div className="flex flex-col w-[280px] sm:w-[320px] md:w-[360px] shrink-0 bg-white rounded-[12px] shadow-sm p-5 md:p-6">
+    <div className="flex flex-col w-[280px] sm:w-[320px] md:w-[360px] shrink-0 bg-white rounded-xl shadow-sm p-5 md:p-6">
       <div className="mb-4">
         <Image
           src="/Icons/comma.png"

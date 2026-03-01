@@ -82,7 +82,7 @@ function ResetPasswordForm() {
           </p>
         </div>
 
-        <Button asChild className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
+        <Button asChild className="w-full h-11 rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
           <Link href="/forgot-password"><T>Request a new link</T></Link>
         </Button>
       </div>
@@ -92,7 +92,7 @@ function ResetPasswordForm() {
   if (isSuccess) {
     return (
       <div className="space-y-6">
-        <div className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-green-100">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100">
           <CheckCircle className="h-6 w-6 text-green-600" />
         </div>
 
@@ -103,7 +103,7 @@ function ResetPasswordForm() {
           </p>
         </div>
 
-        <Button asChild className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
+        <Button asChild className="w-full h-11 rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
           <Link href="/login"><T>Sign in</T></Link>
         </Button>
       </div>
@@ -134,7 +134,7 @@ function ResetPasswordForm() {
                       placeholder={t("Enter your new password")}
                       autoComplete="new-password"
                       disabled={isLoading}
-                      className="rounded-[10px] h-11 pr-10 border-gray-200"
+                      className="rounded-lg h-11 pr-10 border-gray-200"
                       {...field}
                     />
                     <Button
@@ -194,7 +194,7 @@ function ResetPasswordForm() {
                       placeholder={t("Confirm your new password")}
                       autoComplete="new-password"
                       disabled={isLoading}
-                      className="rounded-[10px] h-11 pr-10 border-gray-200"
+                      className="rounded-lg h-11 pr-10 border-gray-200"
                       {...field}
                     />
                     <Button
@@ -218,14 +218,14 @@ function ResetPasswordForm() {
             )}
           />
 
-          <Button type="submit" className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" disabled={isLoading}>
+          <Button type="submit" className="w-full h-11 rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <T>Reset password</T>
           </Button>
         </form>
       </Form>
 
-      <Button asChild variant="ghost" className="w-full rounded-[10px] text-gray-600 hover:text-[#0052CC] font-semibold">
+      <Button asChild variant="ghost" className="w-full rounded-lg text-gray-600 hover:text-[#0052CC] font-semibold">
         <Link href="/login"><T>Back to login</T></Link>
       </Button>
     </div>

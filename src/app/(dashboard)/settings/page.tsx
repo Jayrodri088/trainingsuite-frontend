@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   User,
   Lock,
@@ -30,6 +30,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks";
+import { formatDistanceToNow } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { getInitials, getErrorMessage } from "@/lib/utils";
 import { apiClient } from "@/lib/api/client";
@@ -60,6 +61,16 @@ export default function SettingsPage() {
     confirmNewPassword: "",
   });
 
+  const defaultPrefs = {
+    emailCourseUpdates: true,
+    emailNewCourses: true,
+    emailPromotions: false,
+    emailWeeklyProgress: true,
+    emailLiveSessionReminders: true,
+    emailCertificateEarned: true,
+  };
+  const [notificationPrefs, setNotificationPrefs] = useState(defaultPrefs);
+
   useEffect(() => {
     if (user) {
       const nameParts = user.name?.split(" ") || [];
@@ -71,6 +82,22 @@ export default function SettingsPage() {
       });
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user?.notificationPreferences) {
+      const p = user.notificationPreferences;
+      setNotificationPrefs({
+        emailCourseUpdates: p.emailCourseUpdates !== false,
+        emailNewCourses: p.emailNewCourses !== false,
+        emailPromotions: p.emailPromotions === true,
+        emailWeeklyProgress: p.emailWeeklyProgress !== false,
+        emailLiveSessionReminders: p.emailLiveSessionReminders !== false,
+        emailCertificateEarned: p.emailCertificateEarned !== false,
+      });
+    } else {
+      setNotificationPrefs(defaultPrefs);
+    }
+  }, [user?.notificationPreferences]);
 
   const uploadAvatarMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -181,6 +208,38 @@ export default function SettingsPage() {
     },
   });
 
+  const { data: sessionsData } = useQuery({
+    queryKey: ["auth", "sessions"],
+    queryFn: () => authApi.getSessions(),
+  });
+  const sessions = sessionsData?.data?.sessions ?? [];
+
+  const revokeOtherSessionsMutation = useMutation({
+    mutationFn: () => authApi.revokeOtherSessions(),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["auth", "sessions"] });
+      const revoked = data?.data?.revoked ?? 0;
+      toast({ title: revoked > 0 ? t("Signed out of other devices.") : t("No other devices were signed in.") });
+    },
+    onError: (error) => {
+      toast({ title: getErrorMessage(error), variant: "destructive" });
+    },
+  });
+
+  const saveNotificationPrefsMutation = useMutation({
+    mutationFn: (prefs: typeof notificationPrefs) => authApi.updateNotificationPreferences(prefs),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+      if (user && data?.data?.notificationPreferences) {
+        setUser({ ...user, notificationPreferences: data.data.notificationPreferences });
+      }
+      toast({ title: t("Notification preferences saved.") });
+    },
+    onError: (error) => {
+      toast({ title: getErrorMessage(error), variant: "destructive" });
+    },
+  });
+
   const handleChangePassword = () => {
     if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmNewPassword) {
       toast({ title: t("Please fill in all password fields"), variant: "destructive" });
@@ -203,31 +262,31 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="bg-gray-100 border border-gray-200 w-full justify-start rounded-[10px] h-auto p-1 gap-1 overflow-x-auto flex-nowrap">
+        <TabsList className="bg-gray-100 border border-gray-200 w-full justify-start rounded-lg h-auto p-1 gap-1 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="profile"
-            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
+            className="rounded-lg border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
             <User className="h-4 w-4 mr-2" />
             <T>Profile</T>
           </TabsTrigger>
           <TabsTrigger
             value="security"
-            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
+            className="rounded-lg border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
             <Lock className="h-4 w-4 mr-2" />
             <T>Security</T>
           </TabsTrigger>
           <TabsTrigger
             value="notifications"
-            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
+            className="rounded-lg border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
             <Bell className="h-4 w-4 mr-2" />
             <T>Alerts</T>
           </TabsTrigger>
           <TabsTrigger
             value="preferences"
-            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
+            className="rounded-lg border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
             <Globe className="h-4 w-4 mr-2" />
             <T>Preferences</T>
@@ -237,7 +296,7 @@ export default function SettingsPage() {
         {/* Profile Tab */}
         <TabsContent value="profile" className="mt-8 space-y-8">
           <div className="grid gap-8">
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <CardTitle className="font-sans font-bold text-black"><T>Profile Picture</T></CardTitle>
                 <CardDescription>
@@ -247,9 +306,9 @@ export default function SettingsPage() {
               <CardContent className="p-6">
                 <div className="flex items-center gap-6">
                   <div className="relative">
-                    <Avatar className="h-24 w-24 rounded-[12px] border border-gray-200">
+                    <Avatar className="h-24 w-24 rounded-xl border border-gray-200">
                       <AvatarImage src={avatarPreview || user?.avatar} />
-                      <AvatarFallback className="text-2xl bg-[#0052CC]/10 text-[#0052CC] font-bold rounded-[12px] font-sans">
+                      <AvatarFallback className="text-2xl bg-[#0052CC]/10 text-[#0052CC] font-bold rounded-xl font-sans">
                         {getInitials(user?.name || "User")}
                       </AvatarFallback>
                     </Avatar>
@@ -272,7 +331,7 @@ export default function SettingsPage() {
                       size="sm"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploadAvatarMutation.isPending}
-                      className="rounded-[12px] border-gray-200 bg-white shadow-sm uppercase text-xs font-bold tracking-wider"
+                      className="rounded-xl border-gray-200 bg-white shadow-sm uppercase text-xs font-bold tracking-wider"
                     >
                       <Camera className="h-4 w-4 mr-2" />
                       {uploadAvatarMutation.isPending ? t("Uploading...") : t("Change Photo")}
@@ -285,7 +344,7 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <CardTitle className="font-sans font-bold text-black"><T>Personal Information</T></CardTitle>
                 <CardDescription>
@@ -301,7 +360,7 @@ export default function SettingsPage() {
                       value={profileForm.firstName}
                       onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
                       placeholder={t("Enter your first name")}
-                      className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
+                      className="rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
                     />
                   </div>
                   <div className="space-y-2">
@@ -311,7 +370,7 @@ export default function SettingsPage() {
                       value={profileForm.lastName}
                       onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
                       placeholder={t("Enter your last name")}
-                      className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
+                      className="rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
                     />
                   </div>
                 </div>
@@ -323,7 +382,7 @@ export default function SettingsPage() {
                     value={user?.email || ""}
                     disabled
                     placeholder={t("Enter your email")}
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted opacity-100 font-mono"
+                    className="rounded-xl border-gray-200 bg-white shadow-sm bg-muted opacity-100 font-mono"
                   />
                   <p className="text-[10px] text-gray-600 uppercase tracking-wide pt-1"><T>Email cannot be changed</T></p>
                 </div>
@@ -335,7 +394,7 @@ export default function SettingsPage() {
                     onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
                     placeholder={t("Tell us about yourself...")}
                     rows={4}
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors resize-none"
+                    className="rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors resize-none"
                   />
                 </div>
                 <div className="space-y-2">
@@ -345,10 +404,10 @@ export default function SettingsPage() {
                     value={profileForm.phone}
                     onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                     placeholder={t("Enter your phone number")}
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
+                    className="rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
                   />
                 </div>
-                <Button onClick={handleSave} disabled={isSaving} className="rounded-[10px] font-bold bg-[#0052CC] hover:bg-[#003d99] text-white">
+                <Button onClick={handleSave} disabled={isSaving} className="rounded-lg font-bold bg-[#0052CC] hover:bg-[#003d99] text-white">
                   {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                   <T>Save Changes</T>
                 </Button>
@@ -360,7 +419,7 @@ export default function SettingsPage() {
         {/* Security Tab */}
         <TabsContent value="security" className="mt-8 space-y-8">
           <div className="grid gap-8">
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <CardTitle className="font-sans font-bold text-black"><T>Change Password</T></CardTitle>
                 <CardDescription>
@@ -376,7 +435,7 @@ export default function SettingsPage() {
                     value={passwordForm.currentPassword}
                     onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
                     placeholder={t("Enter current password")}
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
+                    className="rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
@@ -387,7 +446,7 @@ export default function SettingsPage() {
                     value={passwordForm.newPassword}
                     onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                     placeholder={t("Enter new password")}
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
+                    className="rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
@@ -398,13 +457,13 @@ export default function SettingsPage() {
                     value={passwordForm.confirmNewPassword}
                     onChange={(e) => setPasswordForm({ ...passwordForm, confirmNewPassword: e.target.value })}
                     placeholder={t("Confirm new password")}
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
+                    className="rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background transition-colors"
                   />
                 </div>
                 <Button
                   onClick={handleChangePassword}
                   disabled={changePasswordMutation.isPending}
-                  className="rounded-[10px] font-bold bg-[#0052CC] hover:bg-[#003d99] text-white"
+                  className="rounded-lg font-bold bg-[#0052CC] hover:bg-[#003d99] text-white"
                 >
                   {changePasswordMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                   <T>Update Password</T>
@@ -412,7 +471,7 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <CardTitle className="font-sans font-bold text-black"><T>Two-Factor Authentication</T></CardTitle>
                 <CardDescription>
@@ -433,30 +492,47 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <CardTitle className="font-sans font-bold text-black"><T>Active Sessions</T></CardTitle>
                 <CardDescription>
-                  <T>Manage devices where you&apos;re currently logged in</T>
+                  <T>You can be signed in on up to 2 devices. Sign out of other devices below.</T>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border border-gray-200 bg-gray-50">
-                    <div>
-                      <p className="font-bold text-sm"><T>Current Device</T></p>
-                      <p className="text-xs text-gray-600 mt-1">
-                        <T>This device</T> • <T>Current session</T>
-                      </p>
-                    </div>
-                    <Badge variant="secondary" className="rounded-[8px] bg-[#0052CC]/10 text-[#0052CC] border-0 font-semibold text-[10px]"><T>Current</T></Badge>
-                  </div>
+                <div className="space-y-3">
+                  {sessions.length === 0 ? (
+                    <p className="text-sm text-gray-500"><T>Loading sessions...</T></p>
+                  ) : (
+                    sessions.map((session) => (
+                      <div
+                        key={session.id}
+                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50"
+                      >
+                        <div className="min-w-0">
+                          <p className="font-bold text-sm truncate">
+                            {session.userAgent || t("Unknown device")}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-1">
+                            {session.isCurrent ? t("This device") : null}
+                            {session.isCurrent && " • "}
+                            <T>Last active</T> {formatDistanceToNow(new Date(session.lastActiveAt), { addSuffix: true })}
+                          </p>
+                        </div>
+                        {session.isCurrent && (
+                          <Badge variant="secondary" className="rounded-lg bg-[#0052CC]/10 text-[#0052CC] border-0 font-semibold text-[10px] shrink-0"><T>Current</T></Badge>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
                 <Button
                   variant="outline"
-                  onClick={() => toast({ title: t("Coming soon"), description: t("Session management is not available yet.") })}
-                  className="mt-6 rounded-[12px] border-gray-200 bg-white shadow-sm uppercase text-xs font-bold tracking-wider"
+                  onClick={() => revokeOtherSessionsMutation.mutate()}
+                  disabled={revokeOtherSessionsMutation.isPending || sessions.length <= 1 || !sessions.some((s) => s.isCurrent)}
+                  className="mt-6 rounded-xl border-gray-200 bg-white shadow-sm uppercase text-xs font-bold tracking-wider"
                 >
+                  {revokeOtherSessionsMutation.isPending && <Loader2 className="h-3 w-3 mr-2 animate-spin" />}
                   <T>Sign out of all other devices</T>
                 </Button>
               </CardContent>
@@ -466,7 +542,7 @@ export default function SettingsPage() {
 
         {/* Notifications Tab */}
         <TabsContent value="notifications" className="mt-8">
-          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+          <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
             <CardHeader className="bg-gray-50 border-b border-gray-200">
               <CardTitle className="font-sans font-bold text-black"><T>Notification Preferences</T></CardTitle>
               <CardDescription>
@@ -484,7 +560,12 @@ export default function SettingsPage() {
                         <T>Receive updates about your enrolled courses</T>
                       </p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch
+                      checked={notificationPrefs.emailCourseUpdates}
+                      onCheckedChange={(checked) =>
+                        setNotificationPrefs((p) => ({ ...p, emailCourseUpdates: checked }))
+                      }
+                    />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
@@ -493,7 +574,12 @@ export default function SettingsPage() {
                         <T>Get notified when new courses are available</T>
                       </p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch
+                      checked={notificationPrefs.emailNewCourses}
+                      onCheckedChange={(checked) =>
+                        setNotificationPrefs((p) => ({ ...p, emailNewCourses: checked }))
+                      }
+                    />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
@@ -502,7 +588,12 @@ export default function SettingsPage() {
                         <T>Receive promotional offers and discounts</T>
                       </p>
                     </div>
-                    <Switch />
+                    <Switch
+                      checked={notificationPrefs.emailPromotions}
+                      onCheckedChange={(checked) =>
+                        setNotificationPrefs((p) => ({ ...p, emailPromotions: checked }))
+                      }
+                    />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
@@ -511,7 +602,12 @@ export default function SettingsPage() {
                         <T>Get a weekly summary of your learning progress</T>
                       </p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch
+                      checked={notificationPrefs.emailWeeklyProgress}
+                      onCheckedChange={(checked) =>
+                        setNotificationPrefs((p) => ({ ...p, emailWeeklyProgress: checked }))
+                      }
+                    />
                   </div>
                 </div>
               </div>
@@ -526,7 +622,12 @@ export default function SettingsPage() {
                         <T>Get reminded before live sessions start</T>
                       </p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch
+                      checked={notificationPrefs.emailLiveSessionReminders}
+                      onCheckedChange={(checked) =>
+                        setNotificationPrefs((p) => ({ ...p, emailLiveSessionReminders: checked }))
+                      }
+                    />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
@@ -535,15 +636,22 @@ export default function SettingsPage() {
                         <T>Get notified when you earn a certificate</T>
                       </p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch
+                      checked={notificationPrefs.emailCertificateEarned}
+                      onCheckedChange={(checked) =>
+                        setNotificationPrefs((p) => ({ ...p, emailCertificateEarned: checked }))
+                      }
+                    />
                   </div>
                 </div>
               </div>
 
               <Button
-                onClick={() => toast({ title: t("Coming soon"), description: t("Notification preferences will be saved here.") })}
-                className="rounded-[10px] font-bold bg-[#0052CC] hover:bg-[#003d99] text-white"
+                onClick={() => saveNotificationPrefsMutation.mutate(notificationPrefs)}
+                disabled={saveNotificationPrefsMutation.isPending}
+                className="rounded-lg font-bold bg-[#0052CC] hover:bg-[#003d99] text-white"
               >
+                {saveNotificationPrefsMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 <T>Save Preferences</T>
               </Button>
             </CardContent>
@@ -553,7 +661,7 @@ export default function SettingsPage() {
         {/* Preferences Tab */}
         <TabsContent value="preferences" className="mt-8 space-y-8">
           <div className="grid gap-8">
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <CardTitle className="font-sans font-bold text-black"><T>Language & Region</T></CardTitle>
                 <CardDescription>
@@ -565,10 +673,10 @@ export default function SettingsPage() {
                   <div className="space-y-2">
                     <Label className="text-sm font-sans font-medium text-gray-600"><T>Language</T></Label>
                     <Select defaultValue="en">
-                      <SelectTrigger className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                      <SelectTrigger className="rounded-xl border-gray-200 bg-white shadow-sm">
                         <SelectValue placeholder={t("Select language")} />
                       </SelectTrigger>
-                      <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                      <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                         <SelectItem value="en">English</SelectItem>
                         <SelectItem value="es">Spanish</SelectItem>
                         <SelectItem value="fr">French</SelectItem>
@@ -579,10 +687,10 @@ export default function SettingsPage() {
                   <div className="space-y-2">
                     <Label className="text-sm font-sans font-medium text-gray-600"><T>Timezone</T></Label>
                     <Select defaultValue="utc">
-                      <SelectTrigger className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                      <SelectTrigger className="rounded-xl border-gray-200 bg-white shadow-sm">
                         <SelectValue placeholder={t("Select timezone")} />
                       </SelectTrigger>
-                      <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                      <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                         <SelectItem value="utc">UTC (GMT+0)</SelectItem>
                         <SelectItem value="est">Eastern Time (GMT-5)</SelectItem>
                         <SelectItem value="pst">Pacific Time (GMT-8)</SelectItem>
@@ -594,7 +702,7 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <CardTitle className="font-sans font-bold text-black"><T>Appearance</T></CardTitle>
                 <CardDescription>
@@ -605,10 +713,10 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label className="text-sm font-sans font-medium text-gray-600"><T>Theme</T></Label>
                   <Select defaultValue="system">
-                    <SelectTrigger className="w-[200px] rounded-[12px] border-gray-200 bg-white shadow-sm">
+                    <SelectTrigger className="w-[200px] rounded-xl border-gray-200 bg-white shadow-sm">
                       <SelectValue placeholder={t("Select theme")} />
                     </SelectTrigger>
-                    <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                    <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                       <SelectItem value="light"><T>Light</T></SelectItem>
                       <SelectItem value="dark"><T>Dark</T></SelectItem>
                       <SelectItem value="system"><T>System</T></SelectItem>
@@ -618,7 +726,7 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <CardTitle className="font-sans font-bold text-black"><T>Learning Preferences</T></CardTitle>
                 <CardDescription>
@@ -649,10 +757,10 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label className="text-sm font-sans font-medium text-gray-600"><T>Default Video Quality</T></Label>
                   <Select defaultValue="auto">
-                    <SelectTrigger className="w-[200px] rounded-[12px] border-gray-200 bg-white shadow-sm">
+                    <SelectTrigger className="w-[200px] rounded-xl border-gray-200 bg-white shadow-sm">
                       <SelectValue placeholder={t("Select quality")} />
                     </SelectTrigger>
-                    <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                    <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                       <SelectItem value="auto"><T>Auto</T></SelectItem>
                       <SelectItem value="1080p">1080p (HD)</SelectItem>
                       <SelectItem value="720p">720p</SelectItem>
@@ -663,7 +771,7 @@ export default function SettingsPage() {
 
                 <Button
                   onClick={() => toast({ title: t("Coming soon"), description: t("Learning preferences will be saved here.") })}
-                  className="mt-4 rounded-[10px] font-bold bg-[#0052CC] hover:bg-[#003d99] text-white"
+                  className="mt-4 rounded-lg font-bold bg-[#0052CC] hover:bg-[#003d99] text-white"
                 >
                   <T>Save Preferences</T>
                 </Button>

@@ -78,7 +78,7 @@ export default function CertificateDetailPage() {
         <Award className="h-16 w-16 text-gray-500" />
         <h2 className="text-xl font-sans font-bold text-black"><T>Certificate not found</T></h2>
         <p className="font-sans text-gray-600"><T>The certificate you&apos;re looking for doesn&apos;t exist.</T></p>
-        <Button asChild className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
+        <Button asChild className="rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
           <Link href="/certificates">
             <ArrowLeft className="h-4 w-4 mr-2" />
             <T>Back to Certificates</T>
@@ -107,7 +107,7 @@ export default function CertificateDetailPage() {
       </div>
 
       {/* Certificate Card */}
-      <Card className="overflow-hidden rounded-[12px] border-gray-200 bg-white shadow-sm">
+      <Card className="overflow-hidden rounded-xl border-gray-200 bg-white shadow-sm">
         <div className="bg-gradient-to-br from-amber-100 via-amber-50 to-orange-100 p-8 border-b">
           <div className="flex flex-col items-center justify-center space-y-6">
             <div className="relative">
@@ -165,7 +165,7 @@ export default function CertificateDetailPage() {
           <Button
             onClick={handleDownload}
             disabled={isDownloading}
-            className="w-full rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold"
+            className="w-full rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold"
             size="lg"
           >
             {isDownloading ? (

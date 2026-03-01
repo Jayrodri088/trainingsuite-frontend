@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
   if (isSubmitted) {
     return (
       <div className="space-y-6">
-        <div className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-[#0052CC]/10">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0052CC]/10">
           <Mail className="h-6 w-6 text-[#0052CC]" />
         </div>
 
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
             </button>
           </p>
 
-          <Button asChild variant="outline" className="w-full rounded-[10px] border-gray-200 hover:bg-gray-50 font-semibold">
+          <Button asChild variant="outline" className="w-full rounded-lg border-gray-200 hover:bg-gray-50 font-semibold">
             <Link href="/login">
               <ArrowLeft className="mr-2 h-4 w-4" />
               <T>Back to login</T>
@@ -112,7 +112,7 @@ export default function ForgotPasswordPage() {
                     placeholder={t("Enter your email address")}
                     autoComplete="email"
                     disabled={isLoading}
-                    className="rounded-[10px] h-11 border-gray-200"
+                    className="rounded-lg h-11 border-gray-200"
                     {...field}
                   />
                 </FormControl>
@@ -121,14 +121,14 @@ export default function ForgotPasswordPage() {
             )}
           />
 
-          <Button type="submit" className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" disabled={isLoading}>
+          <Button type="submit" className="w-full h-11 rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <T>Reset password</T>
           </Button>
         </form>
       </Form>
 
-      <Button asChild variant="ghost" className="w-full rounded-[10px] text-gray-600 hover:text-[#0052CC] font-semibold">
+      <Button asChild variant="ghost" className="w-full rounded-lg text-gray-600 hover:text-[#0052CC] font-semibold">
         <Link href="/login">
           <ArrowLeft className="mr-2 h-4 w-4" />
           <T>Back to login</T>

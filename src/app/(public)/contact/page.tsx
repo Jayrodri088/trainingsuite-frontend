@@ -32,6 +32,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { T, useT } from "@/components/t";
+import { apiClient } from "@/lib/api/client";
+import { getErrorMessage } from "@/lib/utils";
 
 const contactMethods = [
   {
@@ -81,24 +83,35 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    toast({
-      title: t("Message sent!"),
-      description: t("We'll get back to you as soon as possible."),
-      variant: "success",
-    });
-
-    setFormData({
-      name: "",
-      email: "",
-      category: "",
-      subject: "",
-      message: "",
-    });
-    setIsSubmitting(false);
+    try {
+      await apiClient.post("/contact", {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        category: formData.category,
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+      });
+      toast({
+        title: t("Message sent!"),
+        description: t("We'll get back to you as soon as possible."),
+        variant: "success",
+      });
+      setFormData({
+        name: "",
+        email: "",
+        category: "",
+        subject: "",
+        message: "",
+      });
+    } catch (err) {
+      toast({
+        title: t("Could not send message"),
+        description: getErrorMessage(err),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -116,10 +129,10 @@ export default function ContactPage() {
         <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {contactMethods.map((method) => (
-              <Card key={method.title} className="border-gray-200 rounded-[12px] shadow-sm">
+              <Card key={method.title} className="border-gray-200 rounded-xl shadow-sm">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="h-12 w-12 shrink-0 rounded-[10px] bg-[#0052CC]/10 flex items-center justify-center">
+                    <div className="h-12 w-12 shrink-0 rounded-lg bg-[#0052CC]/10 flex items-center justify-center">
                       <method.icon className="h-6 w-6 text-[#0052CC]" />
                     </div>
                     <div>
@@ -232,7 +245,7 @@ export default function ContactPage() {
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full sm:w-auto rounded-[10px] h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold"
+                  className="w-full sm:w-auto rounded-lg h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -257,13 +270,13 @@ export default function ContactPage() {
               </p>
 
               <div className="space-y-4">
-                <Card className="border-gray-200 rounded-[12px] shadow-sm">
+                <Card className="border-gray-200 rounded-xl shadow-sm">
                   <CardContent className="py-4">
                     <Link
                       href="/faq"
                       className="flex items-center gap-4 hover:opacity-80 transition-opacity"
                     >
-                      <div className="h-10 w-10 shrink-0 rounded-[10px] bg-[#0052CC]/10 flex items-center justify-center">
+                      <div className="h-10 w-10 shrink-0 rounded-lg bg-[#0052CC]/10 flex items-center justify-center">
                         <HelpCircle className="h-5 w-5 text-[#0052CC]" />
                       </div>
                       <div>
@@ -276,13 +289,13 @@ export default function ContactPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-gray-200 rounded-[12px] shadow-sm">
+                <Card className="border-gray-200 rounded-xl shadow-sm">
                   <CardContent className="py-4">
                     <Link
                       href="/courses"
                       className="flex items-center gap-4 hover:opacity-80 transition-opacity"
                     >
-                      <div className="h-10 w-10 shrink-0 rounded-[10px] bg-[#0052CC]/10 flex items-center justify-center">
+                      <div className="h-10 w-10 shrink-0 rounded-lg bg-[#0052CC]/10 flex items-center justify-center">
                         <MessageSquare className="h-5 w-5 text-[#0052CC]" />
                       </div>
                       <div>
@@ -295,13 +308,13 @@ export default function ContactPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-gray-200 rounded-[12px] shadow-sm">
+                <Card className="border-gray-200 rounded-xl shadow-sm">
                   <CardContent className="py-4">
                     <Link
                       href="/about"
                       className="flex items-center gap-4 hover:opacity-80 transition-opacity"
                     >
-                      <div className="h-10 w-10 shrink-0 rounded-[10px] bg-[#0052CC]/10 flex items-center justify-center">
+                      <div className="h-10 w-10 shrink-0 rounded-lg bg-[#0052CC]/10 flex items-center justify-center">
                         <Users className="h-5 w-5 text-[#0052CC]" />
                       </div>
                       <div>
@@ -315,7 +328,7 @@ export default function ContactPage() {
                 </Card>
               </div>
 
-              <Card className="mt-8 border-gray-200 rounded-[12px] shadow-sm">
+              <Card className="mt-8 border-gray-200 rounded-xl shadow-sm">
                 <CardHeader>
                   <CardTitle className="font-sans text-lg font-bold text-black"><T>Business Hours</T></CardTitle>
                 </CardHeader>

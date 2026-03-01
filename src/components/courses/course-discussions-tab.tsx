@@ -20,7 +20,7 @@ export function CourseDiscussionsTab({ courseIdOrSlug }: { courseIdOrSlug: strin
 
   if (isLoading) {
     return (
-      <Card className="rounded-[12px] border-gray-200">
+      <Card className="rounded-xl border-gray-200">
         <CardContent className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-[#0052CC]" />
         </CardContent>
@@ -30,7 +30,7 @@ export function CourseDiscussionsTab({ courseIdOrSlug }: { courseIdOrSlug: strin
 
   if (isError || !forum) {
     return (
-      <Card className="rounded-[12px] border-gray-200">
+      <Card className="rounded-xl border-gray-200">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <MessageSquare className="h-5 w-5 text-[#0052CC]" />
@@ -41,7 +41,7 @@ export function CourseDiscussionsTab({ courseIdOrSlug }: { courseIdOrSlug: strin
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button asChild className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99]">
+          <Button asChild className="rounded-lg bg-[#0052CC] hover:bg-[#003d99]">
             <Link href="/forums">
               <T>Go to Community</T>
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -53,7 +53,7 @@ export function CourseDiscussionsTab({ courseIdOrSlug }: { courseIdOrSlug: strin
   }
 
   return (
-    <Card className="rounded-[12px] border-gray-200">
+    <Card className="rounded-xl border-gray-200">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <MessageSquare className="h-5 w-5 text-[#0052CC]" />
@@ -69,7 +69,7 @@ export function CourseDiscussionsTab({ courseIdOrSlug }: { courseIdOrSlug: strin
         )}
       </CardHeader>
       <CardContent>
-        <Button asChild className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99]">
+        <Button asChild className="rounded-lg bg-[#0052CC] hover:bg-[#003d99]">
           <Link href={`/forums/${forum._id}`}>
             <T>View discussions</T>
             <ArrowRight className="ml-2 h-4 w-4" />

@@ -49,11 +49,11 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
   };
 
   return (
-    <Card className="rounded-[12px] border-gray-200 overflow-hidden bg-white shadow-sm hover:border-gray-300 transition-colors">
+    <Card className="rounded-xl border-gray-200 overflow-hidden bg-white shadow-sm hover:border-gray-300 transition-colors">
       <div className={`h-1 ${announcement.priority === "high" ? "bg-red-500" : announcement.priority === "medium" ? "bg-yellow-500" : "bg-blue-500"}`} />
       <CardContent className="p-6">
         <div className="flex gap-4">
-          <div className={`h-12 w-12 rounded-[12px] ${config.borderColor} ${config.bgColor} flex items-center justify-center shrink-0`}>
+          <div className={`h-12 w-12 rounded-xl ${config.borderColor} ${config.bgColor} flex items-center justify-center shrink-0`}>
             <Icon className={`h-6 w-6 ${config.color}`} />
           </div>
           <div className="flex-1 min-w-0">
@@ -61,7 +61,7 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
               <h3 className="font-sans font-bold text-black text-lg"><T>{announcement.title}</T></h3>
               <Badge
                 variant="outline"
-                className={`rounded-[8px] border px-2 py-0.5 text-xs font-semibold ${announcement.priority === "high" ? "border-red-200 text-red-700 bg-red-50" :
+                className={`rounded-lg border px-2 py-0.5 text-xs font-semibold ${announcement.priority === "high" ? "border-red-200 text-red-700 bg-red-50" :
                     announcement.priority === "medium" ? "border-yellow-200 text-yellow-700 bg-yellow-50" :
                       "border-blue-200 text-blue-700 bg-blue-50"
                   }`}
@@ -85,20 +85,20 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
 
 function AnnouncementSkeleton() {
   return (
-    <Card className="rounded-[12px] border-gray-200">
+    <Card className="rounded-xl border-gray-200">
       <CardContent className="p-6">
         <div className="flex gap-4">
-          <Skeleton className="h-12 w-12 rounded-[12px] shrink-0" />
+          <Skeleton className="h-12 w-12 rounded-xl shrink-0" />
           <div className="flex-1 space-y-4">
             <div className="flex justify-between">
-              <Skeleton className="h-6 w-48 rounded-[10px]" />
-              <Skeleton className="h-5 w-20 rounded-[10px]" />
+              <Skeleton className="h-6 w-48 rounded-lg" />
+              <Skeleton className="h-5 w-20 rounded-lg" />
             </div>
-            <Skeleton className="h-4 w-full rounded-[10px]" />
-            <Skeleton className="h-4 w-3/4 rounded-[10px]" />
+            <Skeleton className="h-4 w-full rounded-lg" />
+            <Skeleton className="h-4 w-3/4 rounded-lg" />
             <div className="flex items-center gap-2 mt-4">
-              <Skeleton className="h-px w-full rounded-[10px]" />
-              <Skeleton className="h-3 w-24 rounded-[10px]" />
+              <Skeleton className="h-px w-full rounded-lg" />
+              <Skeleton className="h-3 w-24 rounded-lg" />
             </div>
           </div>
         </div>
@@ -139,9 +139,9 @@ export default function AnnouncementsPage() {
           ))}
         </div>
       ) : (
-        <Card className="rounded-[12px] border-gray-200 border-dashed bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 border-dashed bg-white shadow-sm">
           <CardContent className="py-20 text-center">
-            <div className="h-16 w-16 mx-auto mb-6 rounded-[12px] border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500">
+            <div className="h-16 w-16 mx-auto mb-6 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500">
               <Megaphone className="h-8 w-8" />
             </div>
             <h3 className="text-xl font-sans font-bold text-black"><T>No announcements</T></h3>

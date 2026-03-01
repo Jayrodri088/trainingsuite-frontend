@@ -30,6 +30,8 @@ const notificationIcons: Record<string, React.ComponentType<{ className?: string
   certificate: Award,
   message: MessageSquare,
   session: Calendar,
+  live_session_reminder: Calendar,
+  live_session_started: Calendar,
   info: Info,
   warning: AlertCircle,
 };
@@ -39,20 +41,22 @@ const notificationColors: Record<string, { bg: string; text: string; border: str
   certificate: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200" },
   message: { bg: "bg-green-50", text: "text-green-600", border: "border-green-200" },
   session: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200" },
+  live_session_reminder: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200" },
+  live_session_started: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200" },
   info: { bg: "bg-gray-50", text: "text-gray-600", border: "border-gray-200" },
   warning: { bg: "bg-red-50", text: "text-red-600", border: "border-red-200" },
 };
 
 function NotificationSkeleton() {
   return (
-    <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+    <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
       <CardContent className="p-5">
         <div className="flex gap-5">
-          <Skeleton className="h-10 w-10 shrink-0 rounded-[10px]" />
+          <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
           <div className="flex-1 space-y-3">
-            <Skeleton className="h-4 w-48 rounded-[8px]" />
-            <Skeleton className="h-4 w-full rounded-[8px]" />
-            <Skeleton className="h-3 w-32 rounded-[8px]" />
+            <Skeleton className="h-4 w-48 rounded-lg" />
+            <Skeleton className="h-4 w-full rounded-lg" />
+            <Skeleton className="h-3 w-32 rounded-lg" />
           </div>
         </div>
       </CardContent>
@@ -80,12 +84,12 @@ function NotificationCard({
 
   return (
     <Card
-      className={`rounded-[12px] border-gray-200 transition-all cursor-pointer hover:border-gray-300 group shadow-sm ${!notification.isRead ? "bg-[#0052CC]/5 border-l-4 border-l-[#0052CC]" : "bg-white"}`}
+      className={`rounded-xl border-gray-200 transition-all cursor-pointer hover:border-gray-300 group shadow-sm ${!notification.isRead ? "bg-[#0052CC]/5 border-l-4 border-l-[#0052CC]" : "bg-white"}`}
       onClick={handleClick}
     >
       <CardContent className="p-5">
         <div className="flex gap-5">
-          <div className={`h-10 w-10 shrink-0 rounded-[10px] border ${colors.border} ${colors.bg} flex items-center justify-center`}>
+          <div className={`h-10 w-10 shrink-0 rounded-lg border ${colors.border} ${colors.bg} flex items-center justify-center`}>
             <Icon className={`h-4 w-4 ${colors.text}`} />
           </div>
           <div className="flex-1 min-w-0">
@@ -96,7 +100,7 @@ function NotificationCard({
                     <T>{notification.title}</T>
                   </h4>
                   {!notification.isRead && (
-                    <Badge className="rounded-[8px] h-4 px-1 text-[10px] font-semibold bg-[#0052CC] border-0"><T>New</T></Badge>
+                    <Badge className="rounded-lg h-4 px-1 text-[10px] font-semibold bg-[#0052CC] border-0"><T>New</T></Badge>
                   )}
                 </div>
                 <p className="text-sm font-sans text-gray-600 line-clamp-2">
@@ -123,7 +127,7 @@ function NotificationCard({
                       e.stopPropagation();
                       onMarkAsRead(notification._id);
                     }}
-                    className="shrink-0 h-8 w-8 rounded-[10px] hover:bg-gray-100 border border-transparent hover:border-gray-200"
+                    className="shrink-0 h-8 w-8 rounded-lg hover:bg-gray-100 border border-transparent hover:border-gray-200"
                     title={t("Mark as read")}
                   >
                     <Check className="h-4 w-4" />
@@ -180,7 +184,7 @@ export default function NotificationsPage() {
             size="sm"
             onClick={handleMarkAllAsRead}
             disabled={markAllAsRead.isPending}
-            className="rounded-[10px] border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold w-full sm:w-auto"
+            className="rounded-lg border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold w-full sm:w-auto"
           >
             <CheckCheck className="h-3.5 w-3.5 mr-2" />
             <T>Mark all as read</T>
@@ -189,9 +193,9 @@ export default function NotificationsPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardContent className="p-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-[12px] border border-[#0052CC]/20 bg-[#0052CC]/10 flex items-center justify-center text-[#0052CC]">
+            <div className="h-12 w-12 rounded-xl border border-[#0052CC]/20 bg-[#0052CC]/10 flex items-center justify-center text-[#0052CC]">
               <Bell className="h-5 w-5" />
             </div>
             <div>
@@ -200,9 +204,9 @@ export default function NotificationsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardContent className="p-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-[12px] border border-blue-200 bg-blue-50 flex items-center justify-center text-blue-600">
+            <div className="h-12 w-12 rounded-xl border border-blue-200 bg-blue-50 flex items-center justify-center text-blue-600">
               <Bell className="h-5 w-5" />
             </div>
             <div>
@@ -211,9 +215,9 @@ export default function NotificationsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
           <CardContent className="p-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-[12px] border border-green-200 bg-green-50 flex items-center justify-center text-green-600">
+            <div className="h-12 w-12 rounded-xl border border-green-200 bg-green-50 flex items-center justify-center text-green-600">
               <Check className="h-5 w-5" />
             </div>
             <div>
@@ -225,24 +229,24 @@ export default function NotificationsPage() {
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="bg-gray-100 border border-gray-200 w-full justify-start rounded-[10px] h-auto p-1 gap-1 overflow-x-auto flex-nowrap">
+        <TabsList className="bg-gray-100 border border-gray-200 w-full justify-start rounded-lg h-auto p-1 gap-1 overflow-x-auto flex-nowrap">
           <TabsTrigger
             value="all"
-            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
+            className="rounded-lg border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
-            <T>All</T> <Badge className="ml-2 rounded-[6px] bg-gray-200 text-gray-700 border-0 text-[10px]">{notifications.length}</Badge>
+            <T>All</T> <Badge className="ml-2 rounded-md bg-gray-200 text-gray-700 border-0 text-[10px]">{notifications.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="unread"
-            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
+            className="rounded-lg border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
-            <T>Unread</T> <Badge className="ml-2 rounded-[6px] bg-gray-200 text-gray-700 border-0 text-[10px]">{unreadNotifications.length}</Badge>
+            <T>Unread</T> <Badge className="ml-2 rounded-md bg-gray-200 text-gray-700 border-0 text-[10px]">{unreadNotifications.length}</Badge>
           </TabsTrigger>
           <TabsTrigger
             value="read"
-            className="rounded-[8px] border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
+            className="rounded-lg border-0 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2.5 font-sans font-semibold text-sm text-gray-600 transition-none shrink-0"
           >
-            <T>Read</T> <Badge className="ml-2 rounded-[6px] bg-gray-200 text-gray-700 border-0 text-[10px]">{readNotifications.length}</Badge>
+            <T>Read</T> <Badge className="ml-2 rounded-md bg-gray-200 text-gray-700 border-0 text-[10px]">{readNotifications.length}</Badge>
           </TabsTrigger>
         </TabsList>
 
@@ -265,9 +269,9 @@ export default function NotificationsPage() {
               ))}
             </div>
           ) : (
-            <Card className="rounded-[12px] border-gray-200 border-dashed bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 border-dashed bg-white shadow-sm">
               <CardContent className="py-20 text-center">
-                <div className="h-16 w-16 mx-auto mb-6 rounded-[12px] border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500">
+                <div className="h-16 w-16 mx-auto mb-6 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500">
                   <BellOff className="h-8 w-8" />
                 </div>
                 <h3 className="text-xl font-sans font-bold text-black"><T>No notifications</T></h3>
@@ -298,9 +302,9 @@ export default function NotificationsPage() {
               ))}
             </div>
           ) : (
-            <Card className="rounded-[12px] border-gray-200 border-dashed bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 border-dashed bg-white shadow-sm">
               <CardContent className="py-20 text-center">
-                <div className="h-16 w-16 mx-auto mb-6 rounded-[12px] border border-gray-200 bg-green-50 flex items-center justify-center text-green-600">
+                <div className="h-16 w-16 mx-auto mb-6 rounded-xl border border-gray-200 bg-green-50 flex items-center justify-center text-green-600">
                   <Check className="h-8 w-8" />
                 </div>
                 <h3 className="text-xl font-sans font-bold text-black"><T>All caught up!</T></h3>
@@ -331,9 +335,9 @@ export default function NotificationsPage() {
               ))}
             </div>
           ) : (
-            <Card className="rounded-[12px] border-gray-200 border-dashed bg-white shadow-sm">
+            <Card className="rounded-xl border-gray-200 border-dashed bg-white shadow-sm">
               <CardContent className="py-20 text-center">
-                <div className="h-16 w-16 mx-auto mb-6 rounded-[12px] border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500">
+                <div className="h-16 w-16 mx-auto mb-6 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500">
                   <Bell className="h-8 w-8" />
                 </div>
                 <h3 className="text-xl font-sans font-bold text-black"><T>No read notifications</T></h3>

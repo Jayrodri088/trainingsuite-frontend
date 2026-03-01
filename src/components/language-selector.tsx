@@ -32,7 +32,7 @@ export function LanguageSelector() {
           <span className="sm:hidden font-medium">{currentLang?.code.toUpperCase() || 'EN'}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48 max-h-80 overflow-y-auto rounded-[12px] border border-gray-200 bg-white text-gray-900 shadow-lg">
+      <DropdownMenuContent align="end" className="w-48 max-h-80 overflow-y-auto rounded-xl border border-gray-200 bg-white text-gray-900 shadow-lg">
         {supportedLanguages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}

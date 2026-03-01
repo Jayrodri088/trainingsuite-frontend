@@ -154,7 +154,7 @@ export default function RegisterPage() {
                     placeholder={t("John Doe")}
                     autoComplete="name"
                     disabled={isLoading}
-                    className="rounded-[10px] h-11 border-gray-200"
+                    className="rounded-lg h-11 border-gray-200"
                     {...field}
                   />
                 </FormControl>
@@ -175,7 +175,7 @@ export default function RegisterPage() {
                     placeholder="name@example.com"
                     autoComplete="email"
                     disabled={isLoading}
-                    className="rounded-[10px] h-11 border-gray-200"
+                    className="rounded-lg h-11 border-gray-200"
                     {...field}
                   />
                 </FormControl>
@@ -196,7 +196,7 @@ export default function RegisterPage() {
                   disabled={isLoading}
                 >
                   <FormControl>
-                    <SelectTrigger className="rounded-[10px] h-11 border-gray-200 w-full">
+                    <SelectTrigger className="rounded-lg h-11 border-gray-200 w-full">
                       <SelectValue placeholder={t("Select your network")} />
                     </SelectTrigger>
                   </FormControl>
@@ -226,7 +226,7 @@ export default function RegisterPage() {
                       placeholder={t("Create a password")}
                       autoComplete="new-password"
                       disabled={isLoading}
-                      className="rounded-[10px] h-11 pr-10 border-gray-200"
+                      className="rounded-lg h-11 pr-10 border-gray-200"
                       {...field}
                     />
                     <Button
@@ -286,7 +286,7 @@ export default function RegisterPage() {
                       placeholder={t("Confirm your password")}
                       autoComplete="new-password"
                       disabled={isLoading}
-                      className="rounded-[10px] h-11 pr-10 border-gray-200"
+                      className="rounded-lg h-11 pr-10 border-gray-200"
                       {...field}
                     />
                     <Button
@@ -331,7 +331,7 @@ export default function RegisterPage() {
             </label>
           </div>
 
-          <Button type="submit" className="w-full h-11 rounded-[10px] bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold" disabled={isLoading || !acceptTerms}>
+          <Button type="submit" className="w-full h-11 rounded-lg bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold" disabled={isLoading || !acceptTerms}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <T>Create account</T>
           </Button>

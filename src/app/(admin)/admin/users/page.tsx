@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -106,6 +107,11 @@ export default function UsersPage() {
     role: "user" as UserRole,
     network: "",
   });
+  const [exporting, setExporting] = useState(false);
+  const [sendEmailDialogOpen, setSendEmailDialogOpen] = useState(false);
+  const [sendEmailTarget, setSendEmailTarget] = useState<User | null>(null);
+  const [bulkEmailDialogOpen, setBulkEmailDialogOpen] = useState(false);
+  const [emailForm, setEmailForm] = useState({ subject: "", body: "" });
 
   // Fetch users from API
   const { data: usersResponse, isLoading } = useQuery({
@@ -231,6 +237,90 @@ export default function UsersPage() {
     waivePortalAccessMutation.mutate(userId);
   };
 
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const blob = await adminApi.exportUsers({
+        page: 1,
+        limit: 5000,
+        search: searchQuery || undefined,
+        role: roleFilter !== "all" ? (roleFilter as UserRole) : undefined,
+        portalAccess: portalAccessFilter !== "all" ? portalAccessFilter : undefined,
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `users-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast({ title: "Export downloaded" });
+    } catch {
+      toast({ title: "Export failed", variant: "destructive" });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const sendEmailToUserMutation = useMutation({
+    mutationFn: ({ id, subject, body }: { id: string; subject: string; body: string }) =>
+      adminApi.sendEmailToUser(id, { subject, body }),
+    onSuccess: () => {
+      setSendEmailDialogOpen(false);
+      setSendEmailTarget(null);
+      setEmailForm({ subject: "", body: "" });
+      toast({ title: "Email sent successfully" });
+    },
+    onError: (err: { response?: { data?: { message?: string } }; message?: string }) => {
+      toast({
+        title: err.response?.data?.message || err.message || "Failed to send email",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const bulkEmailMutation = useMutation({
+    mutationFn: (data: { userIds: string[]; subject: string; body: string }) =>
+      adminApi.sendBulkEmail(data),
+    onSuccess: (data) => {
+      setBulkEmailDialogOpen(false);
+      setSelectedUsers([]);
+      setEmailForm({ subject: "", body: "" });
+      const sent = data?.data?.sent ?? 0;
+      const total = data?.data?.total ?? 0;
+      toast({ title: `Email sent to ${sent} of ${total} users` });
+    },
+    onError: (err: { response?: { data?: { message?: string } }; message?: string }) => {
+      toast({
+        title: err.response?.data?.message || err.message || "Bulk email failed",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const openSendEmailToUser = (user: User) => {
+    setSendEmailTarget(user);
+    setEmailForm({ subject: "", body: "" });
+    setSendEmailDialogOpen(true);
+  };
+
+  const handleSendEmailSubmit = () => {
+    if (!sendEmailTarget || !emailForm.subject.trim() || !emailForm.body.trim()) return;
+    sendEmailToUserMutation.mutate({
+      id: sendEmailTarget._id,
+      subject: emailForm.subject.trim(),
+      body: emailForm.body.trim(),
+    });
+  };
+
+  const handleBulkEmailSubmit = () => {
+    if (selectedUsers.length === 0 || !emailForm.subject.trim() || !emailForm.body.trim()) return;
+    bulkEmailMutation.mutate({
+      userIds: selectedUsers,
+      subject: emailForm.subject.trim(),
+      body: emailForm.body.trim(),
+    });
+  };
+
   const handleDeleteUser = (user: User) => {
     setUserToDelete(user);
     setDeleteDialogOpen(true);
@@ -272,37 +362,37 @@ export default function UsersPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Stats */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="text-3xl font-light text-foreground">{totalUsers}</div>
             <p className="text-sm font-medium uppercase tracking-wide text-gray-600 mt-1">Total Users</p>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="text-3xl font-light text-green-600">{activeUsers}</div>
             <p className="text-sm font-medium uppercase tracking-wide text-gray-600 mt-1">Verified Users</p>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="text-3xl font-light text-blue-600">{instructorCount}</div>
             <p className="text-sm font-medium uppercase tracking-wide text-gray-600 mt-1">Instructors</p>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="text-3xl font-light text-amber-600">{pendingVerification}</div>
             <p className="text-sm font-medium uppercase tracking-wide text-gray-600 mt-1">Pending Action</p>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="text-3xl font-light text-emerald-600">{portalPaidCount}</div>
             <p className="text-sm font-medium uppercase tracking-wide text-gray-600 mt-1">Portal paid (this page)</p>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="text-3xl font-light text-orange-600">{portalUnpaidCount}</div>
             <p className="text-sm font-medium uppercase tracking-wide text-gray-600 mt-1">Portal unpaid (this page)</p>
@@ -311,7 +401,7 @@ export default function UsersPage() {
       </div>
 
       {/* Filters & Actions */}
-      <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+      <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
         <CardHeader className="pb-4 border-b border-gray-200 bg-muted/5">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
             <CardTitle className="font-heading text-lg">User Management</CardTitle>
@@ -319,7 +409,7 @@ export default function UsersPage() {
               <Button
                 onClick={() => setAddUserDialogOpen(true)}
                 size="sm"
-                className="rounded-[12px] bg-[#0052CC] hover:bg-[#003d99] text-white ml-auto"
+                className="rounded-xl bg-[#0052CC] hover:bg-[#003d99] text-white ml-auto"
               >
                 <UserPlus className="h-4 w-4 mr-2" />
                 Add User
@@ -327,10 +417,11 @@ export default function UsersPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-[12px] border-gray-200 bg-white shadow-sm"
-                onClick={() => toast({ title: "Coming soon", description: "Export will be available in a future update." })}
+                className="rounded-xl border-gray-200 bg-white shadow-sm"
+                onClick={handleExport}
+                disabled={exporting}
               >
-                <Download className="h-4 w-4 mr-2" />
+                {exporting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
                 Export
               </Button>
             </div>
@@ -347,7 +438,7 @@ export default function UsersPage() {
                   setSearchQuery(e.target.value);
                   setPage(1);
                 }}
-                className="pl-9 rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
+                className="pl-9 rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
               />
             </div>
             <Select
@@ -357,10 +448,10 @@ export default function UsersPage() {
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-full md:w-[200px] rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20">
+              <SelectTrigger className="w-full md:w-[200px] rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20">
                 <SelectValue placeholder="Filter by Role" />
               </SelectTrigger>
-              <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+              <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                 <SelectItem value="all">All Roles</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="instructor">Instructor</SelectItem>
@@ -374,10 +465,10 @@ export default function UsersPage() {
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-full md:w-[200px] rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20">
+              <SelectTrigger className="w-full md:w-[200px] rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20">
                 <SelectValue placeholder="Portal access" />
               </SelectTrigger>
-              <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+              <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                 <SelectItem value="all">All</SelectItem>
                 <SelectItem value="paid">Portal paid</SelectItem>
                 <SelectItem value="unpaid">Portal unpaid</SelectItem>
@@ -387,7 +478,7 @@ export default function UsersPage() {
 
           {/* Bulk Actions */}
           {selectedUsers.length > 0 && (
-            <div className="flex items-center gap-3 mb-6 p-3 bg-primary/5 border border-primary/20 rounded-[10px]">
+            <div className="flex items-center gap-3 mb-6 p-3 bg-primary/5 border border-primary/20 rounded-lg">
               <span className="text-sm font-medium px-2">
                 {selectedUsers.length} users selected
               </span>
@@ -395,8 +486,11 @@ export default function UsersPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="rounded-[10px] h-8 text-gray-600 hover:text-foreground"
-                onClick={() => toast({ title: "Coming soon", description: "Bulk email will be available in a future update." })}
+                className="rounded-lg h-8 text-gray-600 hover:text-foreground"
+                onClick={() => {
+                  setEmailForm({ subject: "", body: "" });
+                  setBulkEmailDialogOpen(true);
+                }}
               >
                 <Mail className="h-4 w-4 mr-2" />
                 Send Email
@@ -405,7 +499,7 @@ export default function UsersPage() {
           )}
 
           {/* Table */}
-          <div className="border border-gray-200 rounded-[10px] overflow-hidden">
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -417,7 +511,7 @@ export default function UsersPage() {
                           users.length > 0
                         }
                         onCheckedChange={toggleSelectAll}
-                        className="rounded-[10px] border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                        className="rounded-lg border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
                     </TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider">User</TableHead>
@@ -442,14 +536,14 @@ export default function UsersPage() {
                           <Checkbox
                             checked={selectedUsers.includes(user._id)}
                             onCheckedChange={() => toggleSelect(user._id)}
-                            className="rounded-[10px] border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                            className="rounded-lg border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                           />
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-4">
-                            <Avatar className="h-10 w-10 border border-gray-200 rounded-[10px]">
-                              {user.avatar && <AvatarImage src={user.avatar} className="rounded-[10px]" />}
-                              <AvatarFallback className="rounded-[10px] bg-muted font-medium text-xs">
+                            <Avatar className="h-10 w-10 border border-gray-200 rounded-lg">
+                              {user.avatar && <AvatarImage src={user.avatar} className="rounded-lg" />}
+                              <AvatarFallback className="rounded-lg bg-muted font-medium text-xs">
                                 {getInitials(user.name)}
                               </AvatarFallback>
                             </Avatar>
@@ -462,7 +556,7 @@ export default function UsersPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className={`rounded-[10px] uppercase text-[10px] tracking-wide font-bold h-6 ${user.role === 'admin' ? 'border-red-200 bg-red-50 text-red-700' :
+                          <Badge variant="outline" className={`rounded-lg uppercase text-[10px] tracking-wide font-bold h-6 ${user.role === 'admin' ? 'border-red-200 bg-red-50 text-red-700' :
                               user.role === 'instructor' ? 'border-blue-200 bg-blue-50 text-blue-700' :
                                 'border-gray-200 bg-muted/50 text-gray-600'
                             }`}>
@@ -501,20 +595,20 @@ export default function UsersPage() {
                         <TableCell className="pr-6">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-[10px] hover:bg-muted">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                            <DropdownMenuContent align="end" className="rounded-xl border-gray-200 bg-white shadow-sm">
                               <DropdownMenuLabel className="font-heading font-bold text-xs uppercase tracking-wider">Actions</DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleEditUser(user)} className="rounded-[10px] cursor-pointer">
+                              <DropdownMenuItem onClick={() => handleEditUser(user)} className="rounded-lg cursor-pointer">
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit Role
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                className="rounded-[10px] cursor-pointer"
-                                onClick={() => toast({ title: "Coming soon", description: "Send email will be available in a future update." })}
+                                className="rounded-lg cursor-pointer"
+                                onClick={() => openSendEmailToUser(user)}
                               >
                                 <Mail className="h-4 w-4 mr-2" />
                                 Send Email
@@ -523,7 +617,7 @@ export default function UsersPage() {
                                 <DropdownMenuItem
                                   onClick={() => handleVerifyUser(user._id)}
                                   disabled={verifyUserMutation.isPending}
-                                  className="rounded-[10px] cursor-pointer"
+                                  className="rounded-lg cursor-pointer"
                                 >
                                   {verifyUserMutation.isPending ? (
                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -537,7 +631,7 @@ export default function UsersPage() {
                                 <DropdownMenuItem
                                   onClick={() => handleWaivePortalAccess(user._id)}
                                   disabled={waivePortalAccessMutation.isPending}
-                                  className="rounded-[10px] cursor-pointer"
+                                  className="rounded-lg cursor-pointer"
                                 >
                                   {waivePortalAccessMutation.isPending ? (
                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -549,7 +643,7 @@ export default function UsersPage() {
                               )}
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
-                                className="text-destructive focus:text-destructive rounded-[10px] cursor-pointer"
+                                className="text-destructive focus:text-destructive rounded-lg cursor-pointer"
                                 onClick={() => handleDeleteUser(user)}
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
@@ -578,7 +672,7 @@ export default function UsersPage() {
                   size="sm"
                   disabled={page <= 1}
                   onClick={() => setPage(page - 1)}
-                  className="rounded-[10px] h-8 w-8 p-0"
+                  className="rounded-lg h-8 w-8 p-0"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -590,7 +684,7 @@ export default function UsersPage() {
                   size="sm"
                   disabled={!pagination.hasMore}
                   onClick={() => setPage(page + 1)}
-                  className="rounded-[10px] h-8 w-8 p-0"
+                  className="rounded-lg h-8 w-8 p-0"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -602,7 +696,7 @@ export default function UsersPage() {
 
       {/* Add User Dialog */}
       <Dialog open={addUserDialogOpen} onOpenChange={setAddUserDialogOpen}>
-        <DialogContent className="rounded-[12px] border-gray-200 bg-white shadow-sm max-w-md">
+        <DialogContent className="rounded-xl border-gray-200 bg-white shadow-sm max-w-md">
           <DialogHeader>
             <DialogTitle className="font-heading">Add User</DialogTitle>
             <DialogDescription>
@@ -616,7 +710,7 @@ export default function UsersPage() {
                 value={newUserForm.name}
                 onChange={(e) => setNewUserForm({ ...newUserForm, name: e.target.value })}
                 placeholder="Full name"
-                className="rounded-[12px] border-gray-200"
+                className="rounded-xl border-gray-200"
               />
             </div>
             <div className="space-y-2">
@@ -626,7 +720,7 @@ export default function UsersPage() {
                 value={newUserForm.email}
                 onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
                 placeholder="email@example.com"
-                className="rounded-[12px] border-gray-200"
+                className="rounded-xl border-gray-200"
               />
             </div>
             <div className="space-y-2">
@@ -636,7 +730,7 @@ export default function UsersPage() {
                 value={newUserForm.password}
                 onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })}
                 placeholder="Min 8 chars, 1 upper, 1 lower, 1 number"
-                className="rounded-[12px] border-gray-200"
+                className="rounded-xl border-gray-200"
               />
             </div>
             <div className="space-y-2">
@@ -645,10 +739,10 @@ export default function UsersPage() {
                 value={newUserForm.role}
                 onValueChange={(v) => setNewUserForm({ ...newUserForm, role: v as UserRole })}
               >
-                <SelectTrigger className="rounded-[12px] border-gray-200">
+                <SelectTrigger className="rounded-xl border-gray-200">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="rounded-[10px]">
+                <SelectContent className="rounded-lg">
                   <SelectItem value="user">User</SelectItem>
                   <SelectItem value="instructor">Instructor</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
@@ -661,18 +755,18 @@ export default function UsersPage() {
                 value={newUserForm.network}
                 onChange={(e) => setNewUserForm({ ...newUserForm, network: e.target.value })}
                 placeholder="e.g. REON, TNI"
-                className="rounded-[12px] border-gray-200"
+                className="rounded-xl border-gray-200"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddUserDialogOpen(false)} className="rounded-[12px] border-gray-200">
+            <Button variant="outline" onClick={() => setAddUserDialogOpen(false)} className="rounded-xl border-gray-200">
               Cancel
             </Button>
             <Button
               onClick={handleAddUser}
               disabled={createUserMutation.isPending}
-              className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99]"
+              className="rounded-lg bg-[#0052CC] hover:bg-[#003d99]"
             >
               {createUserMutation.isPending ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -685,7 +779,7 @@ export default function UsersPage() {
 
       {/* Edit User Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <DialogContent className="rounded-xl border-gray-200 bg-white shadow-sm">
           <DialogHeader>
             <DialogTitle className="font-heading">Edit User</DialogTitle>
             <DialogDescription>
@@ -699,7 +793,7 @@ export default function UsersPage() {
                 value={editForm.name}
                 onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                 placeholder="Full name"
-                className="rounded-[12px] border-gray-200"
+                className="rounded-xl border-gray-200"
               />
             </div>
             <div className="space-y-2">
@@ -709,16 +803,16 @@ export default function UsersPage() {
                 value={editForm.email}
                 onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                 placeholder="email@example.com"
-                className="rounded-[12px] border-gray-200"
+                className="rounded-xl border-gray-200"
               />
             </div>
             <div className="space-y-2">
               <Label className="text-xs font-bold uppercase tracking-wide">Role</Label>
               <Select value={editForm.role} onValueChange={(v) => setEditForm({ ...editForm, role: v as UserRole })}>
-                <SelectTrigger className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                <SelectTrigger className="rounded-xl border-gray-200 bg-white shadow-sm">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="rounded-[10px]">
+                <SelectContent className="rounded-lg">
                   <SelectItem value="user">User</SelectItem>
                   <SelectItem value="instructor">Instructor</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
@@ -727,13 +821,13 @@ export default function UsersPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)} className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)} className="rounded-xl border-gray-200 bg-white shadow-sm">
               Cancel
             </Button>
             <Button
               onClick={handleUpdateUser}
               disabled={updateUserMutation.isPending}
-              className="rounded-[10px]"
+              className="rounded-lg"
             >
               {updateUserMutation.isPending && (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -746,7 +840,7 @@ export default function UsersPage() {
 
       {/* Delete User Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <AlertDialogContent className="rounded-xl border-gray-200 bg-white shadow-sm">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-heading">Delete User</AlertDialogTitle>
             <AlertDialogDescription>
@@ -761,10 +855,10 @@ export default function UsersPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-[12px] border-gray-200 bg-white shadow-sm">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl border-gray-200 bg-white shadow-sm">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteUser}
-              className="bg-destructive hover:bg-destructive/90 rounded-[10px] text-destructive-foreground"
+              className="bg-destructive hover:bg-destructive/90 rounded-lg text-destructive-foreground"
               disabled={deleteUserMutation.isPending}
             >
               {deleteUserMutation.isPending && (
@@ -775,6 +869,104 @@ export default function UsersPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Send Email (single user) Dialog */}
+      <Dialog
+        open={sendEmailDialogOpen}
+        onOpenChange={(open) => {
+          setSendEmailDialogOpen(open);
+          if (!open) setSendEmailTarget(null);
+        }}
+      >
+        <DialogContent className="rounded-xl border-gray-200 bg-white shadow-sm max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-heading">Send Email</DialogTitle>
+            <DialogDescription>
+              Send an email to {sendEmailTarget?.name} ({sendEmailTarget?.email}).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Subject</Label>
+              <Input
+                value={emailForm.subject}
+                onChange={(e) => setEmailForm((f) => ({ ...f, subject: e.target.value }))}
+                placeholder="Email subject"
+                className="rounded-xl border-gray-200"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Message</Label>
+              <Textarea
+                value={emailForm.body}
+                onChange={(e) => setEmailForm((f) => ({ ...f, body: e.target.value }))}
+                placeholder="Your message..."
+                rows={5}
+                className="rounded-xl border-gray-200 resize-none"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSendEmailDialogOpen(false)} className="rounded-xl border-gray-200">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendEmailSubmit}
+              disabled={sendEmailToUserMutation.isPending || !emailForm.subject.trim() || !emailForm.body.trim()}
+              className="rounded-lg bg-[#0052CC] hover:bg-[#003d99]"
+            >
+              {sendEmailToUserMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Mail className="h-4 w-4 mr-2" />}
+              Send
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Email Dialog */}
+      <Dialog open={bulkEmailDialogOpen} onOpenChange={setBulkEmailDialogOpen}>
+        <DialogContent className="rounded-xl border-gray-200 bg-white shadow-sm max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-heading">Send Email to {selectedUsers.length} Users</DialogTitle>
+            <DialogDescription>
+              Compose a message to send to all selected users. Each will receive the same email.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Subject</Label>
+              <Input
+                value={emailForm.subject}
+                onChange={(e) => setEmailForm((f) => ({ ...f, subject: e.target.value }))}
+                placeholder="Email subject"
+                className="rounded-xl border-gray-200"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Message</Label>
+              <Textarea
+                value={emailForm.body}
+                onChange={(e) => setEmailForm((f) => ({ ...f, body: e.target.value }))}
+                placeholder="Your message..."
+                rows={5}
+                className="rounded-xl border-gray-200 resize-none"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkEmailDialogOpen(false)} className="rounded-xl border-gray-200">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleBulkEmailSubmit}
+              disabled={bulkEmailMutation.isPending || !emailForm.subject.trim() || !emailForm.body.trim()}
+              className="rounded-lg bg-[#0052CC] hover:bg-[#003d99]"
+            >
+              {bulkEmailMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Mail className="h-4 w-4 mr-2" />}
+              Send to {selectedUsers.length} users
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

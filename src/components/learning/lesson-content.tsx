@@ -38,13 +38,13 @@ export function LessonContent({ lesson }: { lesson: Lesson | null }) {
           </h3>
           <div className="space-y-2">
             {(lesson.materials as Array<{ name?: string }>).map((material, index: number) => (
-              <Card key={index} className="rounded-[12px] border-gray-200 shadow-sm">
+              <Card key={index} className="rounded-xl border-gray-200 shadow-sm">
                 <CardContent className="p-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5 text-gray-500" />
                     <span className="text-sm font-sans text-gray-700">{t(material.name || `Material ${index + 1}`)}</span>
                   </div>
-                  <Button variant="ghost" size="sm" className="rounded-[10px]">
+                  <Button variant="ghost" size="sm" className="rounded-lg">
                     <Download className="h-4 w-4" />
                   </Button>
                 </CardContent>

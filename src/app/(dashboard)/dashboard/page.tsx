@@ -65,21 +65,21 @@ function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
   if (!course) return null;
 
   return (
-    <div className="group flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-[12px] border border-gray-200 bg-white shadow-sm hover:border-gray-300 transition-colors">
-      <div className="relative h-20 w-full sm:w-32 bg-gray-100 rounded-[10px] flex items-center justify-center overflow-hidden shrink-0 group-hover:opacity-90 transition-opacity">
+    <div className="group flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm hover:border-gray-300 transition-colors">
+      <div className="relative h-20 w-full sm:w-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden shrink-0 group-hover:opacity-90 transition-opacity">
         {course.thumbnail ? (
           <img
             src={course.thumbnail}
             alt={t(course.title)}
-            className="absolute inset-0 w-full h-full object-cover rounded-[10px]"
+            className="absolute inset-0 w-full h-full object-cover rounded-lg"
           />
         ) : (
           <>
-            <div className="absolute inset-0 bg-[#0052CC]/10 rounded-[10px]" />
+            <div className="absolute inset-0 bg-[#0052CC]/10 rounded-lg" />
             <PlayCircle className="h-8 w-8 text-[#0052CC] relative z-10 group-hover:scale-110 transition-transform" />
           </>
         )}
-        <Badge className="absolute top-2 left-2 rounded-[8px] text-[10px] font-semibold border-0 bg-white/90 text-gray-800 backdrop-blur-sm" variant="secondary">
+        <Badge className="absolute top-2 left-2 rounded-lg text-[10px] font-semibold border-0 bg-white/90 text-gray-800 backdrop-blur-sm" variant="secondary">
           {t(course.level || "beginner")}
         </Badge>
       </div>
@@ -93,7 +93,7 @@ function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
           </span>
         </div>
       </div>
-      <Button asChild className="rounded-[10px] text-xs font-semibold h-9 w-full sm:w-auto bg-[#0052CC] hover:bg-[#003d99] text-white">
+      <Button asChild className="rounded-lg text-xs font-semibold h-9 w-full sm:w-auto bg-[#0052CC] hover:bg-[#003d99] text-white">
         <Link href={`/courses/${course.slug || course._id}/learn`}><T>Continue</T></Link>
       </Button>
     </div>
@@ -112,7 +112,7 @@ function NotificationItem({
   isUnread?: boolean;
 }) {
   return (
-    <div className={`p-4 transition-colors hover:bg-gray-50 rounded-[10px] ${isUnread ? "bg-[#0052CC]/5" : ""}`}>
+    <div className={`p-4 transition-colors hover:bg-gray-50 rounded-lg ${isUnread ? "bg-[#0052CC]/5" : ""}`}>
       <div className="flex items-start gap-3">
         <div
           className={`h-2 w-2 mt-2 shrink-0 rounded-full ${isUnread ? "bg-[#0052CC]" : "bg-transparent"
@@ -203,7 +203,7 @@ export default function DashboardPage() {
               <h2 className="text-xl font-sans font-bold text-black"><T>Continue Learning</T></h2>
               <p className="text-sm font-sans text-gray-600"><T>Pick up where you left off</T></p>
             </div>
-            <Button variant="outline" size="sm" asChild className="rounded-[10px] border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold">
+            <Button variant="outline" size="sm" asChild className="rounded-lg border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold">
               <Link href="/my-courses">
                 <T>View all</T> <ArrowRight className="ml-1 h-3 w-3" />
               </Link>
@@ -216,14 +216,14 @@ export default function DashboardPage() {
                 <CourseProgressCard key={enrollment._id} enrollment={enrollment} />
               ))
             ) : (
-              <Card className="rounded-[12px] border-gray-200 border-dashed bg-white shadow-sm">
+              <Card className="rounded-xl border-gray-200 border-dashed bg-white shadow-sm">
                 <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="h-12 w-12 rounded-[12px] border border-gray-200 bg-gray-50 flex items-center justify-center mb-4">
+                  <div className="h-12 w-12 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center mb-4">
                     <BookOpen className="h-6 w-6 text-gray-500" />
                   </div>
                   <h3 className="font-sans font-bold text-black text-lg mb-1"><T>No courses in progress</T></h3>
                   <p className="font-sans text-gray-600 text-sm max-w-xs mb-6"><T>Start your journey by exploring our available courses.</T></p>
-                  <Button className="rounded-[10px] bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" asChild>
+                  <Button className="rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold" asChild>
                     <Link href="/courses"><T>Browse Courses</T></Link>
                   </Button>
                 </CardContent>
@@ -246,7 +246,7 @@ export default function DashboardPage() {
             </Button>
           </div>
 
-          <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm h-[calc(100%-3rem)]">
+          <Card className="rounded-xl border-gray-200 bg-white shadow-sm h-[calc(100%-3rem)]">
             <CardContent className="p-0">
               {notifications.length > 0 ? (
                 <div className="divide-y divide-gray-200">
@@ -264,7 +264,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center h-full min-h-[300px]">
-                  <div className="h-10 w-10 rounded-[10px] border border-gray-200 bg-gray-50 flex items-center justify-center mb-3">
+                  <div className="h-10 w-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center mb-3">
                     <Bell className="h-5 w-5 text-gray-500" />
                   </div>
                   <p className="text-sm font-sans font-medium text-gray-600"><T>No notifications yet</T></p>
@@ -280,7 +280,7 @@ export default function DashboardPage() {
         <div className="space-y-6 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-sans font-bold text-black"><T>Recent Certificates</T></h2>
-            <Button variant="outline" size="sm" asChild className="rounded-[10px] border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold">
+            <Button variant="outline" size="sm" asChild className="rounded-lg border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold">
               <Link href="/certificates">
                 <T>View All</T> <ArrowRight className="ml-1 h-3 w-3" />
               </Link>
@@ -291,10 +291,10 @@ export default function DashboardPage() {
             {certificates.slice(0, 3).map((cert: Certificate) => {
               const course = typeof cert.course === "object" ? cert.course : null;
               return (
-                <Card key={cert._id} className="rounded-[12px] border-amber-200 bg-amber-50/50 hover:border-amber-300 transition-colors group shadow-sm">
+                <Card key={cert._id} className="rounded-xl border-amber-200 bg-amber-50/50 hover:border-amber-300 transition-colors group shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="h-12 w-12 rounded-[12px] border border-amber-200 bg-amber-100/80 text-amber-600 flex items-center justify-center shrink-0">
+                      <div className="h-12 w-12 rounded-xl border border-amber-200 bg-amber-100/80 text-amber-600 flex items-center justify-center shrink-0">
                         <Award className="h-6 w-6" />
                       </div>
                       <div className="flex-1 min-w-0">

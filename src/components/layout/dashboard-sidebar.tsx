@@ -82,7 +82,7 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 rounded-[10px] hidden lg:flex shrink-0 ml-2 text-gray-700 hover:bg-gray-200"
+              className="h-7 w-7 rounded-lg hidden lg:flex shrink-0 ml-2 text-gray-700 hover:bg-gray-200"
               onClick={() => onCollapse(!collapsed)}
             >
               <ChevronLeft
@@ -115,7 +115,7 @@ export function DashboardSidebar({ collapsed = false, onCollapse }: DashboardSid
                         <Link
                           href={item.href}
                           className={cn(
-                            "flex items-center gap-3 px-3 py-2 text-sm font-medium font-sans transition-colors border-l-2 border-transparent rounded-[8px] hover:bg-gray-200/60",
+                            "flex items-center gap-3 px-3 py-2 text-sm font-medium font-sans transition-colors border-l-2 border-transparent rounded-lg hover:bg-gray-200/60",
                             isActive
                               ? "border-[#0052CC] text-[#0052CC] font-semibold bg-[#0052CC]/10"
                               : "text-gray-600 hover:text-gray-900",

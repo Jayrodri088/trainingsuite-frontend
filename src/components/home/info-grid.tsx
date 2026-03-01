@@ -82,7 +82,7 @@ export function InfoGrid() {
           {infoItems.map((item, idx) => (
             <div
               key={idx}
-              className="group relative mx-auto flex min-h-0 w-full max-w-[320px] min-w-0 flex-col bg-white rounded-[12px] border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden pt-0 sm:mx-0 sm:max-w-none sm:min-h-[180px] sm:flex-row sm:items-center"
+              className="group relative mx-auto flex min-h-0 w-full max-w-[320px] min-w-0 flex-col bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden pt-0 sm:mx-0 sm:max-w-none sm:min-h-[180px] sm:flex-row sm:items-center"
             >
               {/* sm+: Frame in corner (hidden on mobile) */}
               <div

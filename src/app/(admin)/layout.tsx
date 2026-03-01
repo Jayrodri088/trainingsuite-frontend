@@ -189,7 +189,7 @@ export default function AdminLayout({
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 sm:px-5 border-b border-gray-200 gap-2">
           <Link href="/admin" className="flex items-center gap-3 min-w-0" onClick={() => setMobileMenuOpen(false)}>
-            <div className="h-8 w-8 shrink-0 rounded-[10px] bg-[#0052CC] flex items-center justify-center">
+            <div className="h-8 w-8 shrink-0 rounded-lg bg-[#0052CC] flex items-center justify-center">
               <Shield className="h-4 w-4 text-white" />
             </div>
             <span className={cn("font-sans font-bold tracking-tight text-sm text-black truncate", (collapsed && !mobileMenuOpen) && "hidden")}>
@@ -201,7 +201,7 @@ export default function AdminLayout({
               variant="ghost"
               size="icon"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-gray-600 hover:text-black hover:bg-gray-200 rounded-[10px] h-8 w-8 lg:hidden"
+              className="text-gray-600 hover:text-black hover:bg-gray-200 rounded-lg h-8 w-8 lg:hidden"
               aria-label="Close menu"
             >
               <X className="h-4 w-4" />
@@ -210,7 +210,7 @@ export default function AdminLayout({
               variant="ghost"
               size="icon"
               onClick={() => setCollapsed(!collapsed)}
-              className="text-gray-600 hover:text-black hover:bg-gray-200 rounded-[10px] h-8 w-8 hidden lg:flex"
+              className="text-gray-600 hover:text-black hover:bg-gray-200 rounded-lg h-8 w-8 hidden lg:flex"
             >
               {collapsed ? (
                 <ChevronRight className="h-4 w-4" />
@@ -242,7 +242,7 @@ export default function AdminLayout({
                         key={item.href}
                         href={item.href}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2 text-sm font-sans font-medium transition-colors border-l-2 border-transparent rounded-[8px] hover:bg-gray-200/60",
+                          "flex items-center gap-3 px-3 py-2 text-sm font-sans font-medium transition-colors border-l-2 border-transparent rounded-lg hover:bg-gray-200/60",
                           isActive
                             ? "border-[#0052CC] text-[#0052CC] bg-[#0052CC]/10 font-semibold"
                             : "text-gray-600 hover:text-gray-900",
@@ -298,7 +298,7 @@ export default function AdminLayout({
               variant="ghost"
               size="icon"
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden shrink-0 h-9 w-9 rounded-[10px] text-gray-600 hover:text-black hover:bg-gray-200"
+              className="lg:hidden shrink-0 h-9 w-9 rounded-lg text-gray-600 hover:text-black hover:bg-gray-200"
               aria-label="Open menu"
             >
               <Menu className="h-5 w-5" />
@@ -317,14 +317,14 @@ export default function AdminLayout({
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-[10px] text-gray-600 hover:text-gray-900 hover:bg-gray-200">
+                <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-200">
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
                     <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-600 ring-2 ring-[#FAFAFA]" />
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80 rounded-[12px] border-gray-200 shadow-lg">
+              <DropdownMenuContent align="end" className="w-80 rounded-xl border-gray-200 shadow-lg">
                 <DropdownMenuLabel className="flex items-center justify-between p-4 pb-2 font-sans">
                   <span className="font-bold text-black">Notifications</span>
                   {unreadCount > 0 && (
@@ -366,7 +366,7 @@ export default function AdminLayout({
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-1 h-9 rounded-[10px] hover:bg-gray-200">
+                <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-1 h-9 rounded-lg hover:bg-gray-200">
                   <Avatar className="h-7 w-7 border border-gray-200">
                     <AvatarImage src={user?.avatar} />
                     <AvatarFallback className="bg-gray-200 text-gray-700 font-sans text-xs font-medium">
@@ -378,7 +378,7 @@ export default function AdminLayout({
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 rounded-[12px] border-gray-200 shadow-lg font-sans">
+              <DropdownMenuContent align="end" className="w-56 rounded-xl border-gray-200 shadow-lg font-sans">
                 <DropdownMenuLabel className="p-4 pb-2">
                   <div className="flex flex-col space-y-1">
                     <span className="font-semibold text-black leading-none">{user?.name}</span>

@@ -120,7 +120,7 @@ export function CoursesFilterSidebar({
         <Button
           variant="outline"
           size="default"
-          className="w-full rounded-[10px] border-gray-200 bg-white text-gray-700 hover:bg-gray-50 font-sans font-medium"
+          className="w-full rounded-lg border-gray-200 bg-white text-gray-700 hover:bg-gray-50 font-sans font-medium"
           onClick={() => setFilters({ status: "published" })}
         >
           <X className="h-4 w-4 mr-2" />

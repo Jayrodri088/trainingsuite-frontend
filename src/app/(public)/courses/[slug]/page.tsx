@@ -484,7 +484,7 @@ export default function CourseDetailPage({
               <Button
                 variant="ghost"
                 size="sm"
-                className="rounded-[10px] text-slate-200 hover:text-white hover:bg-white/10 border border-white/20 hover:border-white/30 h-9 px-3"
+                className="rounded-lg text-slate-200 hover:text-white hover:bg-white/10 border border-white/20 hover:border-white/30 h-9 px-3"
                 onClick={() => router.push("/courses")}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -552,7 +552,7 @@ export default function CourseDetailPage({
 
             {/* Enrollment Card – rounded corners, clear border */}
             <div className="lg:row-span-2 order-1 lg:order-2">
-              <Card className="lg:sticky lg:top-24 rounded-[12px] border border-white/20 bg-slate-800/90 shadow-xl overflow-hidden">
+              <Card className="lg:sticky lg:top-24 rounded-xl border border-white/20 bg-slate-800/90 shadow-xl overflow-hidden">
                 <div className="aspect-video bg-slate-900 rounded-t-[12px] relative overflow-hidden">
                   {normalizeUploadUrl(course.thumbnail) && (
                     <Image
@@ -583,14 +583,14 @@ export default function CourseDetailPage({
                         />
                       </div>
 
-                      <Button size="lg" className="w-full rounded-[10px]" onClick={handleGoToLearning}>
+                      <Button size="lg" className="w-full rounded-lg" onClick={handleGoToLearning}>
                         {isCompleted ? <T>Review Course</T> : <T>Continue Learning</T>}
                       </Button>
                     </div>
                   ) : (
                     <Button
                       size="lg"
-                      className="w-full mb-3 rounded-[10px]"
+                      className="w-full mb-3 rounded-lg"
                       onClick={handleEnroll}
                       disabled={enrollMutation.isPending || initializePaymentMutation.isPending}
                     >
@@ -638,7 +638,7 @@ export default function CourseDetailPage({
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="lg:col-span-2">
             <Tabs defaultValue="curriculum" className="w-full">
-              <TabsList className="mb-4 sm:mb-6 w-full justify-start overflow-x-auto flex-nowrap gap-1 sm:gap-2 h-auto p-1 rounded-[8px] bg-gray-100 border border-gray-200">
+              <TabsList className="mb-4 sm:mb-6 w-full justify-start overflow-x-auto flex-nowrap gap-1 sm:gap-2 h-auto p-1 rounded-lg bg-gray-100 border border-gray-200">
                 <TabsTrigger value="curriculum" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Curriculum</T></TabsTrigger>
                 <TabsTrigger value="overview" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Overview</T></TabsTrigger>
                 <TabsTrigger value="reviews" className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"><T>Reviews</T></TabsTrigger>
@@ -885,7 +885,7 @@ function RelatedCourses({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {relatedCourses.map((course: Course) => (
               <Link key={course._id} href={`/courses/${course.slug}`}>
-                <Card className="overflow-hidden rounded-[12px] hover:shadow-lg transition-shadow h-full">
+                <Card className="overflow-hidden rounded-xl hover:shadow-lg transition-shadow h-full">
                   <div className="aspect-video rounded-t-[12px] bg-gray-100 relative overflow-hidden">
                     {normalizeUploadUrl(course.thumbnail) ? (
                       <Image

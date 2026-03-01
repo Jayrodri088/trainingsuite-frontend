@@ -8,6 +8,7 @@ import { CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { enrollmentsApi } from "@/lib/api/enrollments";
 import { paymentsApi } from "@/lib/api/payments";
 import { authApi } from "@/lib/api";
@@ -16,6 +17,7 @@ export default function CheckoutSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const sessionId = useMemo(() => searchParams.get("session_id"), [searchParams]);
   const courseRef = useMemo(() => searchParams.get("course"), [searchParams]);
   const isPortalAccess = searchParams.get("portal") === "1";
@@ -57,6 +59,7 @@ export default function CheckoutSuccessPage() {
         if (res?.data?.portalAccessPaidAt) {
           await queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
           setIsChecking(false);
+          toast({ title: "Access confirmed", description: "Your payment was successful. Welcome!" });
           router.replace("/dashboard");
           return;
         }
@@ -71,7 +74,7 @@ export default function CheckoutSuccessPage() {
     };
 
     verifyThenPoll();
-  }, [isPortalAccess, sessionId, queryClient, router]);
+  }, [isPortalAccess, sessionId, queryClient, router, toast]);
 
   // Course enrollment: verify session once (creates enrollment on backend), then poll until enrolled and redirect
   useEffect(() => {
@@ -107,6 +110,7 @@ export default function CheckoutSuccessPage() {
         if (response?.data?.isEnrolled) {
           setIsEnrolled(true);
           setIsChecking(false);
+          toast({ title: "Enrollment confirmed", description: "You're all set. Redirecting to the course..." });
           router.push(`/courses/${courseRef}/learn`);
           return;
         }
@@ -122,7 +126,7 @@ export default function CheckoutSuccessPage() {
     };
 
     verifyThenPoll();
-  }, [courseRef, isPortalAccess, sessionId, router]);
+  }, [courseRef, isPortalAccess, sessionId, router, toast]);
 
   const checkingMessage = isPortalAccess
     ? "Confirming your access..."

@@ -98,4 +98,25 @@ export const authApi = {
     const response = await apiClient.post<ApiResponse<null>>("/auth/signout");
     return response.data;
   },
+
+  getSessions: async () => {
+    const response = await apiClient.get<
+      ApiResponse<{ sessions: { id: string; sessionId: string; userAgent: string | null; lastActiveAt: string; createdAt: string; isCurrent: boolean }[] }>
+    >("/auth/sessions");
+    return response.data;
+  },
+
+  revokeOtherSessions: async () => {
+    const response = await apiClient.delete<ApiResponse<{ revoked: number }>>("/auth/sessions");
+    return response.data;
+  },
+
+  updateNotificationPreferences: async (
+    prefs: Partial<import("@/types").NotificationPreferences>
+  ) => {
+    const response = await apiClient.put<
+      ApiResponse<{ notificationPreferences: import("@/types").NotificationPreferences }>
+    >("/auth/preferences", prefs);
+    return response.data;
+  },
 };

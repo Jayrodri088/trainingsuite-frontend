@@ -89,13 +89,13 @@ export default function AdminStudentsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <Badge className="rounded-[10px] bg-blue-600 font-bold uppercase text-[10px] tracking-wide border-0">Active</Badge>;
+        return <Badge className="rounded-lg bg-blue-600 font-bold uppercase text-[10px] tracking-wide border-0">Active</Badge>;
       case "completed":
-        return <Badge className="rounded-[10px] bg-green-600 font-bold uppercase text-[10px] tracking-wide border-0">Completed</Badge>;
+        return <Badge className="rounded-lg bg-green-600 font-bold uppercase text-[10px] tracking-wide border-0">Completed</Badge>;
       case "expired":
-        return <Badge variant="secondary" className="rounded-[10px] font-bold uppercase text-[10px] tracking-wide border-gray-200 border">Expired</Badge>;
+        return <Badge variant="secondary" className="rounded-lg font-bold uppercase text-[10px] tracking-wide border-gray-200 border">Expired</Badge>;
       default:
-        return <Badge variant="secondary" className="rounded-[12px] border-gray-200 bg-white shadow-sm font-bold uppercase text-[10px] tracking-wide">{status}</Badge>;
+        return <Badge variant="secondary" className="rounded-xl border-gray-200 bg-white shadow-sm font-bold uppercase text-[10px] tracking-wide">{status}</Badge>;
     }
   };
 
@@ -113,7 +113,7 @@ export default function AdminStudentsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-primary/20 bg-primary/5 text-primary">
@@ -126,7 +126,7 @@ export default function AdminStudentsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-blue-200 bg-blue-50 text-blue-600">
@@ -139,7 +139,7 @@ export default function AdminStudentsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-green-200 bg-green-50 text-green-600">
@@ -152,7 +152,7 @@ export default function AdminStudentsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-yellow-200 bg-yellow-50 text-yellow-600">
@@ -168,7 +168,7 @@ export default function AdminStudentsPage() {
       </div>
 
       {/* Students Table */}
-      <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+      <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
         <CardHeader className="pb-4 border-b border-gray-200 bg-muted/5">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -184,15 +184,15 @@ export default function AdminStudentsPage() {
                   placeholder="Search students..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
+                  className="pl-9 rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
                 />
               </div>
               <Select value={courseFilter} onValueChange={setCourseFilter}>
-                <SelectTrigger className="w-48 rounded-[12px] border-gray-200 bg-white shadow-sm">
+                <SelectTrigger className="w-48 rounded-xl border-gray-200 bg-white shadow-sm">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="All Courses" />
                 </SelectTrigger>
-                <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                   <SelectItem value="all">All Courses</SelectItem>
                   {courses.map((course) => (
                     <SelectItem key={course._id} value={course._id}>
@@ -202,10 +202,10 @@ export default function AdminStudentsPage() {
                 </SelectContent>
               </Select>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-36 rounded-[12px] border-gray-200 bg-white shadow-sm">
+                <SelectTrigger className="w-36 rounded-xl border-gray-200 bg-white shadow-sm">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
-                <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
@@ -249,7 +249,7 @@ export default function AdminStudentsPage() {
                       <TableRow key={enrollment._id} className="border-gray-200 hover:bg-muted/10 transition-colors">
                         <TableCell className="pl-6">
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-9 w-9 rounded-[10px] border border-gray-200">
+                            <Avatar className="h-9 w-9 rounded-lg border border-gray-200">
                               <AvatarImage src={user?.avatar} />
                               <AvatarFallback className="bg-primary/10 text-primary font-bold">
                                 {getInitials(user?.name || "?")}
@@ -268,7 +268,7 @@ export default function AdminStudentsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <Progress value={enrollment.progress || 0} className="w-24 h-1.5 rounded-[10px] bg-muted" />
+                            <Progress value={enrollment.progress || 0} className="w-24 h-1.5 rounded-lg bg-muted" />
                             <span className="text-xs font-mono text-gray-600">
                               {enrollment.progress || 0}%
                             </span>

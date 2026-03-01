@@ -331,14 +331,14 @@ export default function LiveSessionDetailPage() {
             <Button
               variant="outline"
               size="sm"
-              className="rounded-[10px] border-gray-200 hover:bg-[#0052CC]/10 hover:text-[#0052CC] font-sans font-medium"
+              className="rounded-lg border-gray-200 hover:bg-[#0052CC]/10 hover:text-[#0052CC] font-sans font-medium"
               onClick={() => setShowReminderDialog(true)}
             >
               <Bell className="h-4 w-4 mr-2" />
               <T>Remind me</T>
             </Button>
           )}
-          <Button variant="outline" size="icon" className="rounded-[10px]">
+          <Button variant="outline" size="icon" className="rounded-lg">
             <Share2 className="h-4 w-4" />
           </Button>
         </div>

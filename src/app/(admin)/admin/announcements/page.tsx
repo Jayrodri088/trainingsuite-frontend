@@ -198,27 +198,27 @@ export default function AnnouncementsPage() {
     const expiresAt = announcement.expiresAt ? parseISO(announcement.expiresAt) : null;
 
     if (!announcement.isActive) {
-      return <Badge variant="secondary" className="rounded-[10px] font-bold uppercase text-[10px] tracking-wide border-gray-200 border">Inactive</Badge>;
+      return <Badge variant="secondary" className="rounded-lg font-bold uppercase text-[10px] tracking-wide border-gray-200 border">Inactive</Badge>;
     }
     if (startsAt && isAfter(startsAt, now)) {
-      return <Badge variant="outline" className="rounded-[10px] border-blue-200 bg-blue-50 text-blue-700 font-bold uppercase text-[10px] tracking-wide">Scheduled</Badge>;
+      return <Badge variant="outline" className="rounded-lg border-blue-200 bg-blue-50 text-blue-700 font-bold uppercase text-[10px] tracking-wide">Scheduled</Badge>;
     }
     if (expiresAt && isBefore(expiresAt, now)) {
-      return <Badge variant="secondary" className="rounded-[10px] font-bold uppercase text-[10px] tracking-wide border-gray-200 border">Expired</Badge>;
+      return <Badge variant="secondary" className="rounded-lg font-bold uppercase text-[10px] tracking-wide border-gray-200 border">Expired</Badge>;
     }
-    return <Badge className="rounded-[10px] bg-green-100 text-green-700 border-green-200 border font-bold uppercase text-[10px] tracking-wide hover:bg-green-100">Active</Badge>;
+    return <Badge className="rounded-lg bg-green-100 text-green-700 border-green-200 border font-bold uppercase text-[10px] tracking-wide hover:bg-green-100">Active</Badge>;
   };
 
   const getPriorityBadge = (priority: AnnouncementPriority) => {
     switch (priority) {
       case "high":
-        return <Badge variant="destructive" className="rounded-[10px] font-bold uppercase text-[10px] tracking-wide">High</Badge>;
+        return <Badge variant="destructive" className="rounded-lg font-bold uppercase text-[10px] tracking-wide">High</Badge>;
       case "medium":
-        return <Badge className="rounded-[10px] bg-amber-100 text-amber-700 border-amber-200 border font-bold uppercase text-[10px] tracking-wide hover:bg-amber-100">Medium</Badge>;
+        return <Badge className="rounded-lg bg-amber-100 text-amber-700 border-amber-200 border font-bold uppercase text-[10px] tracking-wide hover:bg-amber-100">Medium</Badge>;
       case "low":
-        return <Badge variant="outline" className="rounded-[12px] border-gray-200 bg-white shadow-sm font-bold uppercase text-[10px] tracking-wide">Low</Badge>;
+        return <Badge variant="outline" className="rounded-xl border-gray-200 bg-white shadow-sm font-bold uppercase text-[10px] tracking-wide">Low</Badge>;
       default:
-        return <Badge variant="secondary" className="rounded-[12px] border-gray-200 bg-white shadow-sm font-bold uppercase text-[10px] tracking-wide">{priority}</Badge>;
+        return <Badge variant="secondary" className="rounded-xl border-gray-200 bg-white shadow-sm font-bold uppercase text-[10px] tracking-wide">{priority}</Badge>;
     }
   };
 
@@ -232,7 +232,7 @@ export default function AnnouncementsPage() {
             Manage platform announcements and notifications.
           </p>
         </div>
-        <Button onClick={() => { resetForm(); setSelectedAnnouncement(null); setDialogOpen(true); }} className="rounded-[10px]">
+        <Button onClick={() => { resetForm(); setSelectedAnnouncement(null); setDialogOpen(true); }} className="rounded-lg">
           <Plus className="h-4 w-4 mr-2" />
           New Announcement
         </Button>
@@ -240,7 +240,7 @@ export default function AnnouncementsPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-primary/20 bg-primary/5 text-primary">
@@ -253,7 +253,7 @@ export default function AnnouncementsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-green-200 bg-green-50 text-green-600">
@@ -268,7 +268,7 @@ export default function AnnouncementsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-blue-200 bg-blue-50 text-blue-600">
@@ -286,7 +286,7 @@ export default function AnnouncementsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm bg-card">
+        <Card className="rounded-xl border-gray-200 bg-white shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 flex items-center justify-center border border-red-200 bg-red-50 text-red-600">
@@ -304,7 +304,7 @@ export default function AnnouncementsPage() {
       </div>
 
       {/* Table */}
-      <Card className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+      <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
         <CardHeader className="pb-4 border-b border-gray-200 bg-muted/5">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -319,7 +319,7 @@ export default function AnnouncementsPage() {
                 placeholder="Search announcements..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 rounded-[12px] border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
+                className="pl-9 rounded-xl border-gray-200 bg-white shadow-sm bg-muted/20 focus:bg-background"
               />
             </div>
           </div>
@@ -335,7 +335,7 @@ export default function AnnouncementsPage() {
                 {searchQuery ? "No announcements match your search" : "Create your first announcement"}
               </p>
               {!searchQuery && (
-                <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="mt-4 rounded-[10px]">
+                <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="mt-4 rounded-lg">
                   <Plus className="h-4 w-4 mr-2" />
                   New Announcement
                 </Button>
@@ -393,12 +393,12 @@ export default function AnnouncementsPage() {
                           />
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-[10px] hover:bg-muted">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted">
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="rounded-[12px] border-gray-200 bg-white shadow-sm">
-                              <DropdownMenuItem onClick={() => handleEdit(announcement)} className="rounded-[10px] cursor-pointer">
+                            <DropdownMenuContent align="end" className="rounded-xl border-gray-200 bg-white shadow-sm">
+                              <DropdownMenuItem onClick={() => handleEdit(announcement)} className="rounded-lg cursor-pointer">
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit
                               </DropdownMenuItem>
@@ -407,7 +407,7 @@ export default function AnnouncementsPage() {
                                   setSelectedAnnouncement(announcement);
                                   setDeleteDialogOpen(true);
                                 }}
-                                className="text-destructive focus:text-destructive rounded-[10px] cursor-pointer"
+                                className="text-destructive focus:text-destructive rounded-lg cursor-pointer"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete
@@ -427,7 +427,7 @@ export default function AnnouncementsPage() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <DialogContent className="max-w-lg rounded-xl border-gray-200 bg-white shadow-sm">
           <DialogHeader>
             <DialogTitle className="font-sans font-bold text-black uppercase tracking-wide">
               {selectedAnnouncement ? "Edit Announcement" : "New Announcement"}
@@ -448,7 +448,7 @@ export default function AnnouncementsPage() {
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Announcement title"
                   required
-                  className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                  className="rounded-xl border-gray-200 bg-white shadow-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -460,7 +460,7 @@ export default function AnnouncementsPage() {
                   placeholder="Announcement content..."
                   rows={4}
                   required
-                  className="rounded-[12px] border-gray-200 bg-white shadow-sm resize-none"
+                  className="rounded-xl border-gray-200 bg-white shadow-sm resize-none"
                 />
               </div>
               <div className="space-y-2">
@@ -471,10 +471,10 @@ export default function AnnouncementsPage() {
                     setFormData({ ...formData, priority: value })
                   }
                 >
-                  <SelectTrigger className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                  <SelectTrigger className="rounded-xl border-gray-200 bg-white shadow-sm">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+                  <SelectContent className="rounded-xl border-gray-200 bg-white shadow-sm">
                     <SelectItem value="low">Low</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
                     <SelectItem value="high">High</SelectItem>
@@ -489,7 +489,7 @@ export default function AnnouncementsPage() {
                     type="datetime-local"
                     value={formData.startsAt}
                     onChange={(e) => setFormData({ ...formData, startsAt: e.target.value })}
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                    className="rounded-xl border-gray-200 bg-white shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -499,7 +499,7 @@ export default function AnnouncementsPage() {
                     type="datetime-local"
                     value={formData.expiresAt}
                     onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                    className="rounded-[12px] border-gray-200 bg-white shadow-sm"
+                    className="rounded-xl border-gray-200 bg-white shadow-sm"
                   />
                 </div>
               </div>
@@ -515,13 +515,13 @@ export default function AnnouncementsPage() {
               )}
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="rounded-xl border-gray-200 bg-white shadow-sm">
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="rounded-[10px]"
+                className="rounded-lg"
               >
                 {createMutation.isPending || updateMutation.isPending
                   ? "Saving..."
@@ -536,7 +536,7 @@ export default function AnnouncementsPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+        <DialogContent className="rounded-xl border-gray-200 bg-white shadow-sm">
           <DialogHeader>
             <DialogTitle className="font-sans font-bold text-black uppercase tracking-wide">Delete Announcement</DialogTitle>
             <DialogDescription>
@@ -545,11 +545,11 @@ export default function AnnouncementsPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="rounded-[12px] border-gray-200 bg-white shadow-sm">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="rounded-xl border-gray-200 bg-white shadow-sm">
               Cancel
             </Button>
             <Button
-              className="bg-destructive hover:bg-destructive/90 rounded-[10px] text-destructive-foreground"
+              className="bg-destructive hover:bg-destructive/90 rounded-lg text-destructive-foreground"
               onClick={handleDelete}
               disabled={deleteMutation.isPending}
             >

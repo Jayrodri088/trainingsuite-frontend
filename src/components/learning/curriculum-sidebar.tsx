@@ -48,7 +48,7 @@ export function CurriculumSidebar({
                 <AccordionItem
                   key={module._id}
                   value={module._id}
-                  className="border border-gray-200 rounded-[12px] overflow-hidden bg-white"
+                  className="border border-gray-200 rounded-xl overflow-hidden bg-white"
                 >
                   <AccordionTrigger className="px-3 sm:px-4 py-3 hover:no-underline">
                     <div className="flex items-center gap-2 sm:gap-3 text-left min-w-0">

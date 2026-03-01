@@ -24,9 +24,9 @@ export default function HelpPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
             <Link
               href="/faq"
-              className="flex flex-col items-center text-center p-6 rounded-[12px] border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-[#0052CC]/30 transition-all group"
+              className="flex flex-col items-center text-center p-6 rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-[#0052CC]/30 transition-all group"
             >
-              <div className="h-14 w-14 rounded-[12px] bg-[#0052CC]/10 flex items-center justify-center mb-4 group-hover:bg-[#0052CC]/20 transition-colors">
+              <div className="h-14 w-14 rounded-xl bg-[#0052CC]/10 flex items-center justify-center mb-4 group-hover:bg-[#0052CC]/20 transition-colors">
                 <HelpCircle className="h-7 w-7 text-[#0052CC]" />
               </div>
               <h2 className="font-sans text-lg font-bold text-black mb-2"><T>FAQ</T></h2>
@@ -37,9 +37,9 @@ export default function HelpPage() {
 
             <Link
               href="/contact"
-              className="flex flex-col items-center text-center p-6 rounded-[12px] border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-[#0052CC]/30 transition-all group"
+              className="flex flex-col items-center text-center p-6 rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-[#0052CC]/30 transition-all group"
             >
-              <div className="h-14 w-14 rounded-[12px] bg-[#0052CC]/10 flex items-center justify-center mb-4 group-hover:bg-[#0052CC]/20 transition-colors">
+              <div className="h-14 w-14 rounded-xl bg-[#0052CC]/10 flex items-center justify-center mb-4 group-hover:bg-[#0052CC]/20 transition-colors">
                 <MessageSquare className="h-7 w-7 text-[#0052CC]" />
               </div>
               <h2 className="font-sans text-lg font-bold text-black mb-2"><T>Contact Us</T></h2>
@@ -50,9 +50,9 @@ export default function HelpPage() {
 
             <Link
               href="/courses"
-              className="flex flex-col items-center text-center p-6 rounded-[12px] border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-[#0052CC]/30 transition-all group"
+              className="flex flex-col items-center text-center p-6 rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-[#0052CC]/30 transition-all group"
             >
-              <div className="h-14 w-14 rounded-[12px] bg-[#0052CC]/10 flex items-center justify-center mb-4 group-hover:bg-[#0052CC]/20 transition-colors">
+              <div className="h-14 w-14 rounded-xl bg-[#0052CC]/10 flex items-center justify-center mb-4 group-hover:bg-[#0052CC]/20 transition-colors">
                 <BookOpen className="h-7 w-7 text-[#0052CC]" />
               </div>
               <h2 className="font-sans text-lg font-bold text-black mb-2"><T>Training Materials</T></h2>
@@ -64,7 +64,7 @@ export default function HelpPage() {
 
           <div className="mt-12 text-center">
             <p className="font-sans text-gray-600 mb-4"><T>Already have an account? Sign in to access your dashboard and help resources.</T></p>
-            <Button asChild size="lg" className="rounded-[10px] h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold">
+            <Button asChild size="lg" className="rounded-lg h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold">
               <Link href="/login" className="inline-flex items-center gap-2">
                 <LogIn className="h-4 w-4" />
                 <T>Sign In</T>

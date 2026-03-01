@@ -8,7 +8,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-white py-14 sm:py-20">
       <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <Card className="border-gray-200 rounded-[12px] shadow-sm">
+          <Card className="border-gray-200 rounded-xl shadow-sm">
             <CardHeader>
               <CardTitle className="font-sans text-2xl md:text-3xl font-bold text-black"><T>Privacy Policy</T></CardTitle>
             </CardHeader>

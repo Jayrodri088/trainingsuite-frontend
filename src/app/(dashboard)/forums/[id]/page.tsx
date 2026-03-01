@@ -16,6 +16,8 @@ import {
   Clock,
   Loader2,
   Heart,
+  MoreVertical,
+  Trash2,
 } from "lucide-react";
 import { T, useT } from "@/components/t";
 import { Button } from "@/components/ui/button";
@@ -38,11 +40,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks";
 import { forumsApi } from "@/lib/api/forums";
-import { getInitials } from "@/lib/utils";
+import { getInitials, getErrorMessage } from "@/lib/utils";
 import type { Forum, ForumPost, User } from "@/types";
 import { formatDistanceToNow, parseISO } from "date-fns";
 
@@ -51,6 +67,7 @@ export default function ForumDetailPage() {
   const forumId = params.id as string;
   const { toast } = useToast();
   const { t } = useT();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -61,9 +78,10 @@ export default function ForumDetailPage() {
     queryFn: () => forumsApi.getById(forumId),
   });
 
+  const [postSort, setPostSort] = useState<"latest" | "oldest" | "mostLiked">("latest");
   const { data: postsData, isLoading: postsLoading } = useQuery({
-    queryKey: ["forum-posts", forumId],
-    queryFn: () => forumsApi.getPosts(forumId, 1, 50),
+    queryKey: ["forum-posts", forumId, postSort],
+    queryFn: () => forumsApi.getPosts(forumId, 1, 50, postSort),
   });
 
   const createPostMutation = useMutation({
@@ -82,18 +100,29 @@ export default function ForumDetailPage() {
 
   const forum = forumData?.data;
   const posts = postsData?.data || [];
+  const isAdmin = user?.role === "admin";
+
+  const deletePostMutation = useMutation({
+    mutationFn: (postId: string) => forumsApi.deletePost(postId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["forum-posts", forumId] });
+      toast({ title: t("Post deleted") });
+    },
+    onError: (err) => {
+      toast({ title: getErrorMessage(err), variant: "destructive" });
+    },
+  });
 
   const filteredPosts = posts.filter(
     (post) =>
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  // Sort posts: pinned first, then by date
+  // Server returns sorted; keep pinned first for display
   const sortedPosts = [...filteredPosts].sort((a, b) => {
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    return 0;
   });
 
   const handleSubmitPost = (e: React.FormEvent) => {
@@ -153,7 +182,7 @@ export default function ForumDetailPage() {
             <h1 className="text-2xl font-bold">{forum.title}</h1>
             {forum.isGeneral && <Badge variant="secondary"><T>General</T></Badge>}
             {courseSlug && (
-              <Button variant="outline" size="sm" asChild className="rounded-[10px]">
+              <Button variant="outline" size="sm" asChild className="rounded-lg">
                 <Link href={`/courses/${courseSlug}`}>
                   <T>Back to course</T>
                 </Link>
@@ -170,9 +199,9 @@ export default function ForumDetailPage() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1 max-w-md">
+      {/* Search and sort */}
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="relative flex-1 min-w-[200px] max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("Search discussions...")}
@@ -181,6 +210,16 @@ export default function ForumDetailPage() {
             className="pl-9"
           />
         </div>
+        <Select value={postSort} onValueChange={(v: "latest" | "oldest" | "mostLiked") => setPostSort(v)}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="latest"><T>Latest first</T></SelectItem>
+            <SelectItem value="oldest"><T>Oldest first</T></SelectItem>
+            <SelectItem value="mostLiked"><T>Most liked</T></SelectItem>
+          </SelectContent>
+        </Select>
         <p className="text-sm text-muted-foreground">
           {sortedPosts.length} {sortedPosts.length !== 1 ? <T>discussions</T> : <T>discussion</T>}
         </p>
@@ -208,44 +247,45 @@ export default function ForumDetailPage() {
       ) : (
         <div className="space-y-4">
           {sortedPosts.map((post) => (
-            <Link key={post._id} href={`/forums/${forumId}/posts/${post._id}`}>
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={post.user?.avatar} />
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        {getInitials(post.user?.name || "?")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        {post.isPinned && (
-                          <Pin className="h-4 w-4 text-primary fill-primary" />
-                        )}
-                        {post.isLocked && (
-                          <Lock className="h-4 w-4 text-muted-foreground" />
-                        )}
-                        <h3 className="font-semibold truncate">{post.title}</h3>
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                        {post.content}
-                      </p>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span>{post.user?.name || "Anonymous"}</span>
-                        <div className="flex items-center gap-1">
-                          <Heart className="h-4 w-4" />
-                          <span>{post.likes || 0}</span>
+            <Card key={post._id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-4">
+                  <Link href={`/forums/${forumId}/posts/${post._id}`} className="flex-1 min-w-0">
+                    <div className="flex items-start gap-4">
+                      <Avatar className="h-10 w-10 shrink-0">
+                        <AvatarImage src={post.user?.avatar} />
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {getInitials(post.user?.name || "?")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          {post.isPinned && (
+                            <Pin className="h-4 w-4 text-primary fill-primary shrink-0" />
+                          )}
+                          {post.isLocked && (
+                            <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+                          )}
+                          <h3 className="font-semibold truncate">{post.title}</h3>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Eye className="h-4 w-4" />
-                          <span>{post.viewCount || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <MessageCircle className="h-4 w-4" />
-                          <span>{post.commentCount || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                          {post.content}
+                        </p>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>{post.user?.name || "Anonymous"}</span>
+                          <div className="flex items-center gap-1">
+                            <Heart className="h-4 w-4" />
+                            <span>{post.likes || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Eye className="h-4 w-4" />
+                            <span>{post.viewCount || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MessageCircle className="h-4 w-4" />
+                            <span>{post.commentCount || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
                           <span>
                             {formatDistanceToNow(parseISO(post.createdAt), { addSuffix: true })}
@@ -254,9 +294,33 @@ export default function ForumDetailPage() {
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
+                  </Link>
+                  {isAdmin && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={(e) => e.preventDefault()}>
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (confirm(t("Delete this post? This cannot be undone."))) {
+                              deletePostMutation.mutate(post._id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          <T>Delete post</T>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
