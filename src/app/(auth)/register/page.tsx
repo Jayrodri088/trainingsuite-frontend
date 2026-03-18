@@ -65,6 +65,7 @@ export default function RegisterPage() {
     defaultValues: {
       name: "",
       email: "",
+      phone: "",
       network: REGISTRATION_NETWORKS[0],
       password: "",
       confirmPassword: "",
@@ -86,6 +87,7 @@ export default function RegisterPage() {
       const response = await authApi.register({
         name: data.name,
         email: data.email,
+        phone: data.phone,
         network: data.network,
         password: data.password,
         confirmPassword: data.confirmPassword,
@@ -103,7 +105,7 @@ export default function RegisterPage() {
           const fieldErrors = errorData.errors;
 
           Object.entries(fieldErrors).forEach(([field, messages]) => {
-            if (field === "name" || field === "email" || field === "network" || field === "password" || field === "confirmPassword") {
+            if (field === "name" || field === "email" || field === "phone" || field === "network" || field === "password" || field === "confirmPassword") {
               form.setError(field as keyof RegisterFormData, {
                 type: "server",
                 message: messages.join(". "),
@@ -174,6 +176,28 @@ export default function RegisterPage() {
                     type="email"
                     placeholder="name@example.com"
                     autoComplete="email"
+                    disabled={isLoading}
+                    className="rounded-lg h-11 border-gray-200"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel><T>Phone Number</T></FormLabel>
+                <FormControl>
+                  <Input
+                    type="tel"
+                    placeholder={t("+1 555 123 4567")}
+                    autoComplete="tel"
+                    inputMode="tel"
                     disabled={isLoading}
                     className="rounded-lg h-11 border-gray-200"
                     {...field}

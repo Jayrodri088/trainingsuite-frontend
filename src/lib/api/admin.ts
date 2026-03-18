@@ -9,6 +9,7 @@ import type {
   Announcement,
   Course,
   CourseStatus,
+  CourseQuiz,
 } from "@/types";
 
 export interface CreateCourseData {
@@ -282,6 +283,25 @@ export const adminApi = {
 
     const response = await apiClient.get<PaginatedResponse<unknown>>(
       `/admin/enrollments?${params.toString()}`
+    );
+    return response.data;
+  },
+
+  // Course Quizzes
+  getCourseQuiz: async (courseId: string) => {
+    const response = await apiClient.get<ApiResponse<CourseQuiz>>(
+      `/admin/courses/${courseId}/quiz`
+    );
+    return response.data;
+  },
+
+  saveCourseQuiz: async (
+    courseId: string,
+    data: { questions: { question: string; options: string[]; correctOptionIndex: number }[]; passPercentage?: number }
+  ) => {
+    const response = await apiClient.post<ApiResponse<CourseQuiz>>(
+      `/admin/courses/${courseId}/quiz`,
+      data
     );
     return response.data;
   },

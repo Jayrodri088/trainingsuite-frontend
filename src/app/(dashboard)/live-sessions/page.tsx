@@ -365,7 +365,7 @@ export default function LiveSessionsPage() {
                           <span>{session.instructor?.name || t("Instructor")}</span>
                           {session.course && (
                             <>
-                              <span className="text-muted-foreground/50">•</span>
+                              <span className="text-muted-foreground">•</span>
                               <span className="truncate">{t(session.course.title)}</span>
                             </>
                           )}
@@ -393,7 +393,7 @@ export default function LiveSessionsPage() {
                         <Users className="h-3 w-3" />
                         <span>{session.attendeeCount || 0} <T>attended</T></span>
                       </div>
-                      <div className="flex items-center gap-1 text-muted-foreground/70">
+                      <div className="flex items-center gap-1 text-muted-foreground">
                         <History className="h-3 w-3" />
                         <span>{formatDistanceToNow(parseISO(session.scheduledAt), { addSuffix: true })}</span>
                       </div>

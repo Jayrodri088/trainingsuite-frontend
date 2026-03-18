@@ -220,7 +220,7 @@ export default function AdminStudentsPage() {
             <PageLoader />
           ) : filteredEnrollments.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="h-12 w-12 mx-auto text-gray-600/30 mb-4" />
+              <Users className="h-12 w-12 mx-auto text-gray-600 mb-4" />
               <h3 className="text-lg font-medium">No students found</h3>
               <p className="text-gray-600 mt-1">
                 {searchQuery || courseFilter !== "all" || statusFilter !== "all"

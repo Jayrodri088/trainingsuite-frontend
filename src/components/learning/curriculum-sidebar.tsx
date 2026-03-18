@@ -17,12 +17,14 @@ export function CurriculumSidebar({
   onSelectLesson,
   courseProgress,
   completedLessonIds,
+  courseSlug,
 }: {
   modules: Module[];
   currentLessonId: string | null;
   onSelectLesson: (lesson: Lesson) => void;
   courseProgress: number;
   completedLessonIds: Set<string>;
+  courseSlug: string;
 }) {
   const { t } = useT();
   const defaultOpenModules = modules.map((m) => m._id);
@@ -81,6 +83,37 @@ export function CurriculumSidebar({
               );
             })}
           </Accordion>
+        </div>
+      </div>
+
+      <div className="shrink-0 border-t border-gray-200 bg-white p-3 sm:p-4">
+        <div className="p-3 rounded-lg border border-gray-200 bg-gray-50 space-y-2">
+          <p className="text-xs font-sans font-semibold text-black">
+            <T>Course Quiz</T>
+          </p>
+          <p className="text-xs font-sans text-gray-600">
+            {courseProgress >= 100 ? (
+              <T>You have completed the course. You can now take the quiz.</T>
+            ) : (
+              <T>Complete the entire course to unlock the quiz.</T>
+            )}
+          </p>
+          <a
+            href={`/courses/${courseSlug}/quiz`}
+            className={`mt-1 inline-flex items-center justify-center w-full rounded-md px-3 py-1.5 text-xs font-sans font-semibold shadow-sm ${
+              courseProgress >= 100
+                ? "bg-[#0052CC] text-white hover:bg-[#003d99]"
+                : "bg-gray-200 text-gray-500 cursor-not-allowed"
+            }`}
+            aria-disabled={courseProgress < 100}
+            onClick={(e) => {
+              if (courseProgress < 100) {
+                e.preventDefault();
+              }
+            }}
+          >
+            <T>Take Quiz</T>
+          </a>
         </div>
       </div>
     </div>

@@ -86,7 +86,7 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
                 <T>Join Live</T>
               </Button>
             ) : isScheduled ? (
-              <div className="flex items-center text-sm font-medium text-foreground/70 group-hover:text-foreground transition-colors">
+              <div className="flex items-center text-sm font-medium text-gray-800 dark:text-foreground/70 group-hover:text-gray-900 dark:group-hover:text-foreground transition-colors">
                 <Clock className="h-4 w-4 mr-2" />
                 <span>{format(parseISO(session.scheduledAt), "h:mm a")}</span>
                 <ArrowRight className="ml-auto h-4 w-4" />

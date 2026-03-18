@@ -469,7 +469,7 @@ export default function AdminLiveSessionsPage() {
             <PageLoader />
           ) : filteredSessions.length === 0 ? (
             <div className="text-center py-12">
-              <Video className="h-12 w-12 mx-auto text-gray-600/30 mb-4" />
+              <Video className="h-12 w-12 mx-auto text-gray-600 mb-4" />
               <h3 className="text-lg font-medium">No sessions found</h3>
               <p className="text-gray-600 mt-1">
                 {searchQuery || statusFilter !== "all"
@@ -528,11 +528,11 @@ export default function AdminLiveSessionsPage() {
                           <Users className="h-3.5 w-3.5 text-gray-600" />
                           {session.attendeeCount || 0}
                           {session.maxAttendees ? (
-                            <span className="text-gray-600/50">
+                            <span className="text-gray-600">
                               /{session.maxAttendees}
                             </span>
                           ) : (
-                            <span className="text-gray-600/50">
+                            <span className="text-gray-600">
                               /∞
                             </span>
                           )}

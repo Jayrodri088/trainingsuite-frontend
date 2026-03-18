@@ -329,7 +329,7 @@ export default function AnnouncementsPage() {
             <PageLoader />
           ) : filteredAnnouncements.length === 0 ? (
             <div className="text-center py-12">
-              <Megaphone className="h-12 w-12 mx-auto text-gray-600/30 mb-4" />
+            <Megaphone className="h-12 w-12 mx-auto text-gray-600 mb-4" />
               <h3 className="text-lg font-medium">No announcements</h3>
               <p className="text-gray-600 mt-1">
                 {searchQuery ? "No announcements match your search" : "Create your first announcement"}
@@ -378,7 +378,7 @@ export default function AnnouncementsPage() {
                             </p>
                           )}
                           {!announcement.startsAt && !announcement.expiresAt && (
-                            <span className="text-gray-600/50 italic">No schedule</span>
+                            <span className="text-gray-600 italic">No schedule</span>
                           )}
                         </div>
                       </TableCell>

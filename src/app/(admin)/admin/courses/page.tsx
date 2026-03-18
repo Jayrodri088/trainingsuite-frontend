@@ -370,11 +370,11 @@ export default function CoursesPage() {
                         className="rounded-lg border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
                     </TableHead>
-                    <TableHead className="font-bold uppercase text-xs tracking-wider">Course</TableHead>
-                    <TableHead className="font-bold uppercase text-xs tracking-wider">Status</TableHead>
-                    <TableHead className="font-bold uppercase text-xs tracking-wider">Level</TableHead>
-                    <TableHead className="font-bold uppercase text-xs tracking-wider text-right">Enrollments</TableHead>
-                    <TableHead className="font-bold uppercase text-xs tracking-wider text-right">Rating</TableHead>
+                    <TableHead className="font-bold uppercase text-xs tracking-wider text-gray-600">Course</TableHead>
+                    <TableHead className="font-bold uppercase text-xs tracking-wider text-gray-600">Status</TableHead>
+                    <TableHead className="font-bold uppercase text-xs tracking-wider text-gray-600">Level</TableHead>
+                    <TableHead className="font-bold uppercase text-xs tracking-wider text-right text-gray-600">Enrollments</TableHead>
+                    <TableHead className="font-bold uppercase text-xs tracking-wider text-right text-gray-600">Rating</TableHead>
                     <TableHead className="w-[50px] pr-6"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -383,7 +383,7 @@ export default function CoursesPage() {
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12">
                         <div className="flex flex-col items-center">
-                          <BookOpen className="h-12 w-12 text-gray-600/30 mb-4" />
+                          <BookOpen className="h-12 w-12 text-gray-600 mb-4" />
                           <p className="text-gray-600 font-medium">No courses found matching your criteria</p>
                         </div>
                       </TableCell>
@@ -408,7 +408,7 @@ export default function CoursesPage() {
                                   className="h-full w-full object-cover"
                                 />
                               ) : (
-                                <BookOpen className="h-5 w-5 text-gray-600/50" />
+                                <BookOpen className="h-5 w-5 text-gray-600" />
                               )}
                             </div>
                             <div className="min-w-0">
@@ -447,7 +447,7 @@ export default function CoursesPage() {
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <span className="font-mono text-sm">{course.enrollmentCount || 0}</span>
-                            <Users className="h-3.5 w-3.5 text-gray-600/70" />
+                            <Users className="h-3.5 w-3.5 text-gray-600" />
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
@@ -540,7 +540,7 @@ export default function CoursesPage() {
           {pagination && pagination.totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
               <p className="text-xs text-gray-600 uppercase tracking-wide font-medium">
-                Showing <span className="text-foreground">{filteredCourses.length}</span> of <span className="text-foreground">{pagination.total}</span> courses
+                Showing <span className="text-gray-900">{filteredCourses.length}</span> of <span className="text-gray-900">{pagination.total}</span> courses
               </p>
               <div className="flex items-center gap-2">
                 <Button
@@ -584,7 +584,7 @@ export default function CoursesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="font-heading">Delete Course</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <span className="font-semibold text-foreground">&quot;{courseToDelete?.title}&quot;</span>?
+              Are you sure you want to delete <span className="font-semibold text-gray-900">&quot;{courseToDelete?.title}&quot;</span>?
               <br /><br />
               This action cannot be undone. It will permanently remove all associated material, including enrollments and student progress.
             </AlertDialogDescription>

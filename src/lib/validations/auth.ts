@@ -22,6 +22,11 @@ export const registerSchema = z.object({
     .min(2, "Name must be at least 2 characters")
     .max(100, "Name must be less than 100 characters"),
   email: z.string().email("Please enter a valid email address"),
+  phone: z
+    .string()
+    .min(7, "Phone number is required")
+    .max(25, "Phone number must be less than 25 characters")
+    .regex(/^[+\d()\s-]+$/, "Please enter a valid phone number"),
   network: z.enum(REGISTRATION_NETWORKS, {
     message: "Please select your network",
   }),

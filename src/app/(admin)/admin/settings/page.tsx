@@ -451,7 +451,7 @@ export default function SettingsPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
-                    <Label htmlFor="enablePayments" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
+                    <Label htmlFor="enablePayments" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                       Enable Payments
                     </Label>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -469,7 +469,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
-                    <Label htmlFor="enableLiveStreaming" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
+                    <Label htmlFor="enableLiveStreaming" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                       Enable Live Streaming
                     </Label>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -487,7 +487,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
-                    <Label htmlFor="enableForums" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
+                    <Label htmlFor="enableForums" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                       Enable Forums
                     </Label>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -505,7 +505,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
-                    <Label htmlFor="enableComments" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
+                    <Label htmlFor="enableComments" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                       Enable Comments
                     </Label>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -523,7 +523,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
-                    <Label htmlFor="enableRatings" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
+                    <Label htmlFor="enableRatings" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                       Enable Ratings
                     </Label>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -541,7 +541,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between p-4 border border-gray-200 bg-card">
                   <div>
-                    <Label htmlFor="enableCertificates" className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
+                    <Label htmlFor="enableCertificates" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                       Enable Certificates
                     </Label>
                     <p className="text-xs text-muted-foreground mt-1">

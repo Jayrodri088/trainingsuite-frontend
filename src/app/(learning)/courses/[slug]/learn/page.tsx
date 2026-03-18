@@ -241,6 +241,7 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
                   }}
                   courseProgress={courseProgress}
                   completedLessonIds={completedLessonIds}
+                  courseSlug={courseSlug}
                 />
               </SheetContent>
               </Sheet>
@@ -316,6 +317,7 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
             onSelectLesson={setCurrentLesson}
             courseProgress={courseProgress}
             completedLessonIds={completedLessonIds}
+            courseSlug={courseSlug}
           />
         </aside>
       </div>

@@ -164,7 +164,7 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <div className="min-h-screen bg-[#f5f5f5] text-gray-900">
       {/* Mobile backdrop */}
       <button
         type="button"

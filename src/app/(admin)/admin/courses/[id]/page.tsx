@@ -23,6 +23,7 @@ import {
   Upload,
   ImageIcon,
   Clock,
+  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -528,6 +529,10 @@ export default function AdminCourseEditorPage({
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </TabsTrigger>
+          <TabsTrigger value="quiz" className="shrink-0">
+            <Award className="h-4 w-4 mr-2" />
+            Quiz
+          </TabsTrigger>
         </TabsList>
 
         {/* Curriculum Tab */}
@@ -943,6 +948,28 @@ export default function AdminCourseEditorPage({
                     : "Duration is automatically calculated from the video lengths of all lessons."}
                 </p>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Quiz Tab */}
+        <TabsContent value="quiz" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Course Quiz</CardTitle>
+              <CardDescription>
+                Configure the quiz students must take after completing this course.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                You can add multiple-choice questions with a single correct answer. Students will only see the quiz after they finish all lessons.
+              </p>
+              <Button asChild>
+                <Link href={`/admin/courses/${courseId}/quiz`}>
+                  Manage Quiz
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

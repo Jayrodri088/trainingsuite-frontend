@@ -285,7 +285,7 @@ export default function AdminDiscussionsPage() {
             <PageLoader />
           ) : filteredForums.length === 0 ? (
             <div className="text-center py-12">
-              <MessageSquare className="h-12 w-12 mx-auto text-gray-600/30 mb-4" />
+              <MessageSquare className="h-12 w-12 mx-auto text-gray-600 mb-4" />
               <h3 className="text-lg font-medium">No forums found</h3>
               <p className="text-gray-600 mt-1">
                 {searchQuery || typeFilter !== "all"

@@ -6,6 +6,8 @@ import type {
   CourseWithModules,
   CourseFilters,
   Rating,
+  CourseQuiz,
+  QuizSubmissionResult,
 } from "@/types";
 
 export interface CreateCourseData {
@@ -108,6 +110,23 @@ export const coursesApi = {
   getForum: async (courseIdOrSlug: string) => {
     const response = await apiClient.get<ApiResponse<{ _id: string; title: string; description?: string; postCount?: number }>>(
       `/courses/${courseIdOrSlug}/forum`
+    );
+    return response.data;
+  },
+
+  /** Get the quiz for a course (requires enrollment and completion; hides correct answers). */
+  getQuiz: async (courseIdOrSlug: string) => {
+    const response = await apiClient.get<ApiResponse<CourseQuiz>>(
+      `/courses/${courseIdOrSlug}/quiz`
+    );
+    return response.data;
+  },
+
+  /** Submit quiz answers for a course. */
+  submitQuiz: async (courseIdOrSlug: string, answers: number[]) => {
+    const response = await apiClient.post<ApiResponse<QuizSubmissionResult>>(
+      `/courses/${courseIdOrSlug}/quiz/submit`,
+      { answers }
     );
     return response.data;
   },

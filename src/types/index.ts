@@ -131,6 +131,27 @@ export interface EnrollmentWithCourse extends Omit<Enrollment, "course"> {
   course: Course;
 }
 
+// Quiz Types
+export interface CourseQuizQuestion {
+  question: string;
+  options: string[];
+}
+
+export interface CourseQuiz {
+  _id: string;
+  course: string;
+  passPercentage: number;
+  questions: CourseQuizQuestion[];
+}
+
+export interface QuizSubmissionResult {
+  scorePercent: number;
+  passed: boolean;
+  totalQuestions: number;
+  correctCount: number;
+  requiredToPass: number;
+}
+
 // Certificate Types
 export interface Certificate {
   _id: string;

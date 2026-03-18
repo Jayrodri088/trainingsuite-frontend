@@ -239,7 +239,7 @@ export default function CategoriesPage() {
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-12">
                       <div className="flex flex-col items-center">
-                        <FolderTree className="h-12 w-12 text-gray-600/30 mb-4" />
+                        <FolderTree className="h-12 w-12 text-gray-600 mb-4" />
                         <p className="text-gray-600 font-medium">
                           {searchQuery
                             ? "No categories match your search"
@@ -291,7 +291,7 @@ export default function CategoriesPage() {
                       <TableCell>
                         <div className="flex items-center gap-1.5">
                           <span className="font-mono text-sm font-medium">{category.courseCount || 0}</span>
-                          <BookOpen className="h-3.5 w-3.5 text-gray-600/70" />
+                          <BookOpen className="h-3.5 w-3.5 text-gray-600" />
                         </div>
                       </TableCell>
                       <TableCell>
