@@ -480,7 +480,7 @@ export default function CourseDetailPage({
       <div className="bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white border-b border-white/10">
         <div className="container max-w-6xl py-8 sm:py-12 px-4 sm:px-6">
           <div className="grid lg:grid-cols-3 gap-8 lg:gap-10">
-            <div className="lg:col-span-2 order-2 lg:order-1 space-y-5">
+            <div className="lg:col-span-2 order-1 lg:order-1 space-y-5">
               <Button
                 variant="ghost"
                 size="sm"
@@ -551,7 +551,7 @@ export default function CourseDetailPage({
             </div>
 
             {/* Enrollment Card – rounded corners, clear border */}
-            <div className="lg:row-span-2 order-1 lg:order-2">
+            <div className="lg:row-span-2 order-2 lg:order-2">
               <Card className="lg:sticky lg:top-24 rounded-xl border border-white/20 bg-slate-800/90 shadow-xl overflow-hidden">
                 <div className="aspect-video bg-slate-900 rounded-t-[12px] relative overflow-hidden">
                   {normalizeUploadUrl(course.thumbnail) && (

@@ -93,6 +93,55 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
 
   const isLoading = courseLoading || curriculumLoading || enrollmentLoading;
   const hasError = courseError || curriculumError || enrollmentError;
+  const course = courseResponse?.data as Course | undefined;
+  const courseProgress = enrollmentResponse?.data?.progress || 0;
+  const isEnrolled = !!enrollmentResponse?.data;
+
+  const currentIndex = useMemo(() => {
+    const activeId = activeLesson?._id;
+    if (!activeId) return -1;
+    return allLessons.findIndex((l) => l._id === activeId);
+  }, [allLessons, activeLesson?._id]);
+
+  const lessonPosition = useMemo(() => {
+    if (currentIndex < 0) return null;
+    return { current: currentIndex + 1, total: allLessons.length };
+  }, [currentIndex, allLessons.length]);
+
+  const prevLesson = useMemo(() => {
+    if (currentIndex <= 0) return null;
+    return allLessons[currentIndex - 1] ?? null;
+  }, [allLessons, currentIndex]);
+
+  const nextLesson = useMemo(() => {
+    if (currentIndex < 0 || currentIndex >= allLessons.length - 1) return null;
+    return allLessons[currentIndex + 1] ?? null;
+  }, [allLessons, currentIndex]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput = /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable;
+      if (isInput) return;
+      if (e.key === "ArrowLeft" && prevLesson) {
+        e.preventDefault();
+        setCurrentLesson(prevLesson);
+      } else if (e.key === "ArrowRight" && nextLesson) {
+        e.preventDefault();
+        setCurrentLesson(nextLesson);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [prevLesson, nextLesson]);
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (!course) return;
+    if (isEnrolled) return;
+    router.replace(`/courses/${course.slug || course._id}`);
+  }, [course, isEnrolled, isLoading, router]);
+
   const refetchAll = useCallback(() => {
     refetchCourse();
     refetchCurriculum();
@@ -100,10 +149,6 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
   }, [refetchCourse, refetchCurriculum, refetchEnrollment]);
 
   if (isLoading) return <PageLoader />;
-
-  const course = courseResponse?.data as Course | undefined;
-  const courseProgress = enrollmentResponse?.data?.progress || 0;
-  const isEnrolled = !!enrollmentResponse?.data;
 
   if (hasError) {
     return (
@@ -137,31 +182,8 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
   }
 
   if (!isEnrolled) {
-    router.replace(`/courses/${course.slug || course._id}`);
     return null;
   }
-
-  const currentIndex = allLessons.findIndex((l) => l._id === activeLesson?._id);
-  const lessonPosition = currentIndex >= 0 ? { current: currentIndex + 1, total: allLessons.length } : null;
-  const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
-  const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      const isInput = /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable;
-      if (isInput) return;
-      if (e.key === "ArrowLeft" && prevLesson) {
-        e.preventDefault();
-        setCurrentLesson(prevLesson);
-      } else if (e.key === "ArrowRight" && nextLesson) {
-        e.preventDefault();
-        setCurrentLesson(nextLesson);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [prevLesson, nextLesson]);
 
   const courseSlug = course.slug || course._id;
   const courseHref = `/courses/${courseSlug}`;
