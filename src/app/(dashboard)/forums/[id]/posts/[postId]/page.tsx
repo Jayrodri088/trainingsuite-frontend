@@ -60,8 +60,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks";
 import { forumsApi } from "@/lib/api/forums";
-import { getInitials, getErrorMessage } from "@/lib/utils";
-import type { ForumPost, Comment, User } from "@/types";
+import { getInitials, getErrorMessage, isAxiosHttpStatus } from "@/lib/utils";
+import type { Forum, ForumPost, Comment, User } from "@/types";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 
 function PostDetailPageContent() {
@@ -80,21 +80,37 @@ function PostDetailPageContent() {
   const [optimisticPostLikes, setOptimisticPostLikes] = useState<Map<string, boolean>>(new Map());
   const [optimisticCommentLikes, setOptimisticCommentLikes] = useState<Map<string, boolean>>(new Map());
 
-  const { data: postData, isLoading: postLoading, isError: postError, refetch: refetchPost } = useQuery({
+  const {
+    data: postData,
+    isLoading: postLoading,
+    isSuccess: postQuerySuccess,
+    isError: postError,
+    error: postQueryError,
+    refetch: refetchPost,
+  } = useQuery({
     queryKey: ["post", postId],
     queryFn: () => forumsApi.getPost(postId),
+    retry: (failureCount, error) =>
+      !isAxiosHttpStatus(error, 404) && failureCount < 3,
   });
 
-  const { data: forumData } = useQuery({
-    queryKey: ["forum", forumId],
-    queryFn: () => forumsApi.getById(forumId),
-    enabled: !!forumId,
-  });
+  const postLoaded = postQuerySuccess && !!postData?.data;
 
-  const { data: commentsData, isLoading: commentsLoading, isError: commentsError, refetch: refetchComments } = useQuery({
+  const {
+    data: commentsData,
+    isLoading: commentsLoading,
+    isError: commentsError,
+    error: commentsQueryError,
+    refetch: refetchComments,
+  } = useQuery({
     queryKey: ["post-comments", postId, commentSort],
     queryFn: () => forumsApi.getComments(postId, 1, 100, commentSort),
+    enabled: postLoaded,
+    retry: (failureCount, error) =>
+      !isAxiosHttpStatus(error, 404) && failureCount < 3,
   });
+
+  const post = postData?.data;
 
   // Helper to get effective liked state for post
   const getPostIsLiked = (postItem: ForumPost) => {
@@ -239,7 +255,6 @@ function PostDetailPageContent() {
   const [commentToDelete, setCommentToDelete] = useState<Comment | null>(null);
   const [showDeletePostConfirm, setShowDeletePostConfirm] = useState(false);
 
-  const post = postData?.data;
   const rawComments = commentsData?.data || [];
 
   // Helper to get parent ID
@@ -251,16 +266,16 @@ function PostDetailPageContent() {
   const commentMap = new Map<string, Comment>();
   
   // First pass: collect all comments (including nested replies)
-  const flattenComments = (commentList: Comment[]): Comment[] => {
+  const flattenComments = (commentList: Comment[], parentId?: string): Comment[] => {
     const result: Comment[] = [];
     for (const comment of commentList) {
-      result.push(comment);
-      // If API returns nested replies, flatten them
+      const normalizedComment = parentId
+        ? { ...comment, parent: comment.parent || parentId }
+        : comment;
+      result.push(normalizedComment);
+
       if (comment.replies && Array.isArray(comment.replies) && comment.replies.length > 0) {
-        for (const reply of comment.replies) {
-          // Ensure reply has parent set to this comment
-          result.push({ ...reply, parent: reply.parent || comment._id });
-        }
+        result.push(...flattenComments(comment.replies, normalizedComment._id));
       }
     }
     return result;
@@ -279,8 +294,12 @@ function PostDetailPageContent() {
     return comments.filter((c) => getParentId(c) === parentId);
   };
 
-  const isLoading = postLoading || commentsLoading;
+  const isLoading = postLoading || (postLoaded && commentsLoading);
   const hasError = postError || commentsError;
+  const isNotFound =
+    isAxiosHttpStatus(postQueryError, 404) ||
+    isAxiosHttpStatus(commentsQueryError, 404) ||
+    (!postLoading && !postError && !post);
   const refetchAll = () => {
     refetchPost();
     refetchComments();
@@ -296,20 +315,66 @@ function PostDetailPageContent() {
     );
   }
 
+  if (isNotFound) {
+    return (
+      <div className="space-y-4">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-muted-foreground">
+          <Link href="/forums" className="hover:text-foreground">
+            <T>Forums</T>
+          </Link>
+          <ChevronRight className="h-4 w-4" />
+          <span className="text-foreground font-medium">
+            <T>Post</T>
+          </span>
+        </nav>
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <p className="font-medium text-lg">
+              <T>This post is no longer available</T>
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              <T>It may have been removed, or this link is out of date.</T>
+            </p>
+            <Button asChild className="mt-6">
+              <Link href={`/forums/${forumId}`}>
+                <T>Back to Forum</T>
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (hasError) {
     return (
       <div className="space-y-4">
         <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-muted-foreground">
-          <Link href="/forums" className="hover:text-foreground"><T>Forums</T></Link>
+          <Link href="/forums" className="hover:text-foreground">
+            <T>Forums</T>
+          </Link>
           <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground font-medium"><T>Post</T></span>
+          <span className="text-foreground font-medium">
+            <T>Post</T>
+          </span>
         </nav>
         <Card>
           <CardContent className="pt-6 text-center">
-            <p className="font-medium"><T>Something went wrong</T></p>
-            <p className="text-sm text-muted-foreground mt-1"><T>We couldn&apos;t load this page. Please try again.</T></p>
-            <Button className="mt-4" onClick={refetchAll}><T>Try again</T></Button>
-            <Button variant="outline" className="mt-3 ml-2" asChild><Link href={`/forums/${forumId}`}><T>Back to Forum</T></Link></Button>
+            <p className="font-medium">
+              <T>Something went wrong</T>
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              <T>We couldn&apos;t load this page. Please try again.</T>
+            </p>
+            <Button className="mt-4" onClick={refetchAll}>
+              <T>Try again</T>
+            </Button>
+            <Button variant="outline" className="mt-3 ml-2" asChild>
+              <Link href={`/forums/${forumId}`}>
+                <T>Back to Forum</T>
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -317,18 +382,7 @@ function PostDetailPageContent() {
   }
 
   if (!post) {
-    return (
-      <div className="text-center py-12">
-        <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h2 className="text-lg font-medium"><T>Post not found</T></h2>
-        <p className="text-muted-foreground mt-1">
-          <T>This post may have been removed or doesn&apos;t exist.</T>
-        </p>
-        <Button asChild className="mt-4">
-          <Link href={`/forums/${forumId}`}><T>Back to Forum</T></Link>
-        </Button>
-      </div>
-    );
+    return null;
   }
 
   const CommentCard = ({
@@ -464,7 +518,14 @@ function PostDetailPageContent() {
     );
   };
 
-  const forum = forumData?.data;
+  const forumTitle =
+    post &&
+    typeof post.forum === "object" &&
+    post.forum !== null &&
+    "title" in post.forum
+      ? (post.forum as Forum).title
+      : undefined;
+
   const isPostOwner = !!post && !!user && String((post.user as User)?._id ?? post.user) === user._id;
   const isAdmin = user?.role === "admin";
   const canModeratePost = isPostOwner || isAdmin;
@@ -478,7 +539,7 @@ function PostDetailPageContent() {
         <Link href="/forums" className="hover:text-foreground transition-colors"><T>Forums</T></Link>
         <ChevronRight className="h-4 w-4 shrink-0" />
         <Link href={`/forums/${forumId}`} className="hover:text-foreground transition-colors truncate max-w-[180px] sm:max-w-none">
-          {forum?.title ?? t("Forum")}
+          {forumTitle ?? t("Forum")}
         </Link>
         <ChevronRight className="h-4 w-4 shrink-0" />
         <span className="text-foreground font-medium truncate">{post.title}</span>

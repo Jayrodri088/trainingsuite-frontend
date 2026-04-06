@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { coursesApi } from "@/lib/api";
+import { courseQueryKeys } from "@/lib/query-keys";
 import type { CourseFilters } from "@/types";
 
 export function useCourses(
@@ -9,7 +10,7 @@ export function useCourses(
   options?: { enabled?: boolean }
 ) {
   return useQuery({
-    queryKey: ["courses", filters],
+    queryKey: [...courseQueryKeys.all, filters],
     queryFn: () => coursesApi.getAll(filters),
     enabled: options?.enabled !== false,
   });
@@ -17,7 +18,7 @@ export function useCourses(
 
 export function useCourse(id: string) {
   return useQuery({
-    queryKey: ["course", id],
+    queryKey: courseQueryKeys.course(id),
     queryFn: () => coursesApi.getById(id),
     enabled: !!id,
   });
@@ -25,7 +26,7 @@ export function useCourse(id: string) {
 
 export function useCourseCurriculum(id: string) {
   return useQuery({
-    queryKey: ["course", id, "curriculum"],
+    queryKey: courseQueryKeys.curriculum(id),
     queryFn: () => coursesApi.getCurriculum(id),
     enabled: !!id,
   });
@@ -33,7 +34,7 @@ export function useCourseCurriculum(id: string) {
 
 export function useCourseRatings(id: string, page = 1) {
   return useQuery({
-    queryKey: ["course", id, "ratings", page],
+    queryKey: courseQueryKeys.ratings(id, page),
     queryFn: () => coursesApi.getRatings(id, page),
     enabled: !!id,
   });

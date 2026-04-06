@@ -24,6 +24,11 @@ export const forumsApi = {
     return response.data;
   },
 
+  delete: async (id: string) => {
+    const response = await apiClient.delete<ApiResponse<null>>(`/forums/${id}`);
+    return response.data;
+  },
+
   getPosts: async (id: string, page = 1, limit = 10, sort?: "latest" | "oldest" | "mostLiked") => {
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
     if (sort) params.set("sort", sort);
@@ -36,6 +41,20 @@ export const forumsApi = {
   createPost: async (id: string, data: { title: string; content: string }) => {
     const response = await apiClient.post<ApiResponse<ForumPost>>(
       `/forums/${id}/posts`,
+      data
+    );
+    return response.data;
+  },
+
+  createCommunityPost: async (data: {
+    title: string;
+    question: string;
+    details?: string;
+    topicType?: "forum" | "course" | "category";
+    topicId?: string;
+  }) => {
+    const response = await apiClient.post<ApiResponse<ForumPost>>(
+      "/community/posts",
       data
     );
     return response.data;

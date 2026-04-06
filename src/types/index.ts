@@ -67,6 +67,8 @@ export interface Course {
   prerequisites?: string[];
   targetAudience?: string[];
   tags?: string[];
+  /** True when the course has a quiz configured in the database */
+  hasQuiz?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -123,6 +125,9 @@ export interface Enrollment {
   startedAt: string;
   completedAt?: string;
   expiresAt?: string;
+  quizScore?: number;
+  quizPassed?: boolean;
+  quizTakenAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -135,6 +140,7 @@ export interface EnrollmentWithCourse extends Omit<Enrollment, "course"> {
 export interface CourseQuizQuestion {
   question: string;
   options: string[];
+  correctOptionIndex?: number;
 }
 
 export interface CourseQuiz {
@@ -150,6 +156,7 @@ export interface QuizSubmissionResult {
   totalQuestions: number;
   correctCount: number;
   requiredToPass: number;
+  quizTakenAt?: string;
 }
 
 // Certificate Types
@@ -174,7 +181,8 @@ export interface Forum {
   _id: string;
   title: string;
   description?: string;
-  course?: string;
+  course?: string | Course;
+  category?: string | Category;
   createdBy: string | User;
   isGeneral: boolean;
   isActive: boolean;
@@ -288,6 +296,16 @@ export interface LiveAttendance {
   duration: number;
 }
 
+export interface LiveSessionChatMessage {
+  _id: string;
+  session?: string;
+  course?: string;
+  user: Pick<User, "_id" | "name" | "avatar" | "role"> | string;
+  message: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Notification Types
 export type NotificationType =
   | "course_enrolled"
@@ -361,6 +379,7 @@ export interface SiteConfig {
   defaultPaymentProvider: PaymentProvider;
   defaultStreamProvider: StreamProvider;
   contactEmail?: string;
+  networks?: string[];
   socialLinks?: {
     facebook?: string;
     twitter?: string;

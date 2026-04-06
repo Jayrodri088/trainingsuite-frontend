@@ -129,6 +129,13 @@ export const adminApi = {
     return response.data;
   },
 
+  revokePortalAccess: async (id: string) => {
+    const response = await apiClient.delete<ApiResponse<User>>(
+      `/admin/users/${id}/waive-portal-access`
+    );
+    return response.data;
+  },
+
   /** Export users as CSV (uses same filters as getUsers). Returns blob. */
   exportUsers: async (filters?: UserFilters): Promise<Blob> => {
     const params = new URLSearchParams();

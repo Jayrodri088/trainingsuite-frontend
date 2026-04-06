@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   BookOpen,
   Clock,
@@ -19,9 +20,10 @@ import { Badge } from "@/components/ui/badge";
 import { PageLoader } from "@/components/ui/page-loader";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth, useEnrollments, useCertificates, useNotifications } from "@/hooks";
+import { useAuth, useEnrollments, useCertificates, useNotifications, useCourseThumbnail } from "@/hooks";
 import { formatDistanceToNow } from "date-fns";
 import type { Enrollment, Course, Notification, Certificate } from "@/types";
+import { cn } from "@/lib/utils";
 import { T, useT } from "@/components/t";
 
 function StatCard({
@@ -60,26 +62,35 @@ function StatCard({
 function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
   const { t } = useT();
   const course = typeof enrollment.course === "object" ? enrollment.course : null;
+  const thumb = useCourseThumbnail(course);
   const progress = enrollment.progress || 0;
 
   if (!course) return null;
 
   return (
     <div className="group flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm hover:border-gray-300 transition-colors">
-      <div className="relative h-20 w-full sm:w-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden shrink-0 group-hover:opacity-90 transition-opacity">
-        {course.thumbnail ? (
-          <img
-            src={course.thumbnail}
+      <div
+        className={cn(
+          "relative h-20 w-full sm:w-32 rounded-lg flex items-center justify-center overflow-hidden shrink-0 group-hover:opacity-90 transition-opacity",
+          thumb.gradientClass
+        )}
+      >
+        {thumb.showImage && thumb.thumbSrc ? (
+          <Image
+            src={thumb.thumbSrc}
             alt={t(course.title)}
-            className="absolute inset-0 w-full h-full object-cover rounded-lg"
+            fill
+            className="object-cover rounded-lg"
+            sizes="(min-width: 640px) 128px, 100vw"
+            onError={thumb.onImageError}
           />
         ) : (
-          <>
-            <div className="absolute inset-0 bg-[#0052CC]/10 rounded-lg" />
-            <PlayCircle className="h-8 w-8 text-[#0052CC] relative z-10 group-hover:scale-110 transition-transform" />
-          </>
+          <PlayCircle className="h-8 w-8 text-white/80 relative z-0 group-hover:scale-110 transition-transform" />
         )}
-        <Badge className="absolute top-2 left-2 rounded-lg text-[10px] font-semibold border-0 bg-white/90 text-gray-800 backdrop-blur-sm" variant="secondary">
+        <Badge
+          className="absolute top-2 left-2 z-10 rounded-lg text-[10px] font-semibold border-0 bg-white/90 text-gray-800 backdrop-blur-sm"
+          variant="secondary"
+        >
           {t(course.level || "beginner")}
         </Badge>
       </div>

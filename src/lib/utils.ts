@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { AxiosError } from "axios";
+import { getApiOrigin } from "@/lib/api/base-url";
 
 // API Error Response type
 interface ApiErrorResponse {
@@ -81,6 +82,11 @@ export function getErrorMessage(error: unknown): string {
   }
 
   return "An unexpected error occurred.";
+}
+
+/** True when `error` is an Axios error with the given HTTP status (e.g. 404). */
+export function isAxiosHttpStatus(error: unknown, status: number): boolean {
+  return error instanceof AxiosError && error.response?.status === status;
 }
 
 export function cn(...inputs: ClassValue[]) {
@@ -198,9 +204,7 @@ export function getStatusBadgeColor(status: string): string {
 export function getMediaUrl(url: string | undefined | null): string | undefined {
   if (!url) return undefined;
 
-  // Get the base URL (remove /api suffix from NEXT_PUBLIC_API_URL)
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
-  const baseUrl = apiUrl.replace(/\/api\/?$/, "");
+  const baseUrl = getApiOrigin();
 
   // If it's already a full URL with the correct base, return as-is
   if (baseUrl && url.startsWith(baseUrl)) {
@@ -213,9 +217,16 @@ export function getMediaUrl(url: string | undefined | null): string | undefined 
     return baseUrl ? `${baseUrl.replace(/\/$/, "")}${path}` : url;
   }
 
-  // Replace production URLs with the base URL (for local dev with production data)
-  if (url.includes("apis.movortech.com") || url.includes("api.movortech.com")) {
-    const path = url.replace(/https?:\/\/apis?\.movortech\.com/, "");
+  // Replace known production API hosts with the active base URL
+  if (
+    url.includes("apis.movortech.com") ||
+    url.includes("api.movortech.com") ||
+    url.includes("api.rhapsodyomegaforce.org")
+  ) {
+    const path = url.replace(
+      /https?:\/\/(?:apis?\.movortech\.com|api\.rhapsodyomegaforce\.org)/,
+      ""
+    );
     return baseUrl ? `${baseUrl.replace(/\/$/, "")}${path}` : url;
   }
 
@@ -254,6 +265,25 @@ export function normalizeUploadUrl(url: string | undefined | null): string | und
   }
 
   return url;
+}
+
+/** Tailwind gradient classes for course cards when no thumbnail or image fails to load */
+const COURSE_PLACEHOLDER_GRADIENTS = [
+  "bg-gradient-to-br from-violet-500 to-purple-600",
+  "bg-gradient-to-br from-blue-500 to-cyan-600",
+  "bg-gradient-to-br from-emerald-500 to-teal-700",
+  "bg-gradient-to-br from-amber-500 to-orange-600",
+  "bg-gradient-to-br from-rose-500 to-pink-600",
+  "bg-gradient-to-br from-indigo-500 to-blue-700",
+] as const;
+
+/** Stable pseudo-random gradient per course id (same course always gets the same colors). */
+export function coursePlaceholderGradientClass(seed: string): string {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) {
+    h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
+  }
+  return COURSE_PLACEHOLDER_GRADIENTS[Math.abs(h) % COURSE_PLACEHOLDER_GRADIENTS.length];
 }
 
 /**

@@ -26,11 +26,13 @@ export interface CreateCourseData {
   thumbnail?: string;
 }
 
-export interface UpdateCourseData extends Partial<CreateCourseData> {
+export interface UpdateCourseData extends Omit<Partial<CreateCourseData>, "network"> {
   status?: string;
   isPublished?: boolean;
   thumbnail?: string;
   previewVideo?: string;
+  /** Omit or set `null` to clear (server stores unset). */
+  network?: string | null;
 }
 
 export const coursesApi = {
@@ -106,11 +108,11 @@ export const coursesApi = {
     return response.data;
   },
 
-  /** Get the discussion forum for a course (if one exists). */
+  /** Get the discussion forum for a course (if one exists). Missing forum returns 200 with data null. */
   getForum: async (courseIdOrSlug: string) => {
-    const response = await apiClient.get<ApiResponse<{ _id: string; title: string; description?: string; postCount?: number }>>(
-      `/courses/${courseIdOrSlug}/forum`
-    );
+    const response = await apiClient.get<
+      ApiResponse<{ _id: string; title: string; description?: string; postCount?: number } | null>
+    >(`/courses/${courseIdOrSlug}/forum`);
     return response.data;
   },
 

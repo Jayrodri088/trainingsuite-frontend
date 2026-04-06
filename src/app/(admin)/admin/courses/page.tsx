@@ -62,7 +62,13 @@ import {
 import { useCourses } from "@/hooks";
 import { useToast } from "@/hooks/use-toast";
 import { adminApi } from "@/lib/api/admin";
+import {
+  invalidateAllCourseDetails,
+  invalidateCourseCollections,
+  removeDeletedCourseFromCache,
+} from "@/lib/query-keys";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CourseTableThumbnail } from "@/components/admin/course-table-thumbnail";
 import type { Course, CourseStatus } from "@/types";
 
 const statusColors: Record<string, string> = {
@@ -103,7 +109,8 @@ export default function CoursesPage() {
   const publishMutation = useMutation({
     mutationFn: (id: string) => adminApi.publishCourse(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      void invalidateCourseCollections(queryClient);
+      void invalidateAllCourseDetails(queryClient);
       toast({ title: "Course published successfully" });
     },
     onError: () => {
@@ -114,7 +121,8 @@ export default function CoursesPage() {
   const archiveMutation = useMutation({
     mutationFn: (id: string) => adminApi.archiveCourse(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      void invalidateCourseCollections(queryClient);
+      void invalidateAllCourseDetails(queryClient);
       toast({ title: "Course archived successfully" });
     },
     onError: () => {
@@ -126,7 +134,8 @@ export default function CoursesPage() {
     mutationFn: ({ id, featured }: { id: string; featured: boolean }) =>
       adminApi.featureCourse(id, featured),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      void invalidateCourseCollections(queryClient);
+      void invalidateAllCourseDetails(queryClient);
       toast({
         title: variables.featured
           ? "Course featured successfully"
@@ -141,7 +150,13 @@ export default function CoursesPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminApi.deleteCourse(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      if (courseToDelete) {
+        removeDeletedCourseFromCache(queryClient, {
+          id: courseToDelete._id,
+          slug: courseToDelete.slug,
+        });
+      }
+      void invalidateCourseCollections(queryClient);
       toast({ title: "Course deleted successfully" });
       setDeleteDialogOpen(false);
       setCourseToDelete(null);
@@ -400,17 +415,7 @@ export default function CoursesPage() {
                         </TableCell>
                         <TableCell className="max-w-[300px]">
                           <div className="flex items-center gap-4">
-                            <div className="h-12 w-16 border border-gray-200 bg-muted flex items-center justify-center overflow-hidden shrink-0">
-                              {course.thumbnail ? (
-                                <img
-                                  src={course.thumbnail}
-                                  alt={course.title}
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                <BookOpen className="h-5 w-5 text-gray-600" />
-                              )}
-                            </div>
+                            <CourseTableThumbnail course={course} />
                             <div className="min-w-0">
                               <p className="font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">
                                 {course.title}

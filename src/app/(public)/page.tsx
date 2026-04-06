@@ -35,7 +35,9 @@ export default function HomePage() {
     refetchInterval: 30000,
   });
 
-  const courses = coursesResponse?.data || [];
+  const courses = (coursesResponse?.data || []).filter(
+    (course): course is Course => Boolean(course?._id && course.title)
+  );
   const enrollments = enrollmentsResponse?.data || [];
   const liveSessions = liveSessionsResponse?.data || [];
 

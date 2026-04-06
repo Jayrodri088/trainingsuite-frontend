@@ -9,6 +9,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { LessonItem } from "./lesson-item";
 import type { Module, Lesson } from "@/types";
+import { cn } from "@/lib/utils";
 import { T, useT } from "@/components/t";
 
 export function CurriculumSidebar({
@@ -17,24 +18,33 @@ export function CurriculumSidebar({
   onSelectLesson,
   courseProgress,
   completedLessonIds,
-  courseSlug,
+  sheetLayout = false,
 }: {
   modules: Module[];
   currentLessonId: string | null;
   onSelectLesson: (lesson: Lesson) => void;
   courseProgress: number;
   completedLessonIds: Set<string>;
-  courseSlug: string;
+  /** When true, reserves space for the sheet close control so the progress % does not overlap it */
+  sheetLayout?: boolean;
 }) {
   const { t } = useT();
-  const defaultOpenModules = modules.map((m) => m._id);
+  const visibleModules = modules.filter((module) => ((module.lessons || []) as Lesson[]).length > 0);
+  const defaultOpenModules = visibleModules.map((m) => m._id);
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      <div className="p-3 sm:p-4 pt-14 lg:pt-4 border-b border-gray-200 shrink-0">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-sans font-medium text-black"><T>Course Progress</T></span>
-          <span className="text-sm text-gray-500">{courseProgress}%</span>
+      <div
+        className={cn(
+          "p-3 sm:p-4 pt-14 lg:pt-4 border-b border-gray-200 shrink-0",
+          sheetLayout && "pr-12 sm:pr-14"
+        )}
+      >
+        <div className="flex items-center justify-between gap-3 mb-2 min-w-0">
+          <span className="text-sm font-sans font-medium text-black min-w-0 truncate">
+            <T>Course Progress</T>
+          </span>
+          <span className="text-sm text-gray-500 shrink-0 tabular-nums">{courseProgress}%</span>
         </div>
         <Progress value={courseProgress} className="h-2" />
       </div>
@@ -42,7 +52,7 @@ export function CurriculumSidebar({
       <div className="flex-1 overflow-y-auto">
         <div className="p-3 sm:p-4">
           <Accordion type="multiple" defaultValue={defaultOpenModules} className="space-y-2">
-            {modules.map((module, moduleIndex) => {
+            {visibleModules.map((module, moduleIndex) => {
               const lessons = (module.lessons || []) as Lesson[];
               const completedLessonsCount = lessons.filter((l) => completedLessonIds.has(l._id)).length;
 
@@ -50,7 +60,7 @@ export function CurriculumSidebar({
                 <AccordionItem
                   key={module._id}
                   value={module._id}
-                  className="border border-gray-200 rounded-xl overflow-hidden bg-white"
+                  className="border border-gray-200 rounded-[12px] overflow-hidden bg-white"
                 >
                   <AccordionTrigger className="px-3 sm:px-4 py-3 hover:no-underline">
                     <div className="flex items-center gap-2 sm:gap-3 text-left min-w-0">
@@ -83,37 +93,6 @@ export function CurriculumSidebar({
               );
             })}
           </Accordion>
-        </div>
-      </div>
-
-      <div className="shrink-0 border-t border-gray-200 bg-white p-3 sm:p-4">
-        <div className="p-3 rounded-lg border border-gray-200 bg-gray-50 space-y-2">
-          <p className="text-xs font-sans font-semibold text-black">
-            <T>Course Quiz</T>
-          </p>
-          <p className="text-xs font-sans text-gray-600">
-            {courseProgress >= 100 ? (
-              <T>You have completed the course. You can now take the quiz.</T>
-            ) : (
-              <T>Complete the entire course to unlock the quiz.</T>
-            )}
-          </p>
-          <a
-            href={`/courses/${courseSlug}/quiz`}
-            className={`mt-1 inline-flex items-center justify-center w-full rounded-md px-3 py-1.5 text-xs font-sans font-semibold shadow-sm ${
-              courseProgress >= 100
-                ? "bg-[#0052CC] text-white hover:bg-[#003d99]"
-                : "bg-gray-200 text-gray-500 cursor-not-allowed"
-            }`}
-            aria-disabled={courseProgress < 100}
-            onClick={(e) => {
-              if (courseProgress < 100) {
-                e.preventDefault();
-              }
-            }}
-          >
-            <T>Take Quiz</T>
-          </a>
         </div>
       </div>
     </div>

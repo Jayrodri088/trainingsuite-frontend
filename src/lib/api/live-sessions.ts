@@ -1,5 +1,5 @@
 import { apiClient } from "./client";
-import type { ApiResponse, PaginatedResponse, LiveSession, LiveAttendance } from "@/types";
+import type { ApiResponse, PaginatedResponse, LiveSession, LiveAttendance, LiveSessionChatMessage } from "@/types";
 
 export interface LiveSessionReminder {
   _id: string;
@@ -108,6 +108,31 @@ export const liveSessionsApi = {
   removeReminder: async (sessionId: string) => {
     const response = await apiClient.delete<ApiResponse<null>>(
       `/live-sessions/${sessionId}/reminders`
+    );
+    return response.data;
+  },
+
+  getChatMessages: async (sessionId: string, options?: { limit?: number; after?: string }) => {
+    const params = new URLSearchParams();
+    if (options?.limit) params.set("limit", String(options.limit));
+    if (options?.after) params.set("after", options.after);
+    const response = await apiClient.get<PaginatedResponse<LiveSessionChatMessage>>(
+      `/live-sessions/${sessionId}/chat?${params.toString()}`
+    );
+    return response.data;
+  },
+
+  sendChatMessage: async (sessionId: string, message: string) => {
+    const response = await apiClient.post<ApiResponse<LiveSessionChatMessage>>(
+      `/live-sessions/${sessionId}/chat`,
+      { message }
+    );
+    return response.data;
+  },
+
+  deleteChatMessage: async (sessionId: string, messageId: string) => {
+    const response = await apiClient.delete<ApiResponse<null>>(
+      `/live-sessions/${sessionId}/chat/${messageId}`
     );
     return response.data;
   },

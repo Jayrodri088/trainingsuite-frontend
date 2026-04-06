@@ -1,16 +1,5 @@
 import { z } from "zod";
 
-export const REGISTRATION_NETWORKS = [
-  "REON",
-  "TNI",
-  "YOUTHS AGLOW",
-  "SAY YES TO KIDS",
-  "RIM",
-  "RIN",
-  "NOLB",
-  "REACHOUT CAMPAIGNS",
-] as const;
-
 export const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
@@ -27,9 +16,7 @@ export const registerSchema = z.object({
     .min(7, "Phone number is required")
     .max(25, "Phone number must be less than 25 characters")
     .regex(/^[+\d()\s-]+$/, "Please enter a valid phone number"),
-  network: z.enum(REGISTRATION_NETWORKS, {
-    message: "Please select your network",
-  }),
+  network: z.string().min(1, "Please select your network"),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import Image from "next/image";
@@ -37,9 +37,26 @@ import { SetReminderDialog } from "@/components/live-sessions/set-reminder-dialo
 import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { getInitials, normalizeUploadUrl } from "@/lib/utils";
 import type { LiveSession } from "@/types";
-import { format, parseISO, differenceInMinutes, formatDistanceToNow } from "date-fns";
+import {
+  format,
+  parseISO,
+  differenceInMinutes,
+  formatDistanceToNow,
+  addMinutes,
+  differenceInSeconds,
+} from "date-fns";
 import { T, useT } from "@/components/t";
 import { useAuth } from "@/hooks";
+
+/** API may still say "live" after scheduled start + duration — treat as over for UI */
+function isScheduledWindowOver(session: LiveSession): boolean {
+  const endAt = addMinutes(parseISO(session.scheduledAt), session.duration);
+  return differenceInSeconds(endAt, new Date()) <= 0;
+}
+
+function isLiveOnAir(session: LiveSession): boolean {
+  return session.status === "live" && !isScheduledWindowOver(session);
+}
 
 export default function LiveSessionsPage() {
   const { t } = useT();
@@ -47,6 +64,8 @@ export default function LiveSessionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
   const [reminderSessionId, setReminderSessionId] = useState<string | null>(null);
+  /** Re-render periodically so scheduled end moves sessions from live → past without a full refetch */
+  const [timeSync, setTimeSync] = useState(0);
 
   // Fetch upcoming sessions (scheduled + live)
   const { data: upcomingData, isLoading: isLoadingUpcoming } = useQuery({
@@ -66,11 +85,31 @@ export default function LiveSessionsPage() {
   const pastSessions = pastData?.data || [];
   const now = new Date();
 
-  const filteredSessions = (activeTab === "upcoming" ? upcomingSessions : pastSessions)
-    .filter((s) => s.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  // Sessions the API still lists as "live" but past scheduled end — show as ended and list under Past
+  // timeSync bumps every 1s so isScheduledWindowOver() picks up the real clock without refetching
+  void timeSync;
+  const staleLiveFromUpcoming = upcomingSessions.filter(
+    (s) => s.status === "live" && isScheduledWindowOver(s)
+  );
+  const upcomingDisplay = upcomingSessions.filter(
+    (s) => !staleLiveFromUpcoming.some((x) => x._id === s._id)
+  );
+  const pastIds = new Set(pastSessions.map((s) => s._id));
+  const pastDisplay = [...pastSessions, ...staleLiveFromUpcoming.filter((s) => !pastIds.has(s._id))].sort(
+    (a, b) => parseISO(b.scheduledAt).getTime() - parseISO(a.scheduledAt).getTime()
+  );
+
+  useEffect(() => {
+    const id = window.setInterval(() => setTimeSync((n) => n + 1), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const filteredSessions = (activeTab === "upcoming" ? upcomingDisplay : pastDisplay).filter((s) =>
+    s.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getStatusBadge = (session: LiveSession) => {
-    if (session.status === "live") {
+    if (isLiveOnAir(session)) {
       return (
         <Badge className="bg-red-600 animate-pulse">
           <span className="mr-1 h-2 w-2 rounded-full bg-white inline-block" />
@@ -86,6 +125,9 @@ export default function LiveSessionsPage() {
       }
       return <Badge className="bg-blue-600"><T>Scheduled</T></Badge>;
     }
+    if (session.status === "live" && isScheduledWindowOver(session)) {
+      return <Badge variant="secondary"><T>Ended</T></Badge>;
+    }
     if (session.status === "ended" && session.recordingUrl) {
       return <Badge variant="secondary"><T>Recording Available</T></Badge>;
     }
@@ -94,8 +136,11 @@ export default function LiveSessionsPage() {
 
   const getTimeDisplay = (session: LiveSession) => {
     const scheduledAt = parseISO(session.scheduledAt);
-    if (session.status === "live") {
+    if (isLiveOnAir(session)) {
       return t("Happening now");
+    }
+    if (session.status === "live" && isScheduledWindowOver(session)) {
+      return t("Scheduled time ended");
     }
     if (session.status === "scheduled") {
       const minutesUntil = differenceInMinutes(scheduledAt, now);
@@ -118,8 +163,8 @@ export default function LiveSessionsPage() {
       </div>
 
       {/* Live Now Banner */}
-      {upcomingSessions.some((s) => s.status === "live") && (() => {
-        const liveSession = upcomingSessions.find((s) => s.status === "live");
+      {upcomingSessions.some(isLiveOnAir) && (() => {
+        const liveSession = upcomingSessions.find(isLiveOnAir);
         return (
           <Card className="rounded-xl bg-linear-to-r from-red-600 to-red-500 text-white border-0 shadow-sm overflow-hidden">
             <CardContent className="py-6">
@@ -131,7 +176,7 @@ export default function LiveSessionsPage() {
                   <div>
                     <h3 className="font-semibold text-lg"><T>Sessions are live now!</T></h3>
                     <p className="text-red-100">
-                      {upcomingSessions.filter((s) => s.status === "live").length} <T>session(s) currently streaming</T>
+                      {upcomingSessions.filter(isLiveOnAir).length} <T>session(s) currently streaming</T>
                     </p>
                   </div>
                 </div>
@@ -154,10 +199,10 @@ export default function LiveSessionsPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="upcoming">
-              <T>Upcoming</T> ({upcomingSessions.length})
+              <T>Upcoming</T> ({upcomingDisplay.length})
             </TabsTrigger>
             <TabsTrigger value="past">
-              <T>Past Sessions</T> ({pastSessions.length})
+              <T>Past Sessions</T> ({pastDisplay.length})
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -215,7 +260,7 @@ export default function LiveSessionsPage() {
                 <div className="absolute top-3 left-3">
                   {getStatusBadge(session)}
                 </div>
-                {session.status === "live" && (
+                {isLiveOnAir(session) && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                     <Button size="lg" className="bg-red-600 hover:bg-red-700" asChild>
                       <Link href={`/live-sessions/${session._id}`}>
@@ -276,7 +321,7 @@ export default function LiveSessionsPage() {
               </CardContent>
 
               <CardFooter className="pt-0 flex flex-col gap-2">
-                {session.status === "live" ? (
+                {isLiveOnAir(session) ? (
                   <Button className="w-full rounded-lg bg-red-600 hover:bg-red-700" asChild>
                     <Link href={`/live-sessions/${session._id}`}>
                       <Play className="h-4 w-4 mr-2" />
@@ -410,7 +455,7 @@ export default function LiveSessionsPage() {
         <SetReminderDialog
           sessionId={reminderSessionId}
           sessionTitle={
-            (activeTab === "upcoming" ? upcomingSessions : pastSessions).find(
+            (activeTab === "upcoming" ? upcomingDisplay : pastDisplay).find(
               (s) => s._id === reminderSessionId
             )?.title
           }

@@ -7,12 +7,13 @@ import {
   Globe,
   Palette,
   CreditCard,
-  Shield,
+  Network,
   Save,
   Upload,
   Loader2,
   AlertTriangle,
-  Check,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,6 +51,7 @@ import type { SiteConfig, PaymentProvider, StreamProvider } from "@/types";
 export default function SettingsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [newNetwork, setNewNetwork] = useState("");
 
   const { data: configData, isLoading } = useQuery({
     queryKey: ["admin-config"],
@@ -73,6 +75,7 @@ export default function SettingsPage() {
     defaultPaymentProvider: "stripe",
     defaultStreamProvider: "youtube",
     contactEmail: "",
+    networks: [],
     socialLinks: {
       facebook: "",
       twitter: "",
@@ -84,9 +87,12 @@ export default function SettingsPage() {
   // Sync query data to local state for form editing
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    if (configData?.data) {
-      setSiteConfig(configData.data);
-    }
+    const next = configData?.data;
+    if (!next) return;
+    const timeoutId = window.setTimeout(() => {
+      setSiteConfig(next);
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
   }, [configData]);
 
   const updateConfigMutation = useMutation({
@@ -103,6 +109,32 @@ export default function SettingsPage() {
 
   const handleSaveSiteConfig = () => {
     updateConfigMutation.mutate(siteConfig);
+  };
+
+  const networks = siteConfig.networks || [];
+
+  const handleAddNetwork = () => {
+    const trimmed = newNetwork.trim();
+    if (!trimmed) return;
+    if (networks.some((network) => network.toLowerCase() === trimmed.toLowerCase())) {
+      toast({ title: "Network already exists", variant: "destructive" });
+      return;
+    }
+    setSiteConfig({ ...siteConfig, networks: [...networks, trimmed] });
+    setNewNetwork("");
+  };
+
+  const handleUpdateNetwork = (index: number, value: string) => {
+    const nextNetworks = [...networks];
+    nextNetworks[index] = value;
+    setSiteConfig({ ...siteConfig, networks: nextNetworks });
+  };
+
+  const handleRemoveNetwork = (index: number) => {
+    setSiteConfig({
+      ...siteConfig,
+      networks: networks.filter((_, networkIndex) => networkIndex !== index),
+    });
   };
 
   if (isLoading) {
@@ -161,6 +193,13 @@ export default function SettingsPage() {
           >
             <CreditCard className="h-3.5 w-3.5 mr-2" />
             Payments
+          </TabsTrigger>
+          <TabsTrigger
+            value="networks"
+            className="rounded-lg border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-2 mb-[-1px] font-bold uppercase text-xs tracking-wider"
+          >
+            <Network className="h-3.5 w-3.5 mr-2" />
+            Networks
           </TabsTrigger>
         </TabsList>
 
@@ -725,6 +764,75 @@ export default function SettingsPage() {
               </Button>
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="networks">
+          <Card className="rounded-xl border-gray-200 bg-white shadow-sm">
+            <CardHeader className="bg-muted/5 border-b border-gray-200">
+              <CardTitle className="font-sans font-bold text-black uppercase tracking-wide">Network Management</CardTitle>
+              <CardDescription>
+                Add, rename, or remove the ministry networks available across registration and admin forms.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8 p-6">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Input
+                  value={newNetwork}
+                  onChange={(e) => setNewNetwork(e.target.value)}
+                  placeholder="Add a new network"
+                  className="rounded-xl border-gray-200 bg-white shadow-sm"
+                />
+                <Button onClick={handleAddNetwork} className="rounded-lg sm:w-auto">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Network
+                </Button>
+              </div>
+
+              <div className="space-y-3">
+                {networks.length > 0 ? (
+                  networks.map((network, index) => (
+                    <div key={`${network}-${index}`} className="flex items-center gap-3">
+                      <Input
+                        value={network}
+                        onChange={(e) => handleUpdateNetwork(index, e.target.value)}
+                        className="rounded-xl border-gray-200 bg-white shadow-sm"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleRemoveNetwork(index)}
+                        className="rounded-xl border-gray-200"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No networks configured yet.</p>
+                )}
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <Button
+                  onClick={handleSaveSiteConfig}
+                  disabled={updateConfigMutation.isPending}
+                  className="rounded-lg"
+                >
+                  {updateConfigMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

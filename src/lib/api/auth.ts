@@ -96,8 +96,10 @@ export const authApi = {
   },
 
   logout: async () => {
-    const response = await apiClient.post<ApiResponse<null>>("/auth/signout");
-    return response.data;
+    return {
+      success: true,
+      data: null,
+    } satisfies ApiResponse<null>;
   },
 
   getSessions: async () => {

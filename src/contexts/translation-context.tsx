@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { getApiBaseUrl } from '@/lib/api/base-url';
 
 // Supported languages - comprehensive list
 export const SUPPORTED_LANGUAGES = [
@@ -262,7 +263,7 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
       // Process all chunks in parallel
       const results = await Promise.allSettled(
         chunks.map(async (chunk) => {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/translate`, {
+          const response = await fetch(`${getApiBaseUrl()}/translate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

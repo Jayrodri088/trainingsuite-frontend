@@ -1,23 +1,23 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Star, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { normalizeUploadUrl } from "@/lib/utils";
+import { coursePlaceholderGradientClass, normalizeUploadUrl } from "@/lib/utils";
 import type { Course, Enrollment } from "@/types";
 import { T, useT } from "@/components/t";
 
-const CARD_GRADIENTS = [
-  "bg-gradient-to-br from-violet-500 to-purple-600",
-  "bg-gradient-to-br from-amber-500 to-orange-600",
-  "bg-gradient-to-br from-emerald-500 to-teal-600",
-  "bg-gradient-to-br from-blue-500 to-indigo-600",
-  "bg-gradient-to-br from-pink-500 to-rose-600",
-  "bg-gradient-to-br from-cyan-500 to-blue-600",
-];
+function useOptionalThumbnail(src: string | undefined) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
+  return { show: Boolean(src) && !failed, onError: () => setFailed(true) };
+}
 
 export function getLanguageNamePublic(code: string, languages: { code: string; name: string }[]): string {
   const lang = languages.find((l) => l.code === code?.toLowerCase());
@@ -26,19 +26,19 @@ export function getLanguageNamePublic(code: string, languages: { code: string; n
 
 export function CourseCardPublic({
   course,
-  index,
   enrollment,
   viewMode = "grid",
   languages,
 }: {
   course: Course;
-  index: number;
   enrollment?: Enrollment;
   viewMode?: "grid" | "list";
   languages: { code: string; name: string }[];
 }) {
   const { t } = useT();
-  const gradient = CARD_GRADIENTS[index % CARD_GRADIENTS.length];
+  const thumbSrc = normalizeUploadUrl(course.thumbnail);
+  const thumb = useOptionalThumbnail(thumbSrc);
+  const gradient = coursePlaceholderGradientClass(course._id);
   const isEnrolled = !!enrollment;
   const progress = enrollment?.progress || 0;
   const isCompleted = enrollment?.status === "completed" || progress >= 100;
@@ -61,8 +61,13 @@ export function CourseCardPublic({
       <Link href={`/courses/${course.slug || course._id}`}>
         <Card className={cardClass + " flex flex-col sm:flex-row"}>
           <div className={`h-40 sm:h-auto sm:w-48 md:w-56 ${gradient} relative overflow-hidden shrink-0`}>
-            {normalizeUploadUrl(course.thumbnail) && (
-              <img src={normalizeUploadUrl(course.thumbnail)} alt={t(course.title)} className="absolute inset-0 w-full h-full object-cover" />
+            {thumb.show && thumbSrc && (
+              <img
+                src={thumbSrc}
+                alt={t(course.title)}
+                className="absolute inset-0 w-full h-full object-cover"
+                onError={thumb.onError}
+              />
             )}
             <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
             <div className="absolute top-3 left-3 flex gap-2 flex-wrap sm:hidden">
@@ -133,8 +138,13 @@ export function CourseCardPublic({
     <Link href={`/courses/${course.slug || course._id}`}>
       <Card className={cardClass + " h-full"}>
         <div className={`h-36 ${gradient} relative overflow-hidden`}>
-          {normalizeUploadUrl(course.thumbnail) && (
-            <img src={normalizeUploadUrl(course.thumbnail)} alt={t(course.title)} className="absolute inset-0 w-full h-full object-cover" />
+          {thumb.show && thumbSrc && (
+            <img
+              src={thumbSrc}
+              alt={t(course.title)}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={thumb.onError}
+            />
           )}
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
           <div className="absolute top-3 left-3 flex gap-2 flex-wrap">

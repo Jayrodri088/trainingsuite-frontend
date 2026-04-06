@@ -20,42 +20,40 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEnrollments } from "@/hooks";
+import { useEnrollments, useCourseThumbnail } from "@/hooks";
 import type { Enrollment, Course } from "@/types";
+import { cn } from "@/lib/utils";
 import { T, useT } from "@/components/t";
 
-const cardColors = [
-  "bg-violet-500/10 border-violet-500/20 text-violet-600",
-  "bg-amber-500/10 border-amber-500/20 text-amber-600",
-  "bg-emerald-500/10 border-emerald-500/20 text-emerald-600",
-  "bg-blue-500/10 border-blue-500/20 text-blue-600",
-  "bg-pink-500/10 border-pink-500/20 text-pink-600",
-  "bg-cyan-500/10 border-cyan-500/20 text-cyan-600",
-];
-
-function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: number }) {
+function CourseCard({ enrollment }: { enrollment: Enrollment }) {
   const { t } = useT();
   const course = typeof enrollment.course === "object" ? enrollment.course : null;
+  const thumb = useCourseThumbnail(course);
   const progress = enrollment.progress || 0;
   const isCompleted = progress >= 100;
-  const colorClass = cardColors[index % cardColors.length];
 
   if (!course) return null;
 
   return (
     <Link href={`/courses/${course.slug || course._id}/learn`}>
       <Card className="rounded-xl border-gray-200 group cursor-pointer h-full hover:border-gray-300 transition-colors bg-white shadow-sm overflow-hidden">
-        <div className={`h-32 ${colorClass} border-b border-gray-200 relative flex items-center justify-center overflow-hidden rounded-t-[12px]`}>
-          {course.thumbnail ? (
+        <div
+          className={cn(
+            "h-32 border-b border-gray-200 relative flex items-center justify-center overflow-hidden rounded-t-[12px]",
+            thumb.gradientClass
+          )}
+        >
+          {thumb.showImage && thumb.thumbSrc ? (
             <Image
-              src={course.thumbnail}
+              src={thumb.thumbSrc}
               alt={t(course.title)}
               fill
               className="object-cover"
               sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+              onError={thumb.onImageError}
             />
           ) : (
-            <PlayCircle className="h-10 w-10 opacity-50 group-hover:scale-110 group-hover:opacity-100 transition-all" />
+            <PlayCircle className="h-10 w-10 text-white/80 opacity-90 group-hover:scale-110 transition-all relative z-0" />
           )}
           <div className="absolute top-3 left-3">
             <Badge variant="secondary" className="rounded-lg text-[10px] font-semibold border-0 bg-white/90 text-gray-800 backdrop-blur-sm">
@@ -103,12 +101,12 @@ function CourseCard({ enrollment, index }: { enrollment: Enrollment; index: numb
   );
 }
 
-function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: number }) {
+function CourseListItem({ enrollment }: { enrollment: Enrollment }) {
   const { t } = useT();
   const course = typeof enrollment.course === "object" ? enrollment.course : null;
+  const thumb = useCourseThumbnail(course);
   const progress = enrollment.progress || 0;
   const isCompleted = progress >= 100;
-  const colorClass = cardColors[index % cardColors.length];
 
   if (!course) return null;
 
@@ -117,17 +115,23 @@ function CourseListItem({ enrollment, index }: { enrollment: Enrollment; index: 
       <Card className="rounded-xl border-gray-200 group hover:border-gray-300 transition-colors bg-white shadow-sm">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
-            <div className={`h-32 sm:h-24 w-full sm:w-36 ${colorClass} border border-gray-200 relative shrink-0 flex items-center justify-center overflow-hidden rounded-lg`}>
-              {course.thumbnail ? (
+            <div
+              className={cn(
+                "h-32 sm:h-24 w-full sm:w-36 border border-gray-200 relative shrink-0 flex items-center justify-center overflow-hidden rounded-lg",
+                thumb.gradientClass
+              )}
+            >
+              {thumb.showImage && thumb.thumbSrc ? (
                 <Image
-                  src={course.thumbnail}
+                  src={thumb.thumbSrc}
                   alt={t(course.title)}
                   fill
                   className="object-cover rounded-lg"
                   sizes="(min-width: 640px) 9rem, 100vw"
+                  onError={thumb.onImageError}
                 />
               ) : (
-                <PlayCircle className="h-8 w-8 opacity-50 group-hover:scale-110 group-hover:opacity-100 transition-all" />
+                <PlayCircle className="h-8 w-8 text-white/80 opacity-90 group-hover:scale-110 transition-all relative z-0" />
               )}
               {isCompleted && (
                 <div className="absolute top-1 right-1">
@@ -281,14 +285,14 @@ export default function MyCoursesPage() {
           ) : filteredEnrollments.length > 0 ? (
             viewMode === "grid" ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredEnrollments.map((enrollment, index) => (
-                  <CourseCard key={enrollment._id} enrollment={enrollment} index={index} />
+                {filteredEnrollments.map((enrollment) => (
+                  <CourseCard key={enrollment._id} enrollment={enrollment} />
                 ))}
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredEnrollments.map((enrollment, index) => (
-                  <CourseListItem key={enrollment._id} enrollment={enrollment} index={index} />
+                {filteredEnrollments.map((enrollment) => (
+                  <CourseListItem key={enrollment._id} enrollment={enrollment} />
                 ))}
               </div>
             )
@@ -318,14 +322,14 @@ export default function MyCoursesPage() {
           ) : activeEnrollments.length > 0 ? (
             viewMode === "grid" ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {activeEnrollments.map((enrollment, index) => (
-                  <CourseCard key={enrollment._id} enrollment={enrollment} index={index} />
+                {activeEnrollments.map((enrollment) => (
+                  <CourseCard key={enrollment._id} enrollment={enrollment} />
                 ))}
               </div>
             ) : (
               <div className="space-y-4">
-                {activeEnrollments.map((enrollment, index) => (
-                  <CourseListItem key={enrollment._id} enrollment={enrollment} index={index} />
+                {activeEnrollments.map((enrollment) => (
+                  <CourseListItem key={enrollment._id} enrollment={enrollment} />
                 ))}
               </div>
             )
@@ -353,14 +357,14 @@ export default function MyCoursesPage() {
           ) : completedEnrollments.length > 0 ? (
             viewMode === "grid" ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {completedEnrollments.map((enrollment, index) => (
-                  <CourseCard key={enrollment._id} enrollment={enrollment} index={index} />
+                {completedEnrollments.map((enrollment) => (
+                  <CourseCard key={enrollment._id} enrollment={enrollment} />
                 ))}
               </div>
             ) : (
               <div className="space-y-4">
-                {completedEnrollments.map((enrollment, index) => (
-                  <CourseListItem key={enrollment._id} enrollment={enrollment} index={index} />
+                {completedEnrollments.map((enrollment) => (
+                  <CourseListItem key={enrollment._id} enrollment={enrollment} />
                 ))}
               </div>
             )

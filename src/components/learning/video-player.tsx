@@ -34,18 +34,14 @@ export function LearningVideoPlayer({
   const videoRef = useRef<HTMLVideoElement>(null);
   const youtubePlayerRef = useRef<unknown>(null);
   const [ytApiLoaded, setYtApiLoaded] = useState(false);
-  const [videoPoster, setVideoPoster] = useState<string | undefined>(undefined);
+  const [generatedPosterUrl, setGeneratedPosterUrl] = useState<string | undefined>(undefined);
+  const [generatedPosterForVideoUrl, setGeneratedPosterForVideoUrl] = useState<string | null>(null);
   const lastSaveRef = useRef(0);
-
-  // Derive video poster from lesson URL
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => {
-    if (lesson?.videoUrl) {
-      setVideoPoster(getVideoThumbnail(lesson.videoUrl));
-    } else {
-      setVideoPoster(undefined);
-    }
-  }, [lessonId, lesson?.videoUrl]);
+  const basePoster = lesson?.videoUrl ? getVideoThumbnail(lesson.videoUrl) : undefined;
+  const videoPoster =
+    generatedPosterForVideoUrl === lesson?.videoUrl
+      ? generatedPosterUrl
+      : basePoster;
 
   // Load YouTube API script
   // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -113,7 +109,7 @@ export function LearningVideoPlayer({
     }
   }, [lessonId]);
 
-  const handleLoadedData = useCallback(() => {
+  const handleLoadedData = () => {
     if (!videoRef.current || videoPoster) return;
     const v = videoRef.current;
     const embedUrl = lesson?.videoUrl ? getVideoEmbedUrl(lesson.videoUrl).embedUrl : "";
@@ -131,7 +127,8 @@ export function LearningVideoPlayer({
           const ctx = canvas.getContext("2d");
           if (ctx) {
             ctx.drawImage(temp, 0, 0, canvas.width, canvas.height);
-            setVideoPoster(canvas.toDataURL("image/jpeg", 0.8));
+            setGeneratedPosterForVideoUrl(lesson?.videoUrl || null);
+            setGeneratedPosterUrl(canvas.toDataURL("image/jpeg", 0.8));
           }
         } catch {
           // ignore
@@ -141,7 +138,7 @@ export function LearningVideoPlayer({
       { once: true }
     );
     temp.addEventListener("error", () => temp.remove(), { once: true });
-  }, [lesson?.videoUrl, videoPoster]);
+  };
 
   if (!lesson) {
     return (

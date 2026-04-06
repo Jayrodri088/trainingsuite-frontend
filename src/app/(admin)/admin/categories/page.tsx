@@ -67,6 +67,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCategories } from "@/hooks";
 import { useToast } from "@/hooks/use-toast";
 import { categoriesApi } from "@/lib/api/categories";
+import { CategoryIconGlyph } from "@/components/admin/category-icon";
+import { CategoryIconField } from "@/components/admin/category-icon-field";
 import type { Category } from "@/types";
 
 export default function CategoriesPage() {
@@ -263,20 +265,12 @@ export default function CategoriesPage() {
                         </button>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="h-10 w-10 border border-gray-200 flex items-center justify-center bg-muted/30"
-                          >
-                            {category.icon ? (
-                              <span className="text-lg">{category.icon}</span>
-                            ) : (
-                              <FolderTree
-                                className="h-5 w-5 text-gray-600"
-                              />
-                            )}
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="h-10 w-10 shrink-0 border border-gray-200 flex items-center justify-center bg-muted/30 rounded-lg overflow-hidden">
+                            <CategoryIconGlyph icon={category.icon} />
                           </div>
-                          <div>
-                            <p className="font-semibold text-sm">{category.name}</p>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-sm truncate">{category.name}</p>
                             <p className="text-[10px] font-mono text-gray-600 uppercase tracking-wide">
                               /{category.slug}
                             </p>
@@ -533,17 +527,7 @@ function CategoryDialogForm({
               className="rounded-xl border-gray-200 bg-white shadow-sm resize-none"
             />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="icon" className="text-xs font-bold uppercase tracking-wider text-gray-600">Icon (emoji)</Label>
-            <Input
-              id="icon"
-              value={icon}
-              onChange={(e) => setIcon(e.target.value)}
-              placeholder="e.g., 💻"
-              maxLength={4}
-              className="rounded-xl border-gray-200 bg-white shadow-sm"
-            />
-          </div>
+          <CategoryIconField id="category-icon" value={icon} onChange={setIcon} />
           <div className="flex items-center justify-between p-4 border border-gray-200 bg-muted/5">
             <div>
               <Label htmlFor="active" className="text-xs font-bold uppercase tracking-wider">Active Status</Label>
@@ -584,7 +568,7 @@ function CategoryDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] rounded-xl border-gray-200 bg-white shadow-sm">
+      <DialogContent className="sm:max-w-[560px] max-h-[min(90vh,920px)] overflow-y-auto rounded-xl border-gray-200 bg-white shadow-sm">
         {open && (
           <CategoryDialogForm
             key={category?._id ?? "new"}

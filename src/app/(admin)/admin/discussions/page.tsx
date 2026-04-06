@@ -61,6 +61,7 @@ import { PageLoader } from "@/components/ui/page-loader";
 import { useToast } from "@/hooks/use-toast";
 import { forumsApi } from "@/lib/api/forums";
 import { coursesApi } from "@/lib/api/courses";
+import { isExistingCourse } from "@/lib/course-utils";
 import type { Forum } from "@/types";
 import { format, parseISO } from "date-fns";
 
@@ -122,6 +123,20 @@ export default function AdminDiscussionsPage() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => forumsApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-forums"] });
+      queryClient.invalidateQueries({ queryKey: ["forums"] });
+      setDeleteDialogOpen(false);
+      setSelectedForum(null);
+      toast({ title: "Forum deleted successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete forum", variant: "destructive" });
+    },
+  });
+
   const resetForm = () => {
     setFormData({
       title: "",
@@ -157,8 +172,8 @@ export default function AdminDiscussionsPage() {
     }
   };
 
-  const forums = forumsData?.data || [];
-  const courses = coursesData?.data || [];
+  const forums = (forumsData?.data || []).filter((forum) => forum.isGeneral || !!forum.course);
+  const courses = (coursesData?.data || []).filter(isExistingCourse);
 
   const filteredForums = forums.filter((forum) => {
     const matchesSearch = forum.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -492,12 +507,12 @@ export default function AdminDiscussionsPage() {
             <Button
               className="bg-destructive hover:bg-destructive/90 rounded-lg text-destructive-foreground"
               onClick={() => {
-                setDeleteDialogOpen(false);
-                setSelectedForum(null);
-                toast({ title: "Forum deleted successfully" });
+                if (!selectedForum) return;
+                deleteMutation.mutate(selectedForum._id);
               }}
+              disabled={deleteMutation.isPending}
             >
-              Delete Permanently
+              {deleteMutation.isPending ? "Deleting..." : "Delete Permanently"}
             </Button>
           </DialogFooter>
         </DialogContent>

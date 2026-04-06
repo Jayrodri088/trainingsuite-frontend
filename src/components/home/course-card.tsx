@@ -1,11 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Course, Enrollment } from "@/types";
-import { normalizeUploadUrl } from "@/lib/utils";
+import { cn, coursePlaceholderGradientClass, normalizeUploadUrl } from "@/lib/utils";
 import { T, useT } from "@/components/t";
 
 export function CourseCard({ course, enrollment }: { course: Course; enrollment?: Enrollment }) {
@@ -15,18 +16,30 @@ export function CourseCard({ course, enrollment }: { course: Course; enrollment?
   const isCompleted = enrollment?.status === "completed" || progress >= 100;
   const isPaidCourse = (course.price || 0) > 0;
 
-  const thumbnailSrc = normalizeUploadUrl(course.thumbnail) || "/Images/course.png";
+  const thumbnailSrc = normalizeUploadUrl(course.thumbnail);
+  const [thumbFailed, setThumbFailed] = useState(false);
+  useEffect(() => {
+    setThumbFailed(false);
+  }, [thumbnailSrc]);
 
   return (
     <Link href={`/courses/${course.slug || course._id}`} className="block h-full group">
       <div className="h-full flex flex-col bg-white border border-gray-200 rounded-xl overflow-hidden transition-colors hover:border-gray-300">
-        <div className="relative aspect-video bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-xl">
-          <Image
-            src={thumbnailSrc}
-            alt={t(course.title)}
-            fill
-            className="object-cover"
-          />
+        <div
+          className={cn(
+            "relative aspect-video overflow-hidden rounded-t-xl",
+            coursePlaceholderGradientClass(course._id)
+          )}
+        >
+          {thumbnailSrc && !thumbFailed && (
+            <Image
+              src={thumbnailSrc}
+              alt={t(course.title)}
+              fill
+              className="object-cover"
+              onError={() => setThumbFailed(true)}
+            />
+          )}
         </div>
 
         <div className="flex flex-col flex-1 p-5">

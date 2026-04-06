@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -43,7 +43,7 @@ import { useToast } from "@/hooks/use-toast";
 import { coursesApi } from "@/lib/api/courses";
 import { enrollmentsApi } from "@/lib/api/enrollments";
 import { paymentsApi } from "@/lib/api/payments";
-import { normalizeUploadUrl } from "@/lib/utils";
+import { cn, coursePlaceholderGradientClass, normalizeUploadUrl } from "@/lib/utils";
 import type { Course, Module, Lesson, Rating } from "@/types";
 import { T, useT } from "@/components/t";
 
@@ -65,7 +65,7 @@ function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean })
       <div className="flex items-center gap-3">
         <div className="text-gray-500">{getIcon()}</div>
         <span className="text-sm">{t(lesson.title)}</span>
-        {lesson.isFree && !isLocked && (
+        {lesson.isFree && (
           <Badge variant="outline" className="text-xs">
             <T>Preview</T>
           </Badge>
@@ -85,6 +85,10 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
   const { t } = useT();
   const lessons = (module.lessons || []) as Lesson[];
   const totalDuration = lessons.reduce((acc, lesson) => acc + (lesson.duration || 0), 0);
+
+  if (lessons.length === 0) {
+    return null;
+  }
 
   return (
     <AccordionItem value={module._id} className="border rounded-lg px-4">
@@ -107,7 +111,7 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
             <LessonItem
               key={lesson._id}
               lesson={lesson}
-              isLocked={!isEnrolled}
+              isLocked={!isEnrolled && !lesson.isFree}
             />
           ))}
         </div>
@@ -288,8 +292,16 @@ export default function CourseDetailPage({
   const { t } = useT();
   const { toast } = useToast();
   const { user, isAuthenticated } = useAuth();
-  const { data: courseResponse, isLoading: courseLoading } = useCourse(resolvedParams.slug);
-  const { data: curriculumResponse, isLoading: curriculumLoading } = useCourseCurriculum(resolvedParams.slug);
+  const {
+    data: courseResponse,
+    isLoading: courseLoading,
+    isError: courseError,
+  } = useCourse(resolvedParams.slug);
+  const {
+    data: curriculumResponse,
+    isLoading: curriculumLoading,
+    isError: curriculumError,
+  } = useCourseCurriculum(resolvedParams.slug);
   const { data: ratingsResponse } = useCourseRatings(resolvedParams.slug);
 
   // Check enrollment status - need course ID, so wait for course to load
@@ -316,9 +328,13 @@ export default function CourseDetailPage({
   });
 
   const isEnrolled = !!enrollmentResponse;
-  const enrollmentProgress = enrollmentResponse?.progress || 0;
-  const isCompleted = enrollmentResponse?.status === "completed" || enrollmentProgress >= 100;
 
+  const coursePreview = courseResponse?.data as Course | undefined;
+  const heroThumbnailSrc = normalizeUploadUrl(coursePreview?.thumbnail);
+  const [heroThumbFailed, setHeroThumbFailed] = useState(false);
+  useEffect(() => {
+    setHeroThumbFailed(false);
+  }, [heroThumbnailSrc, coursePreview?._id]);
 
   // Enrollment mutation
   const enrollMutation = useMutation({
@@ -417,7 +433,7 @@ export default function CourseDetailPage({
 
   const course = courseResponse?.data;
 
-  if (!course) {
+  if (courseError || curriculumError || !course?._id || !course.title) {
     return (
       <div className="container max-w-6xl py-12 sm:py-16 px-4 sm:px-6 text-center">
         <h1 className="text-xl sm:text-2xl font-bold"><T>Course not found</T></h1>
@@ -434,7 +450,23 @@ export default function CourseDetailPage({
 
   const curriculumData = curriculumResponse?.data as { curriculum?: Module[] } | undefined;
   const modules = (curriculumData?.curriculum || []) as Module[];
+  const visibleModules = modules.filter((module) => ((module.lessons || []) as Lesson[]).length > 0);
   const ratings = (ratingsResponse?.data || []) as Rating[];
+
+  if (visibleModules.length === 0) {
+    return (
+      <div className="container max-w-6xl py-12 sm:py-16 px-4 sm:px-6 text-center">
+        <h1 className="text-xl sm:text-2xl font-bold"><T>Course not currently available</T></h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-2">
+          <T>This course does not currently have any learner-visible content.</T>
+        </p>
+        <Button className="mt-4 sm:mt-6" onClick={() => router.push("/courses")}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          <T>Back to Courses</T>
+        </Button>
+      </div>
+    );
+  }
 
   // Find user's existing review
   const userReview = user
@@ -460,11 +492,20 @@ export default function CourseDetailPage({
     queryClient.invalidateQueries({ queryKey: ["course", resolvedParams.slug] });
   };
 
-  const totalLessons = modules.reduce(
+  const totalLessons = visibleModules.reduce(
     (acc, module) => acc + ((module.lessons as Lesson[])?.length || 0),
     0
   );
-  const totalDuration = modules.reduce(
+  const visibleLessons = visibleModules.flatMap((module) => (module.lessons || []) as Lesson[]);
+  const visibleLessonIds = new Set(visibleLessons.map((lesson) => lesson._id));
+  const completedVisibleLessons = (enrollmentResponse?.completedLessons || []).filter((lessonId) =>
+    visibleLessonIds.has(lessonId)
+  ).length;
+  const enrollmentProgress = visibleLessons.length > 0
+    ? Math.min(100, Math.round((completedVisibleLessons / visibleLessons.length) * 100))
+    : 0;
+  const isCompleted = enrollmentResponse?.status === "completed" || enrollmentProgress >= 100;
+  const totalDuration = visibleModules.reduce(
     (acc, module) =>
       acc +
       ((module.lessons as Lesson[])?.reduce(
@@ -553,14 +594,20 @@ export default function CourseDetailPage({
             {/* Enrollment Card – rounded corners, clear border */}
             <div className="lg:row-span-2 order-2 lg:order-2">
               <Card className="lg:sticky lg:top-24 rounded-xl border border-white/20 bg-slate-800/90 shadow-xl overflow-hidden">
-                <div className="aspect-video bg-slate-900 rounded-t-[12px] relative overflow-hidden">
-                  {normalizeUploadUrl(course.thumbnail) && (
+                <div
+                  className={cn(
+                    "aspect-video rounded-t-[12px] relative overflow-hidden",
+                    coursePlaceholderGradientClass(course._id)
+                  )}
+                >
+                  {heroThumbnailSrc && !heroThumbFailed && (
                     <Image
-                      src={normalizeUploadUrl(course.thumbnail)!}
+                      src={heroThumbnailSrc}
                       alt={t(course.title)}
                       fill
                       className="object-cover"
                       sizes="(min-width: 1024px) 33vw, 100vw"
+                      onError={() => setHeroThumbFailed(true)}
                     />
                   )}
                 </div>
@@ -651,14 +698,14 @@ export default function CourseDetailPage({
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                       <CardTitle className="text-base sm:text-lg"><T>Course Content</T></CardTitle>
                       <p className="text-xs sm:text-sm text-gray-600">
-                        {modules.length} <T>modules</T> &bull; {totalLessons} <T>lessons</T>{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
+                        {visibleModules.length} <T>modules</T> &bull; {totalLessons} <T>lessons</T>{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
                       </p>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0 px-4 sm:px-6">
-                    {modules.length > 0 ? (
+                    {visibleModules.length > 0 ? (
                       <Accordion type="multiple" className="space-y-3">
-                        {modules.map((module, index) => (
+                        {visibleModules.map((module, index) => (
                           <ModuleAccordion
                             key={module._id}
                             module={module}
@@ -844,6 +891,35 @@ export default function CourseDetailPage({
   );
 }
 
+function RelatedCourseThumbnail({ course }: { course: Course }) {
+  const { t } = useT();
+  const src = normalizeUploadUrl(course.thumbnail);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
+
+  return (
+    <div
+      className={cn(
+        "aspect-video rounded-t-[12px] relative overflow-hidden",
+        coursePlaceholderGradientClass(course._id)
+      )}
+    >
+      {src && !failed && (
+        <Image
+          src={src}
+          alt={t(course.title)}
+          fill
+          className="object-cover"
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          onError={() => setFailed(true)}
+        />
+      )}
+    </div>
+  );
+}
+
 // Related Courses Component
 function RelatedCourses({
   categoryId,
@@ -864,6 +940,7 @@ function RelatedCourses({
   });
 
   const relatedCourses = (relatedResponse?.data || [])
+    .filter((course: Course) => Boolean(course?._id && course.title))
     .filter((course: Course) => course._id !== currentCourseId)
     .slice(0, 4);
 
@@ -886,21 +963,7 @@ function RelatedCourses({
             {relatedCourses.map((course: Course) => (
               <Link key={course._id} href={`/courses/${course.slug}`}>
                 <Card className="overflow-hidden rounded-xl hover:shadow-lg transition-shadow h-full">
-                  <div className="aspect-video rounded-t-[12px] bg-gray-100 relative overflow-hidden">
-                    {normalizeUploadUrl(course.thumbnail) ? (
-                      <Image
-                        src={normalizeUploadUrl(course.thumbnail)!}
-                        alt={t(course.title)}
-                        fill
-                        className="object-cover"
-                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <BookOpen className="h-10 w-10 text-white/60" />
-                      </div>
-                    )}
-                  </div>
+                  <RelatedCourseThumbnail course={course} />
                   <CardContent className="p-3 sm:p-4">
                     <h3 className="font-semibold line-clamp-2 mb-2 text-sm sm:text-base">{t(course.title)}</h3>
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-2">

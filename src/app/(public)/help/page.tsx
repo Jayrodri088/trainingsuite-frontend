@@ -1,11 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { HelpCircle, MessageSquare, BookOpen, LogIn } from "lucide-react";
+import { HelpCircle, MessageSquare, BookOpen, LogIn, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks";
 import { T } from "@/components/t";
 
 export default function HelpPage() {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const loggedIn = Boolean(isAuthenticated && user);
+  const sessionPending = isLoading && !user;
+
   return (
     <div className="min-h-screen bg-white">
       <section className="py-14 sm:py-20 border-b border-gray-200">
@@ -14,7 +19,13 @@ export default function HelpPage() {
             <T>Help Center</T>
           </h1>
           <p className="font-sans text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
-            <T>Find answers, get in touch, or sign in to access your dashboard and training progress.</T>
+            {sessionPending ? (
+              <T>Find answers, get in touch, and access training resources.</T>
+            ) : loggedIn ? (
+              <T>Find answers, get in touch, or open your dashboard to continue your training.</T>
+            ) : (
+              <T>Find answers, get in touch, or sign in to access your dashboard and training progress.</T>
+            )}
           </p>
         </div>
       </section>
@@ -62,14 +73,38 @@ export default function HelpPage() {
             </Link>
           </div>
 
-          <div className="mt-12 text-center">
-            <p className="font-sans text-gray-600 mb-4"><T>Already have an account? Sign in to access your dashboard and help resources.</T></p>
-            <Button asChild size="lg" className="rounded-lg h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold">
-              <Link href="/login" className="inline-flex items-center gap-2">
-                <LogIn className="h-4 w-4" />
-                <T>Sign In</T>
-              </Link>
-            </Button>
+          <div className="mt-12 text-center min-h-[5.5rem]">
+            {sessionPending ? (
+              <div
+                className="mx-auto h-11 max-w-xs rounded-lg bg-gray-100 animate-pulse"
+                aria-busy
+                aria-label="Loading"
+              />
+            ) : loggedIn ? (
+              <>
+                <p className="font-sans text-gray-600 mb-4">
+                  <T>Need your learner tools? Open your dashboard anytime.</T>
+                </p>
+                <Button asChild size="lg" className="rounded-lg h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold">
+                  <Link href="/dashboard" className="inline-flex items-center gap-2">
+                    <LayoutDashboard className="h-4 w-4" />
+                    <T>Go to dashboard</T>
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <p className="font-sans text-gray-600 mb-4">
+                  <T>Already have an account? Sign in to access your dashboard and help resources.</T>
+                </p>
+                <Button asChild size="lg" className="rounded-lg h-11 px-8 bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold">
+                  <Link href="/login" className="inline-flex items-center gap-2">
+                    <LogIn className="h-4 w-4" />
+                    <T>Sign In</T>
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </section>

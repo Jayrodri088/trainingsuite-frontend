@@ -7,6 +7,7 @@ export { certificatesApi } from "./certificates";
 export { notificationsApi } from "./notifications";
 export { forumsApi } from "./forums";
 export { liveSessionsApi } from "./live-sessions";
+export { liveSessionChatApi } from "./live-session-chat";
 export { categoriesApi } from "./categories";
 export { adminApi } from "./admin";
 export { announcementsApi } from "./announcements";

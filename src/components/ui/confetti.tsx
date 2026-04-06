@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useEffect } from "react";
+import confetti from "canvas-confetti";
 
 interface ConfettiProps {
   active: boolean;
@@ -9,105 +9,47 @@ interface ConfettiProps {
   className?: string;
 }
 
-interface Particle {
-  id: number;
-  x: number;
-  y: number;
-  rotation: number;
-  color: string;
-  size: number;
-  velocityX: number;
-  velocityY: number;
-  animationDuration: number;
-  animationDelay: number;
-}
-
-const colors = [
-  "#8b5cf6", // violet
-  "#a855f7", // purple
-  "#f59e0b", // amber
-  "#10b981", // emerald
-  "#3b82f6", // blue
-  "#ef4444", // red
-  "#ec4899", // pink
-  "#14b8a6", // teal
-];
-
-export function Confetti({ active, duration = 3000, className }: ConfettiProps) {
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const [isVisible, setIsVisible] = useState(false);
-
-  // Generate particles when animation becomes active
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+export function Confetti({ active, duration = 3000 }: ConfettiProps) {
   useEffect(() => {
-    if (active) {
-      setIsVisible(true);
-
-      // Generate particles with pre-computed animation values
-      const newParticles: Particle[] = [];
-      for (let i = 0; i < 150; i++) {
-        newParticles.push({
-          id: i,
-          x: Math.random() * 100,
-          y: -10 - Math.random() * 20,
-          rotation: Math.random() * 360,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          size: 6 + Math.random() * 8,
-          velocityX: (Math.random() - 0.5) * 4,
-          velocityY: 2 + Math.random() * 4,
-          animationDuration: 2 + Math.random(),
-          animationDelay: Math.random() * 0.5,
-        });
-      }
-      setParticles(newParticles);
-
-      // Hide after duration
-      const timeout = setTimeout(() => {
-        setIsVisible(false);
-        setParticles([]);
-      }, duration);
-
-      return () => clearTimeout(timeout);
+    if (!active) {
+      return;
     }
+
+    const animationEnd = Date.now() + duration;
+    const defaults = {
+      startVelocity: 28,
+      spread: 360,
+      ticks: 70,
+      zIndex: 50,
+      disableForReducedMotion: true,
+    };
+
+    const interval = window.setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) {
+        window.clearInterval(interval);
+        return;
+      }
+
+      const particleCount = Math.max(12, Math.round(50 * (timeLeft / duration)));
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: Math.random() * 0.2 + 0.1, y: Math.random() - 0.2 },
+      });
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: Math.random() * 0.2 + 0.7, y: Math.random() - 0.2 },
+      });
+    }, 250);
+
+    return () => {
+      window.clearInterval(interval);
+    };
   }, [active, duration]);
 
-  if (!isVisible) return null;
-
-  return (
-    <div
-      className={cn(
-        "fixed inset-0 pointer-events-none overflow-hidden z-50",
-        className
-      )}
-    >
-      {particles.map((particle) => (
-        <div
-          key={particle.id}
-          className="absolute animate-confetti"
-          style={{
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
-            backgroundColor: particle.color,
-            transform: `rotate(${particle.rotation}deg)`,
-            animation: `confetti-fall ${particle.animationDuration}s linear forwards`,
-            animationDelay: `${particle.animationDelay}s`,
-          }}
-        />
-      ))}
-      <style jsx>{`
-        @keyframes confetti-fall {
-          0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(100vh) rotate(720deg);
-            opacity: 0;
-          }
-        }
-      `}</style>
-    </div>
-  );
+  return null;
 }

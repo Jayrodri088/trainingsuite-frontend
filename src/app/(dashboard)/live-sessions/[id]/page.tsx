@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "next/navigation";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import {
   Video,
@@ -14,6 +14,7 @@ import {
   Bell,
   CheckCircle,
   Radio,
+  Timer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +28,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PageLoader } from "@/components/ui/page-loader";
 import { SetReminderDialog } from "@/components/live-sessions/set-reminder-dialog";
+import { LiveSessionChat } from "@/components/live-sessions/live-session-chat";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks";
@@ -34,32 +36,44 @@ import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { getInitials } from "@/lib/utils";
 import { LivestreamPlayer, detectStreamType } from "@/components/livestream";
 import type { LiveSession, ApiError } from "@/types";
-import { format, parseISO, differenceInSeconds, isPast } from "date-fns";
+import { format, parseISO, differenceInSeconds, isPast, addMinutes } from "date-fns";
 import { T, useT } from "@/components/t";
+
+function formatTimeLeftToFinish(totalSeconds: number): string {
+  if (totalSeconds <= 0) return "";
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 24) {
+    const days = Math.floor(hours / 24);
+    return `${days}d ${hours % 24}h ${minutes}m`;
+  }
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+  return `${minutes}m ${seconds}s`;
+}
 
 export default function LiveSessionDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const { toast } = useToast();
   const { t } = useT();
-  const queryClient = useQueryClient();
   const sessionId = params.id as string;
   const auth = useAuth();
   const [countdown, setCountdown] = useState<string | null>(null);
+  /** Bumps once per second so scheduled end and time-left labels stay accurate */
+  const [timeSync, setTimeSync] = useState(0);
   const [hasJoined, setHasJoined] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [showReminderDialog, setShowReminderDialog] = useState(false);
+  const hasRefetchedAfterStartTime = useRef(false);
+  const hasRefetchedAfterScheduledEnd = useRef(false);
 
   const { data: sessionData, isLoading, refetch } = useQuery({
     queryKey: ["live-session", sessionId],
     queryFn: () => liveSessionsApi.getById(sessionId),
-    // Refetch every 10 seconds if session is live (for attendee count) or scheduled and time is close
-    refetchInterval: (query) => {
-      const session = query.state.data?.data;
-      if (session?.status === "live") return 10000; // Poll every 10s when live
-      if (shouldRefresh) return 10000; // Poll when close to start time
-      return false;
-    },
+    // Polling is handled in useEffect so we can speed up after scheduled end time
+    refetchInterval: false,
   });
 
   const joinMutation = useMutation({
@@ -80,6 +94,18 @@ export default function LiveSessionDetailPage() {
   });
 
   const session = sessionData?.data;
+  const scheduledEndAt = session
+    ? addMinutes(parseISO(session.scheduledAt), session.duration)
+    : null;
+  const secondsToScheduledEnd =
+    session && scheduledEndAt
+      ? differenceInSeconds(scheduledEndAt, new Date())
+      : 0;
+  const pastScheduledEnd = session && scheduledEndAt ? secondsToScheduledEnd <= 0 : false;
+
+  useEffect(() => {
+    hasRefetchedAfterStartTime.current = false;
+  }, [sessionId, session?.scheduledAt]);
 
   // Auto-join when session is live (silent join without toast)
   useEffect(() => {
@@ -100,7 +126,6 @@ export default function LiveSessionDetailPage() {
   }, [session?.status, sessionId, hasJoined, refetch]);
 
   // Countdown timer for scheduled sessions
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (!session) return;
     
@@ -123,8 +148,11 @@ export default function LiveSessionDetailPage() {
       if (diffSeconds <= 0) {
         setCountdown(null);
         setShouldRefresh(true);
-        // Immediately refetch to check if session is now live
-        refetch();
+        // Trigger a single immediate refetch when the scheduled time is reached.
+        if (!hasRefetchedAfterStartTime.current) {
+          hasRefetchedAfterStartTime.current = true;
+          refetch();
+        }
         return;
       }
 
@@ -147,9 +175,53 @@ export default function LiveSessionDetailPage() {
       }
     };
 
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
+    const initialTick = window.setTimeout(updateCountdown, 0);
+    const interval = window.setInterval(updateCountdown, 1000);
+    return () => {
+      window.clearTimeout(initialTick);
+      window.clearInterval(interval);
+    };
+  }, [session, refetch]);
+
+  useEffect(() => {
+    hasRefetchedAfterScheduledEnd.current = false;
+  }, [sessionId, session?.scheduledAt, session?.duration]);
+
+  // One immediate refetch when the scheduled end (start + duration) is reached — server may still say "live"
+  useEffect(() => {
+    if (!session) return;
+    if (session.status === "ended" || session.status === "cancelled") return;
+    const endAt = addMinutes(parseISO(session.scheduledAt), session.duration);
+    const past = differenceInSeconds(endAt, new Date()) <= 0;
+    if (past && !hasRefetchedAfterScheduledEnd.current) {
+      hasRefetchedAfterScheduledEnd.current = true;
+      refetch();
+    }
+  }, [session, timeSync, refetch]);
+
+  // Poll session while live / near start / past scheduled end until status catches up
+  useEffect(() => {
+    if (!session) return;
+    if (session.status === "ended" || session.status === "cancelled") return;
+
+    let intervalMs: number | false = false;
+    if (session.status === "live" && pastScheduledEnd) intervalMs = 5000;
+    else if (session.status === "live") intervalMs = 10000;
+    else if (shouldRefresh) intervalMs = 10000;
+    else if (pastScheduledEnd) intervalMs = 5000;
+
+    if (!intervalMs) return;
+
+    const id = window.setInterval(() => refetch(), intervalMs);
+    return () => window.clearInterval(id);
+  }, [session, pastScheduledEnd, shouldRefresh, refetch]);
+
+  // Re-render once per second while the session might still be active (for time-left and scheduled-end)
+  useEffect(() => {
+    if (!session) return;
+    if (session.status === "ended" || session.status === "cancelled") return;
+    const id = window.setInterval(() => setTimeSync((n) => n + 1), 1000);
+    return () => window.clearInterval(id);
   }, [session]);
 
   if (isLoading) {
@@ -225,6 +297,29 @@ export default function LiveSessionDetailPage() {
       const streamType = detectStreamType(videoUrl);
       const isLive = session.status === "live" || (session.status === "scheduled" && isScheduledTimePassed);
 
+      // Scheduled window is over but API may still say live — stop the player and prompt refresh
+      if (pastScheduledEnd && session.status !== "ended") {
+        return (
+          <div className="aspect-video bg-slate-900 rounded-lg flex flex-col items-center justify-center px-6 text-center text-white">
+            <Video className="h-16 w-16 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium"><T>Scheduled session time has ended</T></p>
+            <p className="mt-2 max-w-md text-sm text-white/75">
+              <T>
+                Playback has stopped at the scheduled end time. Refresh to check if the session status has updated.
+              </T>
+            </p>
+            <Button
+              type="button"
+              variant="secondary"
+              className="mt-6"
+              onClick={() => refetch()}
+            >
+              <T>Refresh status</T>
+            </Button>
+          </div>
+        );
+      }
+
       return (
         <div className="relative">
           <LivestreamPlayer
@@ -232,7 +327,6 @@ export default function LiveSessionDetailPage() {
             title={session.title}
             isLive={isLive}
             autoplay={isLive}
-            muted={isLive}
             controls={true}
             onReady={() => {
               // If we're playing and status is still scheduled, it means auto-start worked
@@ -327,7 +421,7 @@ export default function LiveSessionDetailPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {(session.status === "scheduled" || session.status === "live") && auth?.user && (
+          {session.status === "scheduled" && auth?.user && (
             <Button
               variant="outline"
               size="sm"
@@ -403,6 +497,8 @@ export default function LiveSessionDetailPage() {
               )}
             </CardContent>
           </Card>
+
+          <LiveSessionChat session={session} currentUser={auth.user} />
         </div>
 
         {/* Sidebar */}
@@ -433,6 +529,25 @@ export default function LiveSessionDetailPage() {
                   </div>
                 </div>
               )}
+              <div className="flex items-center gap-3">
+                <Timer className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">
+                    {session.status === "ended" ? (
+                      <T>Ended</T>
+                    ) : session.status === "cancelled" ? (
+                      <T>Cancelled</T>
+                    ) : pastScheduledEnd ? (
+                      <T>Scheduled time ended</T>
+                    ) : (
+                      formatTimeLeftToFinish(secondsToScheduledEnd) || "—"
+                    )}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    <T>Time left to finish</T>
+                  </p>
+                </div>
+              </div>
               <div className="flex items-center gap-3">
                 <Users className="h-5 w-5 text-muted-foreground" />
                 <div>

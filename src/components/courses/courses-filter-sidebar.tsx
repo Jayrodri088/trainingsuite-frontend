@@ -5,9 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { CourseFilters } from "@/types";
 import { T, useT } from "@/components/t";
-import { REGISTRATION_NETWORKS } from "@/lib/validations/auth";
-
-export const COURSE_NETWORKS = [...REGISTRATION_NETWORKS];
 
 export const COURSE_LANGUAGES = [
   { code: "en", name: "English" },
@@ -36,10 +33,12 @@ export function CoursesFilterSidebar({
   filters,
   setFilters,
   categories,
+  networks,
 }: {
   filters: CourseFilters;
   setFilters: (filters: CourseFilters) => void;
   categories: { _id: string; name: string }[];
+  networks?: string[];
 }) {
   const { t } = useT();
 
@@ -73,7 +72,7 @@ export function CoursesFilterSidebar({
       <div>
         <h4 className="font-sans font-semibold text-sm text-black mb-3"><T>Network</T></h4>
         <div className="space-y-3">
-          {COURSE_NETWORKS.map((network) => (
+          {(networks || []).map((network) => (
             <label
               key={network}
               className="flex items-center gap-3 cursor-pointer py-1"

@@ -73,6 +73,17 @@ import { adminApi } from "@/lib/api/admin";
 import { getInitials, formatDate } from "@/lib/utils";
 import type { User, UserRole } from "@/types";
 
+type AdminUsersQueryData = {
+  data: User[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasMore: boolean;
+  };
+};
+
 const roleColors: Record<string, string> = {
   admin: "bg-red-100 text-red-800",
   instructor: "bg-blue-100 text-blue-800",
@@ -127,6 +138,22 @@ export default function UsersPage() {
 
   const users = usersResponse?.data || [];
   const pagination = usersResponse?.pagination;
+
+  const updateUserInAdminUsersCache = (updatedUser: User) => {
+    queryClient.setQueriesData(
+      { queryKey: ["admin-users"] },
+      (oldData: AdminUsersQueryData | undefined) => {
+        if (!oldData?.data) return oldData;
+
+        return {
+          ...oldData,
+          data: oldData.data.map((user) =>
+            user._id === updatedUser._id ? { ...user, ...updatedUser } : user
+          ),
+        };
+      }
+    );
+  };
 
   // Update user mutation
   const updateUserMutation = useMutation({
@@ -224,7 +251,8 @@ export default function UsersPage() {
   // Waive portal access payment
   const waivePortalAccessMutation = useMutation({
     mutationFn: (id: string) => adminApi.waivePortalAccess(id),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      updateUserInAdminUsersCache(response.data);
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       toast({ title: "Portal access granted. User can now access the app." });
     },
@@ -235,6 +263,22 @@ export default function UsersPage() {
 
   const handleWaivePortalAccess = (userId: string) => {
     waivePortalAccessMutation.mutate(userId);
+  };
+
+  const revokePortalAccessMutation = useMutation({
+    mutationFn: (id: string) => adminApi.revokePortalAccess(id),
+    onSuccess: (response) => {
+      updateUserInAdminUsersCache(response.data);
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast({ title: "Portal access revoked. User must complete portal access again." });
+    },
+    onError: () => {
+      toast({ title: "Failed to revoke portal access", variant: "destructive" });
+    },
+  });
+
+  const handleRevokePortalAccess = (userId: string) => {
+    revokePortalAccessMutation.mutate(userId);
   };
 
   const handleExport = async () => {
@@ -627,7 +671,7 @@ export default function UsersPage() {
                                   Verify User
                                 </DropdownMenuItem>
                               )}
-                              {!user.portalAccessPaidAt && (
+                              {!user.portalAccessPaidAt ? (
                                 <DropdownMenuItem
                                   onClick={() => handleWaivePortalAccess(user._id)}
                                   disabled={waivePortalAccessMutation.isPending}
@@ -639,6 +683,19 @@ export default function UsersPage() {
                                     <Banknote className="h-4 w-4 mr-2" />
                                   )}
                                   Waive portal payment
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  onClick={() => handleRevokePortalAccess(user._id)}
+                                  disabled={revokePortalAccessMutation.isPending}
+                                  className="rounded-lg cursor-pointer"
+                                >
+                                  {revokePortalAccessMutation.isPending ? (
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  ) : (
+                                    <CircleDollarSign className="h-4 w-4 mr-2" />
+                                  )}
+                                  Revoke portal access
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator />

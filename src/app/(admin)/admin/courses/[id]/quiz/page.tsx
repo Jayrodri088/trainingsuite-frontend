@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PageLoader } from "@/components/ui/page-loader";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/utils";
 import { T, useT } from "@/components/t";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -62,7 +63,7 @@ export default function AdminCourseQuizPage({
     const quiz = quizResponse?.data as CourseQuiz | undefined;
     if (quiz?.questions && quiz.questions.length > 0) {
       setQuestions(
-        quiz.questions.map((q: any) => ({
+        quiz.questions.map((q) => ({
           question: q.question,
           options: q.options,
           correctOptionIndex: q.correctOptionIndex ?? 0,
@@ -81,12 +82,8 @@ export default function AdminCourseQuizPage({
     onSuccess: () => {
       toast({ title: t("Quiz saved successfully") });
     },
-    onError: (error: any) => {
-      const message =
-        error?.response?.data?.error ||
-        error?.response?.data?.message ||
-        t("Failed to save quiz");
-      toast({ title: message, variant: "destructive" });
+    onError: (error: unknown) => {
+      toast({ title: getErrorMessage(error) || t("Failed to save quiz"), variant: "destructive" });
     },
   });
 
@@ -319,4 +316,3 @@ export default function AdminCourseQuizPage({
     </div>
   );
 }
-

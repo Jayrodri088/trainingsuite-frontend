@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
@@ -44,8 +44,10 @@ import { PageLoader } from "@/components/ui/page-loader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { forumsApi } from "@/lib/api/forums";
+import { categoriesApi } from "@/lib/api/categories";
+import { coursesApi } from "@/lib/api/courses";
 import { getInitials } from "@/lib/utils";
-import type { Forum, ForumPost, User } from "@/types";
+import type { Forum, ForumPost, User, Category, Course } from "@/types";
 import { formatDistanceToNow, parseISO } from "date-fns";
 
 type SortOption = "recent" | "popular" | "unanswered";
@@ -58,7 +60,12 @@ function CommunityPageContent() {
   const [selectedForum, setSelectedForum] = useState<string>("all");
   const [sortBy, setSortBy] = useState<SortOption>("recent");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newPost, setNewPost] = useState({ title: "", content: "", forumId: "" });
+  const [newPost, setNewPost] = useState({
+    title: "",
+    question: "",
+    details: "",
+    topicValue: "none",
+  });
   // Track optimistic updates - maps postId to optimistic liked state (true = liked, false = unliked)
   const [optimisticLikes, setOptimisticLikes] = useState<Map<string, boolean>>(new Map());
 
@@ -69,6 +76,36 @@ function CommunityPageContent() {
   });
 
   const forums = forumsData?.data || [];
+
+  const { data: categoriesData } = useQuery({
+    queryKey: ["categories"],
+    queryFn: categoriesApi.getAll,
+  });
+
+  const { data: coursesData } = useQuery({
+    queryKey: ["community-topic-courses"],
+    queryFn: () => coursesApi.getAll({ status: "published", limit: 100, sort: "title", order: "asc" }),
+  });
+
+  const categories = categoriesData?.data || [];
+  const courses = coursesData?.data || [];
+
+  const topicOptions = useMemo(() => {
+    const forumOptions = forums.map((forum) => ({
+      value: `forum:${forum._id}`,
+      label: forum.title,
+    }));
+    const categoryOptions = categories.map((category: Category) => ({
+      value: `category:${category._id}`,
+      label: `Subject: ${category.name}`,
+    }));
+    const courseOptions = courses.map((course: Course) => ({
+      value: `course:${course._id}`,
+      label: `Course: ${course.title}`,
+    }));
+
+    return [...categoryOptions, ...courseOptions, ...forumOptions];
+  }, [forums, categories, courses]);
 
   // Fetch posts from all forums
   const { data: allPostsData, isLoading: postsLoading } = useQuery({
@@ -144,12 +181,30 @@ function CommunityPageContent() {
 
   // Create post mutation
   const createPostMutation = useMutation({
-    mutationFn: (data: { title: string; content: string; forumId: string }) =>
-      forumsApi.createPost(data.forumId, { title: data.title, content: data.content }),
+    mutationFn: (data: {
+      title: string;
+      question: string;
+      details?: string;
+      topicValue: string;
+    }) => {
+      const [topicType, topicId] =
+        data.topicValue && data.topicValue !== "none"
+          ? data.topicValue.split(":")
+          : [undefined, undefined];
+
+      return forumsApi.createCommunityPost({
+        title: data.title,
+        question: data.question,
+        details: data.details || undefined,
+        topicType: topicType as "forum" | "course" | "category" | undefined,
+        topicId,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all-forum-posts"] });
+      queryClient.invalidateQueries({ queryKey: ["forums"] });
       setDialogOpen(false);
-      setNewPost({ title: "", content: "", forumId: "" });
+      setNewPost({ title: "", question: "", details: "", topicValue: "none" });
       toast({ title: t("Question posted successfully!") });
     },
     onError: () => {
@@ -159,8 +214,8 @@ function CommunityPageContent() {
 
   const handleSubmitPost = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPost.title.trim() || !newPost.content.trim() || !newPost.forumId) {
-      toast({ title: t("Please fill in all fields"), variant: "destructive" });
+    if (!newPost.title.trim() || !newPost.question.trim()) {
+      toast({ title: t("Please fill in the title and question"), variant: "destructive" });
       return;
     }
     createPostMutation.mutate(newPost);
@@ -418,39 +473,52 @@ function CommunityPageContent() {
           <form onSubmit={handleSubmitPost}>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="forum"><T>Topic</T></Label>
-                <Select value={newPost.forumId} onValueChange={(v) => setNewPost({ ...newPost, forumId: v })}>
+                <Label htmlFor="forum"><T>Topic</T> <span className="text-muted-foreground">(<T>optional</T>)</span></Label>
+                <Select value={newPost.topicValue} onValueChange={(v) => setNewPost({ ...newPost, topicValue: v })}>
                   <SelectTrigger>
-                    <SelectValue placeholder={t("Select a topic")} />
+                    <SelectValue placeholder={t("Choose a subject or course")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {forums.map((forum) => (
-                      <SelectItem key={forum._id} value={forum._id}>
-                        {forum.title}
+                    <SelectItem value="none">
+                      {t("No topic (general community)")}
+                    </SelectItem>
+                    {topicOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="title"><T>Question</T></Label>
+                <Label htmlFor="title"><T>Title</T></Label>
                 <Input
                   id="title"
                   value={newPost.title}
                   onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                  placeholder={t("What would you like to know?")}
+                  placeholder={t("Give your post a clear title")}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="content"><T>Details</T></Label>
+                <Label htmlFor="question"><T>Question</T></Label>
+                <Textarea
+                  id="question"
+                  value={newPost.question}
+                  onChange={(e) => setNewPost({ ...newPost, question: e.target.value })}
+                  placeholder={t("What would you like to ask the community?")}
+                  rows={3}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="content"><T>Details</T> <span className="text-muted-foreground">(<T>optional</T>)</span></Label>
                 <Textarea
                   id="content"
-                  value={newPost.content}
-                  onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                  value={newPost.details}
+                  onChange={(e) => setNewPost({ ...newPost, details: e.target.value })}
                   placeholder={t("Provide more context or details...")}
                   rows={5}
-                  required
                 />
               </div>
             </div>

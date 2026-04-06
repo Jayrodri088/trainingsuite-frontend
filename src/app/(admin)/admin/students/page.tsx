@@ -39,6 +39,7 @@ import { Progress } from "@/components/ui/progress";
 import { PageLoader } from "@/components/ui/page-loader";
 import { adminApi } from "@/lib/api/admin";
 import { coursesApi } from "@/lib/api/courses";
+import { isExistingCourse } from "@/lib/course-utils";
 import { getInitials } from "@/lib/utils";
 import type { EnrollmentWithCourse, Course, User } from "@/types";
 import { format, parseISO } from "date-fns";
@@ -58,8 +59,10 @@ export default function AdminStudentsPage() {
     queryFn: () => adminApi.getEnrollments(1, 100),
   });
 
-  const courses = coursesData?.data || [];
-  const enrollments = (enrollmentsData?.data || []) as EnrollmentWithCourse[];
+  const courses = (coursesData?.data || []).filter(isExistingCourse);
+  const enrollments = ((enrollmentsData?.data || []) as EnrollmentWithCourse[]).filter((enrollment) =>
+    isExistingCourse(enrollment.course as Course | null | undefined)
+  );
 
   // Filter enrollments
   const filteredEnrollments = enrollments.filter((enrollment: EnrollmentWithCourse) => {

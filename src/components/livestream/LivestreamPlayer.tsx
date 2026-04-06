@@ -2,12 +2,12 @@
 
 import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
+import type { ComponentType } from "react";
 import { Video, ExternalLink, AlertCircle, Loader2, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 // Dynamically import ReactPlayer to avoid SSR issues
- 
 const ReactPlayer = dynamic(() => import("react-player"), {
   ssr: false,
   loading: () => (
@@ -15,7 +15,7 @@ const ReactPlayer = dynamic(() => import("react-player"), {
       <Loader2 className="h-8 w-8 animate-spin text-white/50" />
     </div>
   ),
-}) as any;
+}) as ComponentType<Record<string, unknown>>;
 
 export type StreamType = 
   | "youtube" 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getApiOrigin } from '@/lib/api/base-url';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -8,7 +9,7 @@ const BACKEND_URLS = [
   // Internal Docker network (if containers are on same network)
   process.env.INTERNAL_BACKEND_URL,
   // External URL
-  'https://apis.movortech.com',
+  getApiOrigin(),
 ];
 
 /**

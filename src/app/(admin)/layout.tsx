@@ -10,6 +10,7 @@ import {
   FolderTree,
   BarChart3,
   Settings,
+  Network,
   Bell,
   ChevronLeft,
   ChevronRight,
@@ -111,9 +112,31 @@ const adminNavSections = [
         href: "/admin/settings",
         icon: Settings,
       },
+      {
+        label: "Networks",
+        href: "/admin/networks",
+        icon: Network,
+      },
     ],
   },
 ];
+
+/** Sidebar active state: avoid /admin/courses matching /admin/courses/new (both would highlight). */
+function isAdminNavItemActive(pathname: string, href: string): boolean {
+  if (pathname === href) return true;
+  if (href === "/admin") {
+    return pathname === "/admin";
+  }
+  if (href === "/admin/courses/new") {
+    return pathname === "/admin/courses/new" || pathname.startsWith("/admin/courses/new/");
+  }
+  if (href === "/admin/courses") {
+    if (!pathname.startsWith("/admin/courses")) return false;
+    if (pathname === "/admin/courses/new" || pathname.startsWith("/admin/courses/new/")) return false;
+    return true;
+  }
+  return href !== "/admin" && pathname.startsWith(`${href}/`);
+}
 
 export default function AdminLayout({
   children,
@@ -233,8 +256,7 @@ export default function AdminLayout({
                 )}
                 <div className="space-y-1">
                   {section.items.map((item) => {
-                    const isActive = pathname === item.href ||
-                      (item.href !== "/admin" && pathname.startsWith(item.href));
+                    const isActive = isAdminNavItemActive(pathname, item.href);
                     const Icon = item.icon;
 
                     return (
@@ -306,10 +328,8 @@ export default function AdminLayout({
             <h1 className="text-base sm:text-lg font-sans font-bold text-black truncate">
               {adminNavSections
                 .flatMap((section) => section.items)
-                .find((item) =>
-                  pathname === item.href ||
-                  (item.href !== "/admin" && pathname.startsWith(item.href))
-                )?.label || "Dashboard"}
+                .filter((item) => isAdminNavItemActive(pathname, item.href))
+                .sort((a, b) => b.href.length - a.href.length)[0]?.label || "Dashboard"}
             </h1>
           </div>
 

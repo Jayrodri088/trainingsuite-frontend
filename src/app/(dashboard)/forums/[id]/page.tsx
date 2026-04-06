@@ -41,6 +41,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -72,6 +82,7 @@ export default function ForumDetailPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newPost, setNewPost] = useState({ title: "", content: "" });
+  const [postToDelete, setPostToDelete] = useState<ForumPost | null>(null);
 
   const { data: forumData, isLoading: forumLoading } = useQuery({
     queryKey: ["forum", forumId],
@@ -106,6 +117,8 @@ export default function ForumDetailPage() {
     mutationFn: (postId: string) => forumsApi.deletePost(postId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["forum-posts", forumId] });
+      queryClient.invalidateQueries({ queryKey: ["all-forum-posts"] });
+      setPostToDelete(null);
       toast({ title: t("Post deleted") });
     },
     onError: (err) => {
@@ -307,9 +320,7 @@ export default function ForumDetailPage() {
                           className="text-destructive focus:text-destructive cursor-pointer"
                           onClick={(e) => {
                             e.preventDefault();
-                            if (confirm(t("Delete this post? This cannot be undone."))) {
-                              deletePostMutation.mutate(post._id);
-                            }
+                            setPostToDelete(post);
                           }}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
@@ -376,6 +387,30 @@ export default function ForumDetailPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!postToDelete} onOpenChange={(open) => !open && setPostToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle><T>Delete post?</T></AlertDialogTitle>
+            <AlertDialogDescription>
+              <T>This will permanently delete this discussion. This action cannot be undone.</T>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel><T>Cancel</T></AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (postToDelete) {
+                  deletePostMutation.mutate(postToDelete._id);
+                }
+              }}
+            >
+              {deletePostMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <T>Delete</T>}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useCallback } from "react";
+import { use, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -67,13 +67,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { PageLoader } from "@/components/ui/page-loader";
 import { useToast } from "@/hooks/use-toast";
+import { adminApi } from "@/lib/api/admin";
 import { coursesApi, UpdateCourseData } from "@/lib/api/courses";
 import { modulesApi, lessonsApi, CreateModuleData, CreateLessonData } from "@/lib/api/lessons";
 import { categoriesApi } from "@/lib/api/categories";
 import { uploadApi } from "@/lib/api/upload";
 import { getVideoDuration } from "@/lib/utils";
 import type { Module, Lesson, CourseLevel, Material, ApiError } from "@/types";
-import { REGISTRATION_NETWORKS } from "@/lib/validations/auth";
+
+const NO_NETWORK_VALUE = "__no_network__";
 
 export default function AdminCourseEditorPage({
   params,
@@ -109,6 +111,7 @@ export default function AdminCourseEditorPage({
 
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [durationLoading, setDurationLoading] = useState(false);
+  const [newObjective, setNewObjective] = useState("");
 
   // Auto-extract video duration when URL changes
   const extractVideoDuration = useCallback(async (url: string) => {
@@ -143,12 +146,18 @@ export default function AdminCourseEditorPage({
     queryKey: ["categories"],
     queryFn: () => categoriesApi.getAll(),
   });
+  const { data: configData } = useQuery({
+    queryKey: ["admin-config"],
+    queryFn: adminApi.getConfig,
+  });
 
   // Mutations
   const updateCourseMutation = useMutation({
-    mutationFn: (data: UpdateCourseData) => coursesApi.update(courseId, data),
-    onSuccess: () => {
+    mutationFn: (data: UpdateCourseData) => adminApi.updateCourse(courseId, data),
+    onSuccess: (response) => {
+      queryClient.setQueryData(["course", courseId], response);
       queryClient.invalidateQueries({ queryKey: ["course", courseId] });
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
       toast({ title: "Course updated successfully" });
     },
     onError: () => {
@@ -315,6 +324,16 @@ export default function AdminCourseEditorPage({
   const curriculumData = curriculumResponse?.data as { course?: { _id: string; title: string; duration: number }; curriculum?: Module[] } | undefined;
   const modules = (curriculumData?.curriculum || []) as Module[];
   const categories = categoriesData?.data || [];
+  const networks = configData?.data?.networks || [];
+
+  const networkSelectOptions = useMemo(() => {
+    const fromConfig = [...networks];
+    const current = course?.network?.trim();
+    if (current && !fromConfig.includes(current)) {
+      return [current, ...fromConfig];
+    }
+    return fromConfig;
+  }, [networks, course?.network]);
 
   const isLoading = courseLoading || curriculumLoading;
 
@@ -333,6 +352,15 @@ export default function AdminCourseEditorPage({
       // Invalid URL, return as-is
     }
     return url;
+  };
+
+  const handleAddObjective = () => {
+    const trimmed = newObjective.trim();
+    if (!trimmed || !course) return;
+    updateCourseMutation.mutate({
+      objectives: [...(course.objectives || []), trimmed],
+    });
+    setNewObjective("");
   };
 
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -862,16 +890,25 @@ export default function AdminCourseEditorPage({
                 <div className="space-y-2">
                   <Label>Network</Label>
                   <Select
-                    value={course.network ?? ""}
+                    value={
+                      course.network?.trim()
+                        ? course.network.trim()
+                        : NO_NETWORK_VALUE
+                    }
                     onValueChange={(value) =>
-                      updateCourseMutation.mutate({ network: value || undefined })
+                      updateCourseMutation.mutate({
+                        network: value === NO_NETWORK_VALUE ? null : value,
+                      })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select network (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      {REGISTRATION_NETWORKS.map((net) => (
+                      <SelectItem value={NO_NETWORK_VALUE}>
+                        No network
+                      </SelectItem>
+                      {networkSelectOptions.map((net) => (
                         <SelectItem key={net} value={net}>
                           {net}
                         </SelectItem>
@@ -880,6 +917,56 @@ export default function AdminCourseEditorPage({
                   </Select>
                 </div>
               </div>
+
+              <div className="space-y-3">
+                <div>
+                  <Label>Course outcomes</Label>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Shown under &quot;Course Outcomes&quot; on the public course Overview tab.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={newObjective}
+                    onChange={(e) => setNewObjective(e.target.value)}
+                    placeholder="e.g. Understand the basics of…"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddObjective();
+                      }
+                    }}
+                  />
+                  <Button type="button" variant="secondary" onClick={handleAddObjective}>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                {(course.objectives || []).length > 0 && (
+                  <ul className="space-y-2">
+                    {(course.objectives || []).map((obj, index) => (
+                      <li
+                        key={`${index}-${obj.slice(0, 24)}`}
+                        className="flex items-center justify-between gap-2 p-2 border rounded-lg"
+                      >
+                        <span className="text-sm">{obj}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() =>
+                            updateCourseMutation.mutate({
+                              objectives: (course.objectives || []).filter((_, i) => i !== index),
+                            })
+                          }
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
               <div className="space-y-4 rounded-lg border p-4">
                 <div className="flex items-center justify-between">
                   <div>

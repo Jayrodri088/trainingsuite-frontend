@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, Suspense, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { Search, Filter, Grid3X3, List, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useCourses, useCategories, useEnrollments } from "@/hooks";
+import { adminApi } from "@/lib/api/admin";
 import type { Course, CourseFilters, Enrollment } from "@/types";
 import { T, useT } from "@/components/t";
 import { CourseCardPublic } from "@/components/courses/course-card-public";
@@ -54,9 +56,16 @@ function CoursesContent() {
 
   const { data: categoriesResponse } = useCategories();
   const { data: enrollmentsResponse } = useEnrollments();
+  const { data: configResponse } = useQuery({
+    queryKey: ["site-config"],
+    queryFn: adminApi.getConfig,
+  });
 
-  const courses = coursesResponse?.data || [];
+  const courses = ((coursesResponse?.data || []) as Course[]).filter(
+    (course) => Boolean(course?._id && course.title)
+  );
   const categories = categoriesResponse?.data || [];
+  const networks = configResponse?.data?.networks || [];
 
   const enrollmentMap = useMemo(() => {
   const enrollments = enrollmentsResponse?.data || [];
@@ -126,7 +135,7 @@ function CoursesContent() {
                   <SheetTitle className="font-sans font-bold text-black"><T>Filters</T></SheetTitle>
               </SheetHeader>
               <div className="mt-6 overflow-y-auto max-h-[calc(100vh-120px)]">
-                  <CoursesFilterSidebar filters={filters} setFilters={setFilters} categories={categories} />
+                  <CoursesFilterSidebar filters={filters} setFilters={setFilters} categories={categories} networks={networks} />
               </div>
             </SheetContent>
           </Sheet>
@@ -180,7 +189,7 @@ function CoursesContent() {
                   </Badge>
                 )}
               </div>
-              <CoursesFilterSidebar filters={filters} setFilters={setFilters} categories={categories} />
+              <CoursesFilterSidebar filters={filters} setFilters={setFilters} categories={categories} networks={networks} />
           </div>
         </aside>
 
@@ -211,11 +220,10 @@ function CoursesContent() {
                   : "flex flex-col gap-8"
               }
             >
-                {courses.map((course: Course, index: number) => (
+                {courses.map((course: Course) => (
                   <CourseCardPublic
                   key={course._id}
                   course={course}
-                  index={index}
                   enrollment={enrollmentMap.get(course._id)}
                   viewMode={viewMode}
                     languages={COURSE_LANGUAGES}

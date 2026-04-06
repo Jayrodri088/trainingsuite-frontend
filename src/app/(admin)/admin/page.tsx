@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/table";
 import { adminApi } from "@/lib/api/admin";
 import { coursesApi } from "@/lib/api/courses";
+import { CourseTableThumbnail } from "@/components/admin/course-table-thumbnail";
 import type { OverviewAnalytics, Course } from "@/types";
 
 interface StatCardProps {
@@ -272,17 +273,7 @@ export default function AdminDashboardPage() {
                     <TableRow key={course._id} className="border-gray-200 hover:bg-gray-50">
                       <TableCell className="pl-6 py-4">
                         <div className="flex items-center gap-4">
-                          <div className="h-12 w-16 bg-muted flex items-center justify-center overflow-hidden border border-gray-200 rounded-lg">
-                            {course.thumbnail ? (
-                              <img
-                                src={course.thumbnail}
-                                alt={course.title}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <BookOpen className="h-5 w-5 text-gray-600" />
-                            )}
-                          </div>
+                          <CourseTableThumbnail course={course} />
                           <div>
                             <p className="font-medium line-clamp-1">{course.title}</p>
                             <Badge variant={course.status === "published" ? "default" : "secondary"} className="mt-1 rounded-lg text-[10px] h-5 font-semibold">

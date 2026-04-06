@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -25,13 +25,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { registerSchema, REGISTRATION_NETWORKS, type RegisterFormData } from "@/lib/validations/auth";
-import { authApi } from "@/lib/api";
+import { registerSchema, type RegisterFormData } from "@/lib/validations/auth";
+import { adminApi, authApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AxiosError } from "axios";
 import { T, useT } from "@/components/t";
+import { useQuery } from "@tanstack/react-query";
 
 interface ValidationErrors {
   [key: string]: string[];
@@ -52,6 +53,11 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const { data: configData } = useQuery({
+    queryKey: ["site-config"],
+    queryFn: adminApi.getConfig,
+  });
+  const networks = (configData?.data?.networks || []).filter(Boolean);
 
   const passwordRequirements = [
     { id: "length", label: t("At least 8 characters"), test: (p: string) => p.length >= 8 },
@@ -66,11 +72,17 @@ export default function RegisterPage() {
       name: "",
       email: "",
       phone: "",
-      network: REGISTRATION_NETWORKS[0],
+      network: "",
       password: "",
       confirmPassword: "",
     },
   });
+
+  useEffect(() => {
+    if (!form.getValues("network") && networks[0]) {
+      form.setValue("network", networks[0], { shouldDirty: false, shouldValidate: false });
+    }
+  }, [form, networks]);
 
   const password = form.watch("password");
 
@@ -225,7 +237,7 @@ export default function RegisterPage() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {REGISTRATION_NETWORKS.map((network) => (
+                    {networks.map((network) => (
                       <SelectItem key={network} value={network}>
                         {network}
                       </SelectItem>
@@ -236,6 +248,12 @@ export default function RegisterPage() {
               </FormItem>
             )}
           />
+          {networks.length === 0 && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{t("No networks have been configured yet. Please contact an administrator.")}</AlertDescription>
+            </Alert>
+          )}
 
           <FormField
             control={form.control}

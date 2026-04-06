@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Save,
@@ -34,14 +34,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi, CreateCourseData } from "@/lib/api/courses";
+import { adminApi } from "@/lib/api/admin";
 import { categoriesApi } from "@/lib/api/categories";
 import { uploadApi } from "@/lib/api/upload";
+import { invalidateCourseCollections } from "@/lib/query-keys";
 import type { CourseLevel } from "@/types";
-import { REGISTRATION_NETWORKS } from "@/lib/validations/auth";
 
 export default function AdminCreateCoursePage() {
   const router = useRouter();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState<CreateCourseData>({
     title: "",
@@ -71,10 +73,15 @@ export default function AdminCreateCoursePage() {
     queryKey: ["categories"],
     queryFn: () => categoriesApi.getAll(),
   });
+  const { data: configData } = useQuery({
+    queryKey: ["admin-config"],
+    queryFn: adminApi.getConfig,
+  });
 
   const createMutation = useMutation({
     mutationFn: (data: CreateCourseData) => coursesApi.create(data),
     onSuccess: (response) => {
+      void invalidateCourseCollections(queryClient);
       toast({ title: "Course created successfully", variant: "success" });
       if (response?.data?._id) {
         router.push(`/admin/courses/${response.data._id}`);
@@ -88,6 +95,7 @@ export default function AdminCreateCoursePage() {
   });
 
   const categories = categoriesData?.data || [];
+  const networks = configData?.data?.networks || [];
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -310,7 +318,7 @@ export default function AdminCreateCoursePage() {
                         <SelectValue placeholder="Select network (optional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        {REGISTRATION_NETWORKS.map((net) => (
+                        {networks.map((net) => (
                           <SelectItem key={net} value={net}>
                             {net}
                           </SelectItem>
