@@ -1,24 +1,32 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { LiveSessionCard } from "./live-session-card";
 import { LiveSessionCardSkeleton } from "./live-session-card";
 import type { LiveSession } from "@/types";
+import { isLiveOnAir } from "@/lib/live-session-utils";
 import { T } from "@/components/t";
 
 interface LiveSessionsSectionProps {
   sessions: LiveSession[];
   isLoading: boolean;
-  hasLiveNow: boolean;
 }
 
-export function LiveSessionsSection({
-  sessions,
-  isLoading,
-  hasLiveNow,
-}: LiveSessionsSectionProps) {
+export function LiveSessionsSection({ sessions, isLoading }: LiveSessionsSectionProps) {
+  const [timeSync, setTimeSync] = useState(0);
+
+  useEffect(() => {
+    if (!sessions.length) return;
+    const id = window.setInterval(() => setTimeSync((n) => n + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [sessions]);
+
+  void timeSync;
+  const hasLiveNow = sessions.some(isLiveOnAir);
+
   if (sessions.length === 0 && !isLoading) return null;
 
   return (

@@ -35,7 +35,7 @@ export function StatementSection({ isAuthenticated, statementItems }: StatementS
             {/* Wrapper: aspect-4/3 gives explicit size so Next Image fill can render */}
             <div className="relative w-full max-w-lg mx-auto lg:mx-0 aspect-4/3 min-h-[260px] rounded-[16px] overflow-visible">
               {/* Container 1 – empty.png only (narrower, shifted left) */}
-              <div className="absolute -left-3 top-0 bottom-0 w-[65%] rounded-[16px] overflow-hidden shadow-2xl bg-[#4D4D4D] z-0">
+              <div className="absolute -left-3 top-0 bottom-0 w-[65%] rounded-[16px] overflow-hidden shadow-2xl bg-[#0052CC] z-0">
                 <Image
                   src="/Images/empty.png"
                   alt=""

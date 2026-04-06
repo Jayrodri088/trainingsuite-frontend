@@ -51,7 +51,6 @@ export default function HomePage() {
     .slice(0, 4);
 
   const hasLiveSessions = sortedLiveSessions.length > 0;
-  const hasLiveNow = sortedLiveSessions.some((s) => s.status === "live");
 
   const enrollmentMap = new Map<string, Enrollment>();
   if (enrollments) {
@@ -85,7 +84,6 @@ export default function HomePage() {
         <LiveSessionsSection
           sessions={sortedLiveSessions}
           isLoading={isLoadingLiveSessions}
-          hasLiveNow={hasLiveNow}
         />
       )}
       <StatementSection

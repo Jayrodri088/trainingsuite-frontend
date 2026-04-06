@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Users, Radio, Calendar, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,18 +8,29 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { LiveSession } from "@/types";
 import { normalizeUploadUrl } from "@/lib/utils";
+import { isLiveOnAir, isScheduledWindowOver } from "@/lib/live-session-utils";
 import { format, parseISO } from "date-fns";
 import { T, useT } from "@/components/t";
 
 export function LiveSessionCard({ session }: { session: LiveSession }) {
   const { t: translate } = useT();
-  const isLive = session.status === "live";
+  const [timeSync, setTimeSync] = useState(0);
+
+  useEffect(() => {
+    if (session.status !== "live" && session.status !== "scheduled") return;
+    const id = window.setInterval(() => setTimeSync((n) => n + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [session.status]);
+
+  void timeSync;
+  const onAir = isLiveOnAir(session);
+  const staleLive = session.status === "live" && isScheduledWindowOver(session);
   const isScheduled = session.status === "scheduled";
 
   return (
     <Link href={`/live-sessions/${session._id}`} className="block h-full group">
       <div className="h-full flex flex-col border border-border bg-card transition-colors hover:border-foreground/50 relative overflow-hidden">
-        {isLive && (
+        {onAir && (
           <div className="absolute top-0 left-0 right-0 h-1 bg-red-600 animate-pulse" />
         )}
 
@@ -36,10 +48,14 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
           )}
 
           <div className="absolute top-3 right-3 z-10">
-            {isLive ? (
+            {onAir ? (
               <Badge className="bg-red-600 text-white font-bold rounded-[9999px] border-0 uppercase text-[10px] tracking-wider animate-pulse">
                 <span className="mr-1.5 h-1.5 w-1.5 rounded-[9999px] bg-white inline-block animate-pulse" />
                 <T>Live Now</T>
+              </Badge>
+            ) : staleLive ? (
+              <Badge variant="secondary" className="font-medium rounded-[9999px] text-xs tracking-wide">
+                <T>Ended</T>
               </Badge>
             ) : isScheduled ? (
               <Badge variant="outline" className="bg-background text-foreground font-medium rounded-[9999px] border-foreground/10 text-xs tracking-wide">
@@ -48,7 +64,7 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
             ) : null}
           </div>
 
-          {isLive && session.attendeeCount > 0 && (
+          {onAir && session.attendeeCount > 0 && (
             <div className="absolute bottom-3 left-3 z-10">
               <Badge variant="secondary" className="bg-black/60 text-white rounded-[9999px] border-0 text-xs">
                 <Users className="h-3 w-3 mr-1" />
@@ -65,7 +81,13 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
               <span>{format(parseISO(session.scheduledAt), "MMM d, yyyy")}</span>
             </div>
             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
-              {isLive ? <T>Live Stream</T> : <T>Live Session</T>}
+              {onAir ? (
+                <T>Live Stream</T>
+              ) : staleLive ? (
+                <T>Session ended</T>
+              ) : (
+                <T>Live Session</T>
+              )}
             </span>
           </div>
 
@@ -80,11 +102,16 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
           )}
 
           <div className="mt-auto pt-4">
-            {isLive ? (
+            {onAir ? (
               <Button className="w-full rounded-lg h-9 text-xs uppercase tracking-wide bg-red-600 hover:bg-red-700 text-white">
                 <Radio className="h-3 w-3 mr-2 animate-pulse" />
                 <T>Join Live</T>
               </Button>
+            ) : staleLive ? (
+              <div className="flex items-center text-sm font-medium text-muted-foreground">
+                <T>View session</T>
+                <ArrowRight className="ml-auto h-4 w-4" />
+              </div>
             ) : isScheduled ? (
               <div className="flex items-center text-sm font-medium text-gray-800 dark:text-foreground/70 group-hover:text-gray-900 dark:group-hover:text-foreground transition-colors">
                 <Clock className="h-4 w-4 mr-2" />

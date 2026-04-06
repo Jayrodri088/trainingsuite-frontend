@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense, useMemo } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { Search, Filter, Grid3X3, List, X } from "lucide-react";
@@ -30,10 +30,30 @@ import { CoursesFilterSidebar, COURSE_LANGUAGES } from "@/components/courses/cou
 import { CoursesLoading } from "@/components/courses/courses-loading";
 import { PageLoader } from "@/components/ui/page-loader";
 
+const COURSES_VIEW_MODE_STORAGE_KEY = "trainingsuite:courses-view-mode";
+
 function CoursesContent() {
   const searchParams = useSearchParams();
   const { t } = useT();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(COURSES_VIEW_MODE_STORAGE_KEY);
+      if (raw === "grid" || raw === "list") setViewMode(raw);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const setViewModeAndPersist = (mode: "grid" | "list") => {
+    setViewMode(mode);
+    try {
+      localStorage.setItem(COURSES_VIEW_MODE_STORAGE_KEY, mode);
+    } catch {
+      /* ignore */
+    }
+  };
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [filters, setFilters] = useState<CourseFilters>({
     status: "published",
@@ -161,7 +181,7 @@ function CoursesContent() {
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon"
                 className={`rounded-lg h-9 w-9 ${viewMode === "grid" ? "bg-[#0052CC]/10 text-[#0052CC]" : "text-gray-600 hover:bg-gray-100"}`}
-              onClick={() => setViewMode("grid")}
+              onClick={() => setViewModeAndPersist("grid")}
             >
               <Grid3X3 className="h-4 w-4" />
             </Button>
@@ -169,7 +189,7 @@ function CoursesContent() {
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="icon"
                 className={`rounded-lg h-9 w-9 ${viewMode === "list" ? "bg-[#0052CC]/10 text-[#0052CC]" : "text-gray-600 hover:bg-gray-100"}`}
-              onClick={() => setViewMode("list")}
+              onClick={() => setViewModeAndPersist("list")}
             >
               <List className="h-4 w-4" />
             </Button>

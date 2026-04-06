@@ -35,6 +35,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PageLoader } from "@/components/ui/page-loader";
 import { SetReminderDialog } from "@/components/live-sessions/set-reminder-dialog";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
+import { isLiveOnAir, isScheduledWindowOver } from "@/lib/live-session-utils";
 import { getInitials, normalizeUploadUrl } from "@/lib/utils";
 import type { LiveSession } from "@/types";
 import {
@@ -42,21 +43,9 @@ import {
   parseISO,
   differenceInMinutes,
   formatDistanceToNow,
-  addMinutes,
-  differenceInSeconds,
 } from "date-fns";
 import { T, useT } from "@/components/t";
 import { useAuth } from "@/hooks";
-
-/** API may still say "live" after scheduled start + duration — treat as over for UI */
-function isScheduledWindowOver(session: LiveSession): boolean {
-  const endAt = addMinutes(parseISO(session.scheduledAt), session.duration);
-  return differenceInSeconds(endAt, new Date()) <= 0;
-}
-
-function isLiveOnAir(session: LiveSession): boolean {
-  return session.status === "live" && !isScheduledWindowOver(session);
-}
 
 export default function LiveSessionsPage() {
   const { t } = useT();
