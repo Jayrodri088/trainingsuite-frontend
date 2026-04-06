@@ -32,7 +32,10 @@ export const adminApi = {
     return response.data;
   },
 
-  updateCourse: async (id: string, data: Partial<Course>) => {
+  updateCourse: async (
+    id: string,
+    data: Omit<Partial<Course>, "network"> & { network?: string | null }
+  ) => {
     const response = await apiClient.put<ApiResponse<Course>>(
       `/admin/courses/${id}`,
       data

@@ -148,10 +148,14 @@ export default function AdminDiscussionsPage() {
 
   const handleEdit = (forum: Forum) => {
     setSelectedForum(forum);
+    const courseId =
+      typeof forum.course === "object" && forum.course
+        ? forum.course._id
+        : forum.course || "";
     setFormData({
       title: forum.title,
       description: forum.description || "",
-      course: forum.course || "",
+      course: courseId,
       isGeneral: forum.isGeneral || false,
     });
     setDialogOpen(true);

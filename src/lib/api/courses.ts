@@ -3,6 +3,8 @@ import type {
   ApiResponse,
   PaginatedResponse,
   Course,
+  CourseLevel,
+  CourseStatus,
   CourseWithModules,
   CourseFilters,
   Rating,
@@ -26,8 +28,10 @@ export interface CreateCourseData {
   thumbnail?: string;
 }
 
-export interface UpdateCourseData extends Omit<Partial<CreateCourseData>, "network"> {
-  status?: string;
+export interface UpdateCourseData
+  extends Omit<Partial<CreateCourseData>, "network" | "level"> {
+  status?: CourseStatus;
+  level?: CourseLevel;
   isPublished?: boolean;
   thumbnail?: string;
   previewVideo?: string;

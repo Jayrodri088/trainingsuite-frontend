@@ -252,7 +252,9 @@ export default function UsersPage() {
   const waivePortalAccessMutation = useMutation({
     mutationFn: (id: string) => adminApi.waivePortalAccess(id),
     onSuccess: (response) => {
-      updateUserInAdminUsersCache(response.data);
+      if (response.data) {
+        updateUserInAdminUsersCache(response.data);
+      }
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       toast({ title: "Portal access granted. User can now access the app." });
     },
@@ -268,7 +270,9 @@ export default function UsersPage() {
   const revokePortalAccessMutation = useMutation({
     mutationFn: (id: string) => adminApi.revokePortalAccess(id),
     onSuccess: (response) => {
-      updateUserInAdminUsersCache(response.data);
+      if (response.data) {
+        updateUserInAdminUsersCache(response.data);
+      }
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       toast({ title: "Portal access revoked. User must complete portal access again." });
     },

@@ -73,7 +73,14 @@ import { modulesApi, lessonsApi, CreateModuleData, CreateLessonData } from "@/li
 import { categoriesApi } from "@/lib/api/categories";
 import { uploadApi } from "@/lib/api/upload";
 import { getVideoDuration } from "@/lib/utils";
-import type { Module, Lesson, CourseLevel, Material, ApiError } from "@/types";
+import type {
+  Module,
+  Lesson,
+  CourseLevel,
+  CourseStatus,
+  Material,
+  ApiError,
+} from "@/types";
 
 const NO_NETWORK_VALUE = "__no_network__";
 
@@ -836,7 +843,9 @@ export default function AdminCourseEditorPage({
                   <Select
                     value={course.status}
                     onValueChange={(value) =>
-                      updateCourseMutation.mutate({ status: value })
+                      updateCourseMutation.mutate({
+                        status: value as CourseStatus,
+                      })
                     }
                   >
                     <SelectTrigger>
