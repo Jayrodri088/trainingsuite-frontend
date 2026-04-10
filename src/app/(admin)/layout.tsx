@@ -23,6 +23,7 @@ import {
   GraduationCap,
   Menu,
   X,
+  MessageCircleQuestion,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -106,6 +107,11 @@ const adminNavSections = [
         label: "Announcements",
         href: "/admin/announcements",
         icon: Megaphone,
+      },
+      {
+        label: "Ask Pastor Chris",
+        href: "/admin/ask-pastor-chris",
+        icon: MessageCircleQuestion,
       },
       {
         label: "Settings",

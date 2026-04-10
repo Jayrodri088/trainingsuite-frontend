@@ -35,7 +35,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
 
         {/* Subheading – white, smaller */}
         <p className="text-white/95 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-8 font-normal">
-          <T>A professional training portal designed for the rigorous spiritual and practical development of ministers worldwide.</T>
+          <T>A specially trained workforce of the Rhapsody Global Network, equipped to organize Rhapsody End-Time Teaching Crusades, win souls through door-to-door evangelism, and advance the gospel with precision to reach the last lost soul.</T>
         </p>
 
         {/* CTAs – royal blue + white bg / dark text / grey border for View Curriculum */}

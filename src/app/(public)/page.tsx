@@ -74,9 +74,10 @@ export default function HomePage() {
   const coursesToShow: Course[] = courses;
 
   const statementItems = [
-    t("Global Networking"),
-    t("Resource Library Access"),
-    t("Priority Event Registration"),
+    t("Organize Rhapsody End-Time Teaching Crusades in Your City"),
+    t("Weekly Prevailing Prayer Sessions for Your Nation"),
+    t("Participate in Ministry Programs with Pastor Chris"),
+    t("Upload Field Work Reports, Testimonies & Footage"),
   ];
 
   return (

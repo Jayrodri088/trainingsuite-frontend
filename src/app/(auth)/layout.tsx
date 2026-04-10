@@ -26,11 +26,11 @@ export default function AuthLayout({
                 <T>Equipping Ministers for Global Impact.</T>
               </h1>
               <p className="max-w-md text-base leading-relaxed text-white/90">
-                <T>Access your training dashboard, continue coursework, and stay aligned with live ministry sessions.</T>
+                <T>Access your training dashboard, engage in weekly prevailing prayers, upload field reports, and connect with your global workforce.</T>
               </p>
             </div>
             <p className="max-w-sm text-sm leading-relaxed text-white/80">
-              <T>Continue your formation with a focused curriculum designed for spiritual depth and practical ministry effectiveness.</T>
+              <T>Specially trained missionaries of the Rhapsody Global Network, advancing the gospel with precision to reach the last lost soul.</T>
             </p>
           </div>
 

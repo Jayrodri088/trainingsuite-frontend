@@ -151,7 +151,7 @@ export default function AboutPage() {
               <T>Rhapsody Omega Force</T>
             </h1>
             <p ref={heroSubtitleRef} className="font-sans text-sm sm:text-base md:text-lg text-gray-600 mb-4 sm:mb-6 opacity-0 leading-relaxed">
-              <T>Rhapsody Omega Force is a training arm of Rhapsody of Realities, committed to equipping ministers for global impact through excellence in education, mentorship, and community.</T>
+              <T>Rhapsody Omega Force is a group of specially trained individuals of the Rhapsody Global Network, consistently equipped to carry out specific missionary assignments with precision — using the Rhapsody of Realities — as we intensify our search for the last lost soul.</T>
             </p>
             <div ref={heroButtonsRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 opacity-0 justify-center lg:justify-start">
               <Button asChild size="lg" className="rounded-lg h-11 px-6 sm:px-8 w-full sm:w-auto bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
@@ -176,7 +176,7 @@ export default function AboutPage() {
             <T>What Rhapsody Omega Force Is About</T>
           </h2>
           <p ref={missionTextRef} className="font-sans text-sm sm:text-base text-gray-700 text-center max-w-3xl mx-auto mb-8 sm:mb-12 leading-relaxed opacity-0">
-            <T>The platform is a professional training portal designed for the rigorous spiritual and practical development of ministers worldwide. We exist to equip you with structured curriculum, HD video lessons, live mentorship, and official certification—all aimed at the next level of impact.</T>
+            <T>Rhapsody Omega Force is a specially trained workforce of the Rhapsody Global Network. These individuals are consistently trained to carry out specific missionary assignments with precision — using the Rhapsody of Realities — as we intensify our search for the last lost soul. At the core of the training is organizing Rhapsody End-Time Teaching Crusades in cities across the globe, alongside door-to-door evangelism, church planting, prevailing prayer, and strategic city transformation. The platform also offers weekly prayer sessions, field report uploads, ministry program participation, and the Ask Pastor Chris dashboard for direct mentorship.</T>
           </p>
 
           {/* Image beside text – stacks on mobile */}
@@ -196,10 +196,10 @@ export default function AboutPage() {
                 <T>Our Mission</T>
               </h3>
               <p className="font-sans text-sm sm:text-base text-gray-600 leading-relaxed">
-                <T>This is a comprehensive training platform that serves ministers globally. Quality and practical training is accessible to every minister—through structured curriculum, live sessions, and certification designed for lasting impact.</T>
+                <T>The site offers a variety of mission-focused courses — including organizing Rhapsody End-Time Teaching Crusades in your city, door-to-door evangelism, church planting, winning through prevailing prayer, discipleship, and Christianizing your city using Rhapsody of Realities strategically.</T>
               </p>
               <p className="font-sans text-sm sm:text-base text-gray-600 leading-relaxed">
-                <T>We are committed to helping ministers advance their work on reaching the last man, to fulfill the mandate after excellent training and mentorship.</T>
+                <T>Beyond training, the platform enables ministers to participate in ministry programs with Pastor Chris, upload testimonies, field reports and footage from their countries, and access the exclusive Ask Pastor Chris dashboard for life and ministry guidance.</T>
               </p>
               <Button asChild className="rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-semibold mt-2 w-full sm:w-auto">
                 <Link href="/courses"><T>Start Learning</T></Link>
@@ -259,8 +259,8 @@ export default function AboutPage() {
           </h2>
           <p className="font-sans text-white/90 max-w-2xl mx-auto mb-6 sm:mb-8 text-sm sm:text-base md:text-lg">
             {isAuthenticated
-              ? <T>Explore our courses and continue building your skills with Rhapsody Omega Force.</T>
-              : <T>Join a global network of ministers. Browse our courses and begin your training today.</T>}
+              ? <T>Continue your missionary training and stay equipped for precision gospel work with Rhapsody Omega Force.</T>
+              : <T>Join the Rhapsody Omega Force workforce. Browse our courses and begin your missionary training today.</T>}
           </p>
           <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4">
             <Button asChild size="lg" className="rounded-lg h-11 px-6 sm:px-8 w-full sm:w-auto bg-white text-[#0052CC] hover:bg-white/90 font-bold">

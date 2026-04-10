@@ -12,3 +12,5 @@ export { categoriesApi } from "./categories";
 export { adminApi } from "./admin";
 export { announcementsApi } from "./announcements";
 export { paymentsApi } from "./payments";
+export { pastorChrisApi } from "./pastor-chris";
+export type { PastorChrisQuestion, PastorChrisStats } from "./pastor-chris";

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
   ),
   title: "Rhapsody Omega Force",
-  description: "Preparatory training portal for ministers - Video training and live sessions",
+  description: "The specially trained workforce of the Rhapsody Global Network, equipped to advance the gospel and reach the last lost soul through targeted missionary training.",
   icons: {
     icon: [
       { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Rhapsody Omega Force",
-    description: "Preparatory training portal for ministers - Video training and live sessions",
+    description: "The specially trained workforce of the Rhapsody Global Network, equipped to advance the gospel and reach the last lost soul through targeted missionary training.",
     images: [{ url: "/icon-512.png", width: 512, height: 512 }],
   },
 };

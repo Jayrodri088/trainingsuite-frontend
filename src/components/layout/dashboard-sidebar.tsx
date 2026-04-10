@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   Megaphone,
   Home,
+  MessageCircleQuestion,
 } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ const sidebarItems = [
     title: "Community",
     items: [
       { label: "Community", href: "/forums", icon: MessageSquare },
+      { label: "Ask Pastor Chris", href: "/ask-pastor-chris", icon: MessageCircleQuestion },
       { label: "Announcements", href: "/announcements", icon: Megaphone },
       { label: "Notifications", href: "/notifications", icon: Bell },
     ],

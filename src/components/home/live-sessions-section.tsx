@@ -30,35 +30,35 @@ export function LiveSessionsSection({ sessions, isLoading }: LiveSessionsSection
   if (sessions.length === 0 && !isLoading) return null;
 
   return (
-    <section className="py-24 md:py-32 border-t border-gray-200 bg-gray-50">
-      <div className="container max-w-7xl px-4 md:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+    <section className="py-16 sm:py-20 md:py-24 lg:py-32 border-t border-gray-200 bg-gray-50">
+      <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 lg:mb-16 gap-4 md:gap-6">
           <div className="max-w-2xl">
-            <div className="flex items-center gap-3 mb-4">
-              {hasLiveNow && (
-                <Badge className="bg-red-600 text-white font-bold rounded-[9999px] border-0 uppercase text-[10px] tracking-wider animate-pulse">
-                  <span className="mr-1.5 h-1.5 w-1.5 rounded-[9999px] bg-white inline-block animate-pulse" />
+            {hasLiveNow && (
+              <div className="mb-3">
+                <Badge className="bg-red-600 text-white font-bold rounded-full border-0 uppercase text-[10px] tracking-wider animate-pulse">
+                  <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block" />
                   <T>Live Now</T>
                 </Badge>
-              )}
-            </div>
-            <h2 className="font-heading text-4xl md:text-5xl font-bold mb-4 text-[#3a3a3a]">
+              </div>
+            )}
+            <h2 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-3 text-black">
               <T>Live Sessions</T>
             </h2>
-            <p className="text-lg text-[#6a6a6a] font-light">
+            <p className="text-sm md:text-lg text-gray-600 font-normal">
               <T>Join real-time interactive sessions with our leadership and ministry team.</T>
             </p>
           </div>
           <Link
             href="/live-sessions"
-            className="hidden md:flex items-center text-sm font-bold uppercase tracking-widest hover:text-muted-foreground transition-colors"
+            className="flex items-center gap-2 text-sm md:text-base font-medium text-[#0052CC] hover:text-[#0052CC]/80 transition-colors self-start md:self-auto"
           >
             <T>All Sessions</T>
-            <ArrowRight className="ml-3 h-4 w-4" />
+            <ArrowRight className="h-4 w-4 md:h-5 md:w-5 shrink-0" />
           </Link>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {isLoading ? (
             [...Array(4)].map((_, i) => <LiveSessionCardSkeleton key={i} />)
           ) : (
@@ -67,14 +67,6 @@ export function LiveSessionsSection({ sessions, isLoading }: LiveSessionsSection
             ))
           )}
         </div>
-
-        <Link
-          href="/live-sessions"
-          className="md:hidden mt-8 flex items-center justify-center h-12 border border-border text-sm font-bold uppercase tracking-widest hover:bg-secondary transition-colors"
-        >
-          <T>All Sessions</T>
-          <ArrowRight className="ml-3 h-4 w-4" />
-        </Link>
       </div>
     </section>
   );

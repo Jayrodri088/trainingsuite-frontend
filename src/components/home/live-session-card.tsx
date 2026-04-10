@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Users, Radio, Calendar, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { LiveSession } from "@/types";
@@ -29,12 +28,13 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
 
   return (
     <Link href={`/live-sessions/${session._id}`} className="block h-full group">
-      <div className="h-full flex flex-col border border-border bg-card transition-colors hover:border-foreground/50 relative overflow-hidden">
+      <div className="h-full flex flex-col bg-white border border-gray-200 rounded-xl overflow-hidden transition-colors hover:border-gray-300 relative">
         {onAir && (
-          <div className="absolute top-0 left-0 right-0 h-1 bg-red-600 animate-pulse" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-red-600 animate-pulse z-10" />
         )}
 
-        <div className="relative aspect-video bg-muted border-b border-border flex items-center justify-center overflow-hidden">
+        {/* Thumbnail */}
+        <div className="relative aspect-video overflow-hidden rounded-t-xl bg-gray-100">
           {normalizeUploadUrl(session.thumbnail) ? (
             <img
               src={normalizeUploadUrl(session.thumbnail)}
@@ -47,26 +47,28 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
             </div>
           )}
 
+          {/* Status badge */}
           <div className="absolute top-3 right-3 z-10">
             {onAir ? (
-              <Badge className="bg-red-600 text-white font-bold rounded-[9999px] border-0 uppercase text-[10px] tracking-wider animate-pulse">
-                <span className="mr-1.5 h-1.5 w-1.5 rounded-[9999px] bg-white inline-block animate-pulse" />
+              <Badge className="bg-red-600 text-white font-bold rounded-full border-0 uppercase text-[10px] tracking-wider animate-pulse">
+                <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block" />
                 <T>Live Now</T>
               </Badge>
             ) : staleLive ? (
-              <Badge variant="secondary" className="font-medium rounded-[9999px] text-xs tracking-wide">
+              <Badge className="bg-gray-100 text-gray-600 border-gray-200 rounded-full text-xs">
                 <T>Ended</T>
               </Badge>
             ) : isScheduled ? (
-              <Badge variant="outline" className="bg-background text-foreground font-medium rounded-[9999px] border-foreground/10 text-xs tracking-wide">
+              <Badge className="bg-white/90 text-gray-700 border-gray-200 rounded-full text-xs">
                 <T>Upcoming</T>
               </Badge>
             ) : null}
           </div>
 
+          {/* Viewer count */}
           {onAir && session.attendeeCount > 0 && (
             <div className="absolute bottom-3 left-3 z-10">
-              <Badge variant="secondary" className="bg-black/60 text-white rounded-[9999px] border-0 text-xs">
+              <Badge className="bg-black/60 text-white rounded-full border-0 text-xs">
                 <Users className="h-3 w-3 mr-1" />
                 {session.attendeeCount} <T>watching</T>
               </Badge>
@@ -74,55 +76,51 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
           )}
         </div>
 
-        <div className="flex flex-col flex-1 p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        {/* Content */}
+        <div className="flex flex-col flex-1 p-5">
+          <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center gap-1.5 text-xs text-gray-500">
               <Calendar className="h-3 w-3" />
               <span>{format(parseISO(session.scheduledAt), "MMM d, yyyy")}</span>
             </div>
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
-              {onAir ? (
-                <T>Live Stream</T>
-              ) : staleLive ? (
-                <T>Session ended</T>
-              ) : (
-                <T>Live Session</T>
-              )}
+            <span className="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">
+              {onAir ? <T>Live Stream</T> : staleLive ? <T>Session ended</T> : <T>Live Session</T>}
             </span>
           </div>
 
-          <h3 className="text-xl font-heading font-bold text-foreground mb-3 leading-tight group-hover:underline decoration-1 underline-offset-4">
+          <h3 className="font-sans text-lg font-bold text-black mb-4 leading-tight line-clamp-2 group-hover:underline decoration-1 underline-offset-2">
             {translate(session.title)}
           </h3>
 
           {session.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+            <p className="text-sm text-gray-500 line-clamp-2 mb-4 leading-relaxed">
               {translate(session.description)}
             </p>
           )}
 
-          <div className="mt-auto pt-4">
+          {/* CTA */}
+          <div className="mt-auto pt-2">
             {onAir ? (
-              <Button className="w-full rounded-lg h-9 text-xs uppercase tracking-wide bg-red-600 hover:bg-red-700 text-white">
-                <Radio className="h-3 w-3 mr-2 animate-pulse" />
+              <span className="inline-flex w-full justify-center items-center gap-2 rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-semibold text-red-600">
+                <Radio className="h-3.5 w-3.5 animate-pulse" />
                 <T>Join Live</T>
-              </Button>
+              </span>
             ) : staleLive ? (
-              <div className="flex items-center text-sm font-medium text-muted-foreground">
-                <T>View session</T>
-                <ArrowRight className="ml-auto h-4 w-4" />
-              </div>
+              <span className="inline-flex w-full justify-center items-center rounded-xl border border-[#D4D4D4] bg-white py-2.5 text-sm font-medium text-gray-800 shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.1),0px_1px_3px_0px_rgba(0,0,0,0.1)] group-hover:bg-gray-50 transition-colors">
+                <T>View Session</T>
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </span>
             ) : isScheduled ? (
-              <div className="flex items-center text-sm font-medium text-gray-800 dark:text-foreground/70 group-hover:text-gray-900 dark:group-hover:text-foreground transition-colors">
-                <Clock className="h-4 w-4 mr-2" />
-                <span>{format(parseISO(session.scheduledAt), "h:mm a")}</span>
+              <span className="inline-flex w-full justify-center items-center rounded-xl border border-[#D4D4D4] bg-white py-2.5 text-sm font-medium text-gray-800 shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.1),0px_1px_3px_0px_rgba(0,0,0,0.1)] group-hover:bg-gray-50 transition-colors">
+                <Clock className="h-4 w-4 mr-2 text-gray-500" />
+                {format(parseISO(session.scheduledAt), "h:mm a")}
                 <ArrowRight className="ml-auto h-4 w-4" />
-              </div>
+              </span>
             ) : (
-              <div className="flex items-center text-sm font-medium text-muted-foreground">
+              <span className="inline-flex w-full justify-center items-center rounded-xl border border-[#D4D4D4] bg-white py-2.5 text-sm font-medium text-gray-800 shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.1),0px_1px_3px_0px_rgba(0,0,0,0.1)] group-hover:bg-gray-50 transition-colors">
                 <T>View Recording</T>
-                <ArrowRight className="ml-auto h-4 w-4" />
-              </div>
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </span>
             )}
           </div>
         </div>
@@ -133,14 +131,17 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
 
 export function LiveSessionCardSkeleton() {
   return (
-    <div className="border border-gray-200 rounded-xl h-full bg-white shadow-sm overflow-hidden">
-      <Skeleton className="aspect-video w-full rounded-t-[12px] rounded-b-none" />
-      <div className="p-6 space-y-4">
-        <Skeleton className="h-4 w-24 rounded-lg" />
-        <Skeleton className="h-6 w-full rounded-lg" />
-        <Skeleton className="h-4 w-3/4 rounded-lg" />
-        <div className="pt-4 mt-auto">
-          <Skeleton className="h-9 w-full rounded-lg" />
+    <div className="border border-gray-200 rounded-xl h-full bg-white overflow-hidden">
+      <Skeleton className="aspect-video w-full rounded-t-xl rounded-b-none" />
+      <div className="p-5 space-y-3">
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-24 rounded-lg" />
+          <Skeleton className="h-4 w-16 rounded-lg" />
+        </div>
+        <Skeleton className="h-5 w-full rounded-lg" />
+        <Skeleton className="h-5 w-4/5 rounded-lg" />
+        <div className="pt-2">
+          <Skeleton className="h-10 w-full rounded-lg" />
         </div>
       </div>
     </div>
