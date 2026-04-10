@@ -1,43 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ShieldCheck, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { paymentsApi } from "@/lib/api";
 import { useAuth } from "@/hooks";
 import { T, useT } from "@/components/t";
 
-export default function CompleteAccessPage() {
+function CompleteAccessInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useT();
   const auth = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const cancelled = searchParams.get("cancelled") === "1";
 
-  // If not loaded or not authenticated, redirect to login
-  if (!auth.isLoading && !auth.isAuthenticated) {
-    router.replace("/login?redirect=/complete-access");
-    return null;
-  }
+  useEffect(() => {
+    if (auth.isLoading) return;
+    if (!auth.isAuthenticated) {
+      router.replace("/login?redirect=/complete-access");
+      return;
+    }
+    if (auth.user?.portalAccessPaidAt) {
+      router.replace("/dashboard");
+    }
+  }, [auth.isLoading, auth.isAuthenticated, auth.user?.portalAccessPaidAt, router]);
 
-  // Admins are not required to pay; send them to admin or dashboard
-  if (!auth.isLoading && auth.user?.role === "admin") {
-    router.replace("/admin");
-    return null;
-  }
-
-  // If already has portal access, go to dashboard
-  if (!auth.isLoading && auth.user?.portalAccessPaidAt) {
-    router.replace("/dashboard");
-    return null;
+  if (auth.isLoading || !auth.isAuthenticated || auth.user?.portalAccessPaidAt) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="h-10 w-10 animate-spin text-[#0052CC]" aria-hidden />
+      </div>
+    );
   }
 
   async function handlePay() {
+    setShowPaymentModal(false);
     setError(null);
     setIsLoading(true);
     try {
@@ -69,7 +82,7 @@ export default function CompleteAccessPage() {
         </h1>
         <p className="text-gray-600 text-sm">
           <T>
-            To access the training portal, complete a one-time $1 identity verification. This helps us keep the platform secure for all ministers.
+            To access the training portal, you will need to complete a one-time $1 identity verification. This helps us confirm that each account belongs to a real person and keeps the platform secure for all ministers.
           </T>
         </p>
       </div>
@@ -94,7 +107,7 @@ export default function CompleteAccessPage() {
         <Button
           type="button"
           className="w-full h-11 rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-bold"
-          onClick={handlePay}
+          onClick={() => setShowPaymentModal(true)}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -107,9 +120,63 @@ export default function CompleteAccessPage() {
           )}
         </Button>
         <p className="text-center text-xs text-gray-500">
-          <T>Secure payment via Stripe. You will be redirected to complete payment.</T>
+          <T>Secure payment via Stripe. You will be redirected to complete your identity verification payment.</T>
         </p>
       </div>
+
+      <AlertDialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+        <AlertDialogContent className="rounded-xl border-gray-200 bg-white shadow-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-sans font-bold text-black">
+              <T>Why you are being asked to pay $1</T>
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 text-left text-sm leading-6 text-gray-600">
+                <p>
+                  <T>
+                    This one-time $1 payment is used to verify your identity and confirm that your account belongs to a real person.
+                  </T>
+                </p>
+                <p>
+                  <T>
+                    It helps protect the training portal from fake accounts, spam, and misuse, so the platform remains safe and trustworthy for everyone.
+                  </T>
+                </p>
+                <p>
+                  <T>
+                    After your payment is confirmed, your access will be activated and you will not need to pay this verification fee again.
+                  </T>
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-lg border-gray-200 bg-white">
+              <T>Cancel</T>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="rounded-lg bg-[#0052CC] text-white hover:bg-[#003d99]"
+              onClick={handlePay}
+            >
+              <T>Continue to secure payment</T>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
+  );
+}
+
+export default function CompleteAccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center py-12">
+          <Loader2 className="h-10 w-10 animate-spin text-[#0052CC]" aria-hidden />
+        </div>
+      }
+    >
+      <CompleteAccessInner />
+    </Suspense>
   );
 }

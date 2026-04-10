@@ -52,7 +52,7 @@ export default function LoginPage() {
         } else if (user?.portalAccessPaidAt) {
           router.push("/dashboard");
         } else {
-          router.push("/complete-access");
+          router.push("/courses");
         }
       }
     } catch (error: unknown) {

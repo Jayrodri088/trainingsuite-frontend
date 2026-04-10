@@ -176,19 +176,19 @@ export function Header() {
                     variant="ghost"
                     className="relative h-9 w-9 rounded-[9999px] hover:bg-gray-200 border-0 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-0"
                   >
-                    <Avatar className="h-9 w-9 border border-gray-200 rounded-[9999px]">
-                      <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback className="bg-gray-200 text-gray-900 text-xs font-medium">
+                      <Avatar className="h-9 w-9 border border-gray-200 rounded-[9999px]">
+                        <AvatarImage src={user.avatar || undefined} alt={user.name || "User"} />
+                        <AvatarFallback className="bg-gray-200 text-gray-900 text-xs font-medium">
                         {getInitials(user.name)}
                       </AvatarFallback>
-                    </Avatar>
+                      </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 rounded-xl border border-gray-200 bg-white text-gray-900 shadow-lg p-0">
                   <DropdownMenuLabel className="font-normal p-4 pb-2 border-b border-gray-100">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-semibold text-gray-900 leading-none">{user.name}</p>
-                      <p className="text-xs text-gray-500 leading-none truncate">{user.email}</p>
+                      <p className="text-sm font-semibold text-gray-900 leading-none">{user.name || "User"}</p>
+                      <p className="text-xs text-gray-500 leading-none truncate">{user.email || ""}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-gray-100" />

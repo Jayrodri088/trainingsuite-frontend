@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import { apiClient, publicApiClient } from "./client";
 import type { ApiResponse, User } from "@/types";
 
 export interface LoginCredentials {
@@ -50,10 +50,10 @@ export const authApi = {
     return response.data;
   },
 
+  /** Public — email link opens the frontend; this calls the backend GET (no auth). */
   verifyEmail: async (token: string) => {
-    const response = await apiClient.post<ApiResponse<null>>(
-      "/auth/verify-email",
-      { token }
+    const response = await publicApiClient.get<ApiResponse<null>>(
+      `/auth/verify-email?token=${encodeURIComponent(token)}`
     );
     return response.data;
   },

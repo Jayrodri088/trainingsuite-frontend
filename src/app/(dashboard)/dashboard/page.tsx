@@ -152,10 +152,6 @@ export default function DashboardPage() {
     return <PageLoader />;
   }
 
-  const enrollments = (enrollmentsResponse?.data || []) as Enrollment[];
-  const certificates = certificatesResponse?.data || [];
-  const notifications = notificationsResponse?.data || [];
-
   const activeEnrollments = enrollments.filter(
     (e: Enrollment) => e.status === "active" && (e.progress || 0) < 100
   );

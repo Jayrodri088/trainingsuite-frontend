@@ -21,8 +21,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useCourses, useCategories, useEnrollments } from "@/hooks";
+import { useAuth, useCategories, useEnrollments } from "@/hooks";
 import { adminApi } from "@/lib/api/admin";
+import { coursesApi } from "@/lib/api/courses";
 import type { Course, CourseFilters, Enrollment } from "@/types";
 import { T, useT } from "@/components/t";
 import { CourseCardPublic } from "@/components/courses/course-card-public";
@@ -35,6 +36,7 @@ const COURSES_VIEW_MODE_STORAGE_KEY = "trainingsuite:courses-view-mode";
 function CoursesContent() {
   const searchParams = useSearchParams();
   const { t } = useT();
+  const { isAuthenticated } = useAuth();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
@@ -69,9 +71,12 @@ function CoursesContent() {
     { value: "title", label: t("Title") },
   ];
 
-  const { data: coursesResponse, isLoading } = useCourses({
-    ...filters,
-    search: searchQuery || undefined,
+  const { data: coursesResponse, isLoading } = useQuery({
+    queryKey: ["public-courses", filters, searchQuery, isAuthenticated],
+    queryFn: () =>
+      isAuthenticated
+        ? coursesApi.getAll({ ...filters, search: searchQuery || undefined })
+        : coursesApi.getAllPublic({ ...filters, search: searchQuery || undefined }),
   });
 
   const { data: categoriesResponse } = useCategories();

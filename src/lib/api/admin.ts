@@ -53,7 +53,7 @@ export const adminApi = {
   publishCourse: async (id: string) => {
     const response = await apiClient.put<ApiResponse<Course>>(
       `/admin/courses/${id}`,
-      { status: "published" as CourseStatus }
+      { status: "published" as CourseStatus, isPublished: true }
     );
     return response.data;
   },
@@ -61,7 +61,7 @@ export const adminApi = {
   archiveCourse: async (id: string) => {
     const response = await apiClient.put<ApiResponse<Course>>(
       `/admin/courses/${id}`,
-      { status: "archived" as CourseStatus }
+      { status: "archived" as CourseStatus, isPublished: false }
     );
     return response.data;
   },

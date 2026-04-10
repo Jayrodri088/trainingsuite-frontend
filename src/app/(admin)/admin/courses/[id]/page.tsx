@@ -845,6 +845,7 @@ export default function AdminCourseEditorPage({
                     onValueChange={(value) =>
                       updateCourseMutation.mutate({
                         status: value as CourseStatus,
+                        isPublished: value === "published",
                       })
                     }
                   >

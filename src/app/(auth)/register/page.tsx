@@ -106,8 +106,13 @@ export default function RegisterPage() {
       });
       if (response.success && response.data) {
         setAuth(response.data.user, response.data.token);
-        toast.success(t("Welcome! Your account has been created. Complete the one-time verification to access the portal."));
-        router.push("/complete-access");
+        toast.success(
+          response.message ||
+            t(
+              "Welcome! Your account has been created. You can browse courses now, and complete the one-time verification when you are ready to access training."
+            )
+        );
+        router.push("/courses");
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError && error.response?.data) {

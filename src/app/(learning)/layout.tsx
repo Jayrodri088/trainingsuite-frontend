@@ -21,15 +21,13 @@ export default function LearningLayout({
       router.replace("/login");
       return;
     }
-    const isAdmin = auth.user?.role === "admin";
-    if (auth.user && !isAdmin && !auth.user.portalAccessPaidAt) {
+    if (auth.user && !auth.user.portalAccessPaidAt) {
       router.replace("/complete-access");
     }
   }, [auth.isLoading, auth.isAuthenticated, auth.user, router]);
 
-  const isAdmin = auth.user?.role === "admin";
   const hasAccess =
-    auth.isAuthenticated && auth.user && (isAdmin || auth.user.portalAccessPaidAt);
+    auth.isAuthenticated && auth.user && !!auth.user.portalAccessPaidAt;
   if (!auth.isLoading && (!auth.isAuthenticated || !hasAccess)) {
     return null;
   }

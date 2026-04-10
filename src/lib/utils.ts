@@ -125,10 +125,15 @@ export function formatProgress(progress: number): string {
   return `${Math.round(progress)}%`;
 }
 
-export function getInitials(name: string): string {
+export function getInitials(name?: string | null): string {
+  if (!name?.trim()) {
+    return "";
+  }
+
   return name
-    .split(" ")
-    .map((word) => word[0])
+    .trim()
+    .split(/\s+/)
+    .map((word) => word[0] ?? "")
     .join("")
     .toUpperCase()
     .slice(0, 2);

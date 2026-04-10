@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import { apiClient, publicApiClient } from "./client";
 import type {
   ApiResponse,
   PaginatedResponse,
@@ -55,6 +55,21 @@ export const coursesApi = {
     return response.data;
   },
 
+  getAllPublic: async (filters?: CourseFilters) => {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, String(value));
+        }
+      });
+    }
+    const response = await publicApiClient.get<PaginatedResponse<Course>>(
+      `/courses?${params.toString()}`
+    );
+    return response.data;
+  },
+
   getById: async (id: string) => {
     const response = await apiClient.get<ApiResponse<Course>>(`/courses/${id}`);
     return response.data;
@@ -62,6 +77,11 @@ export const coursesApi = {
 
   getBySlug: async (slug: string) => {
     const response = await apiClient.get<ApiResponse<Course>>(`/courses/${slug}`);
+    return response.data;
+  },
+
+  getBySlugPublic: async (slug: string) => {
+    const response = await publicApiClient.get<ApiResponse<Course>>(`/courses/${slug}`);
     return response.data;
   },
 

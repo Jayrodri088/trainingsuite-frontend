@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useCourses, useAuth, useEnrollments } from "@/hooks";
+import { useAuth, useEnrollments } from "@/hooks";
+import { coursesApi } from "@/lib/api/courses";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
 import type { Course, Enrollment } from "@/types";
 import { useT } from "@/components/t";
@@ -18,15 +19,23 @@ export default function HomePage() {
   const { isAuthenticated } = useAuth();
   const { t } = useT();
 
-  const { data: coursesResponse, isLoading } = useCourses(
-    {
-      status: "published",
-      sort: "enrollmentCount",
-      order: "desc",
-      limit: 50,
-    },
-    { enabled: true }
-  );
+  const { data: coursesResponse, isLoading } = useQuery({
+    queryKey: ["home-public-courses", isAuthenticated],
+    queryFn: () =>
+      isAuthenticated
+        ? coursesApi.getAll({
+            status: "published",
+            sort: "enrollmentCount",
+            order: "desc",
+            limit: 50,
+          })
+        : coursesApi.getAllPublic({
+            status: "published",
+            sort: "enrollmentCount",
+            order: "desc",
+            limit: 50,
+          }),
+  });
   const { data: enrollmentsResponse } = useEnrollments();
 
   const { data: liveSessionsResponse, isLoading: isLoadingLiveSessions } = useQuery({
