@@ -21,25 +21,32 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
     <section className="relative bg-white py-6 sm:py-8 md:py-10">
       {/* Contained hero: bg does not span full width on large screens; rounded corners */}
       <div
-        className="relative min-h-[min(85vh,780px)] w-full max-w-7xl mx-auto rounded-2xl sm:rounded-3xl overflow-hidden bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-0"
-        style={{ backgroundImage: "url(/Images/bg-world.png)" }}
+        className="relative min-h-[min(85vh,780px)] w-full max-w-7xl mx-auto rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-0"
       >
-        <h1 className="font-sans text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-3 max-w-5xl leading-tight">
+        <Image
+          src="/Images/bg-world.png"
+          alt=""
+          fill
+          priority
+          className="object-cover object-center z-0"
+          sizes="100vw"
+        />
+        <h1 className="relative z-10 font-sans text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-3 max-w-5xl leading-tight">
           <T>Rhapsody Omega Force</T>
         </h1>
 
         {/* Hero text */}
-        <h2 className="font-sans text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4 max-w-4xl leading-tight">
+        <h2 className="relative z-10 font-sans text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4 max-w-4xl leading-tight">
           <T>Equipping Ministers for Global Impact.</T>
         </h2>
 
         {/* Subheading – white, smaller */}
-        <p className="text-white/95 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-8 font-normal">
+        <p className="relative z-10 text-white/95 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-8 font-normal">
           <T>A specially trained workforce of the Rhapsody Global Network, equipped to organize Rhapsody End-Time Teaching Crusades, win souls through door-to-door evangelism, and advance the gospel with precision to reach the last lost soul.</T>
         </p>
 
         {/* CTAs – royal blue + white bg / dark text / grey border for View Curriculum */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12 sm:mb-16 md:mb-20">
+        <div className="relative z-10 flex flex-col sm:flex-row justify-center gap-4 mb-12 sm:mb-16 md:mb-20">
           {isAuthenticated ? (
             <Button
               asChild
@@ -68,7 +75,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
         </div>
 
         {/* Carousel: break out of hero padding so it touches left/right edges of the dark section */}
-        <div className="-mx-4 sm:-mx-6 lg:-mx-8 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] lg:w-[calc(100%+4rem)] overflow-hidden mt-auto pb-10 sm:pb-12 md:pb-14">
+        <div className="relative z-10 -mx-4 sm:-mx-6 lg:-mx-8 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] lg:w-[calc(100%+4rem)] overflow-hidden mt-auto pb-10 sm:pb-12 md:pb-14">
           <div className="flex animate-hero-carousel gap-4 sm:gap-5 md:gap-6">
             {[...HERO_IMAGES, ...HERO_IMAGES].map((src, i) => (
               <div
@@ -79,6 +86,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
                   src={src}
                   alt=""
                   fill
+                  priority={i < 4}
                   className="object-cover"
                   sizes="300px"
                 />

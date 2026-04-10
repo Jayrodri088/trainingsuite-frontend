@@ -27,13 +27,13 @@ export default function HomePage() {
             status: "published",
             sort: "enrollmentCount",
             order: "desc",
-            limit: 50,
+            limit: 8,
           })
         : coursesApi.getAllPublic({
             status: "published",
             sort: "enrollmentCount",
             order: "desc",
-            limit: 50,
+            limit: 8,
           }),
   });
   const { data: enrollmentsResponse } = useEnrollments();
