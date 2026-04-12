@@ -22,9 +22,6 @@ export default function AuthLayout({
               <p className="inline-flex rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white/90">
                 <T>Rhapsody Omega Force</T>
               </p>
-              <h1 className="max-w-md font-sans text-4xl font-bold leading-tight tracking-tight">
-                <T>Equipping Ministers for Global Impact.</T>
-              </h1>
               <p className="max-w-md text-base leading-relaxed text-white/90">
                 <T>Access your training dashboard, engage in weekly prevailing prayers, upload field reports, and connect with your global workforce.</T>
               </p>

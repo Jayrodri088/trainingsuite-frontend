@@ -35,14 +35,9 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
           <T>Rhapsody Omega Force</T>
         </h1>
 
-        {/* Hero text */}
-        <h2 className="relative z-10 font-sans text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4 max-w-4xl leading-tight">
-          <T>Equipping Ministers for Global Impact.</T>
-        </h2>
-
         {/* Subheading – white, smaller */}
         <p className="relative z-10 text-white/95 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-8 font-normal">
-          <T>A specially trained workforce of the Rhapsody Global Network, equipped to organize Rhapsody End-Time Teaching Crusades, win souls through door-to-door evangelism, and advance the gospel with precision to reach the last lost soul.</T>
+          <T>A specially trained workforce of the Rhapsody Global Network, trained and equipped to  propagate the gospel in this terminal generation till the last lost soul is brought in.</T>
         </p>
 
         {/* CTAs – royal blue + white bg / dark text / grey border for View Curriculum */}
