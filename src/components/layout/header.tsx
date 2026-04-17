@@ -10,6 +10,7 @@ import {
   Users,
   LogOut,
   BookOpen,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,6 +69,7 @@ export function Header() {
     { label: t("About"), href: "/about", icon: null },
     { label: t("Curriculum"), href: "/courses", icon: BookOpen },
     { label: t("Mentorship"), href: "/live-sessions", icon: Users },
+    ...(user?.role === "admin" ? [{ label: t("Admin"), href: "/admin", icon: Shield }] : []),
   ];
 
   return (

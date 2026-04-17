@@ -24,7 +24,9 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
   void timeSync;
   const onAir = isLiveOnAir(session);
   const staleLive = session.status === "live" && isScheduledWindowOver(session);
+  const isEnded = session.status === "ended" || staleLive;
   const isScheduled = session.status === "scheduled";
+  const hasRecording = Boolean(session.recordingUrl);
 
   return (
     <Link href={`/live-sessions/${session._id}`} className="block h-full group">
@@ -54,7 +56,7 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
                 <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-white inline-block" />
                 <T>Live Now</T>
               </Badge>
-            ) : staleLive ? (
+            ) : isEnded ? (
               <Badge className="bg-gray-100 text-gray-600 border-gray-200 rounded-full text-xs">
                 <T>Ended</T>
               </Badge>
@@ -84,7 +86,7 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
               <span>{format(parseISO(session.scheduledAt), "MMM d, yyyy")}</span>
             </div>
             <span className="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">
-              {onAir ? <T>Live Stream</T> : staleLive ? <T>Session ended</T> : <T>Live Session</T>}
+              {onAir ? <T>Live Stream</T> : isEnded ? <T>Session ended</T> : <T>Live Session</T>}
             </span>
           </div>
 
@@ -105,9 +107,9 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
                 <Radio className="h-3.5 w-3.5 animate-pulse" />
                 <T>Join Live</T>
               </span>
-            ) : staleLive ? (
+            ) : isEnded ? (
               <span className="inline-flex w-full justify-center items-center rounded-xl border border-[#D4D4D4] bg-white py-2.5 text-sm font-medium text-gray-800 shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.1),0px_1px_3px_0px_rgba(0,0,0,0.1)] group-hover:bg-gray-50 transition-colors">
-                <T>View Session</T>
+                {hasRecording ? <T>View Recording</T> : <T>View Session</T>}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </span>
             ) : isScheduled ? (
@@ -118,7 +120,7 @@ export function LiveSessionCard({ session }: { session: LiveSession }) {
               </span>
             ) : (
               <span className="inline-flex w-full justify-center items-center rounded-xl border border-[#D4D4D4] bg-white py-2.5 text-sm font-medium text-gray-800 shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.1),0px_1px_3px_0px_rgba(0,0,0,0.1)] group-hover:bg-gray-50 transition-colors">
-                <T>View Recording</T>
+                <T>View Session</T>
                 <ArrowRight className="ml-2 h-4 w-4" />
               </span>
             )}

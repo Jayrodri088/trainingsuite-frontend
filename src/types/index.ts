@@ -433,6 +433,8 @@ export interface OverviewAnalytics {
   };
   liveSessions: {
     upcoming: number;
+    active: number;
+    ended: number;
     live: number;
   };
 }

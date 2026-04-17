@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { LiveSessionCard } from "./live-session-card";
 import { LiveSessionCardSkeleton } from "./live-session-card";
 import type { LiveSession } from "@/types";
@@ -12,10 +13,18 @@ import { T } from "@/components/t";
 
 interface LiveSessionsSectionProps {
   sessions: LiveSession[];
+  endedSessions: LiveSession[];
   isLoading: boolean;
 }
 
-export function LiveSessionsSection({ sessions, isLoading }: LiveSessionsSectionProps) {
+type SessionView = "live" | "ended";
+
+export function LiveSessionsSection({
+  sessions,
+  endedSessions,
+  isLoading,
+}: LiveSessionsSectionProps) {
+  const [activeView, setActiveView] = useState<SessionView>("live");
   const [timeSync, setTimeSync] = useState(0);
 
   useEffect(() => {
@@ -26,8 +35,13 @@ export function LiveSessionsSection({ sessions, isLoading }: LiveSessionsSection
 
   void timeSync;
   const hasLiveNow = sessions.some(isLiveOnAir);
+  const visibleSessions = activeView === "live" ? sessions : endedSessions;
+  const emptyMessage =
+    activeView === "live"
+      ? "No live or upcoming sessions available."
+      : "No ended sessions available.";
 
-  if (sessions.length === 0 && !isLoading) return null;
+  if (sessions.length === 0 && endedSessions.length === 0 && !isLoading) return null;
 
   return (
     <section className="py-16 sm:py-20 md:py-24 lg:py-32 border-t border-gray-200 bg-gray-50">
@@ -58,13 +72,40 @@ export function LiveSessionsSection({ sessions, isLoading }: LiveSessionsSection
           </Link>
         </div>
 
+        <div className="mb-6 flex justify-center">
+          <div className="inline-flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
+            <Button
+              type="button"
+              variant={activeView === "live" ? "default" : "ghost"}
+              className="h-9 rounded-md px-4 text-sm"
+              onClick={() => setActiveView("live")}
+            >
+              <T>Live Sessions</T>
+            </Button>
+            <Button
+              type="button"
+              variant={activeView === "ended" ? "default" : "ghost"}
+              className="h-9 rounded-md px-4 text-sm"
+              onClick={() => setActiveView("ended")}
+            >
+              <T>Ended Sessions</T>
+            </Button>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {isLoading ? (
             [...Array(4)].map((_, i) => <LiveSessionCardSkeleton key={i} />)
-          ) : (
-            sessions.map((session) => (
+          ) : visibleSessions.length > 0 ? (
+            visibleSessions.map((session) => (
               <LiveSessionCard key={session._id} session={session} />
             ))
+          ) : (
+            <div className="sm:col-span-2 lg:col-span-4 rounded-lg border border-gray-200 bg-white px-6 py-10 text-center">
+              <p className="text-sm font-medium text-gray-600">
+                <T>{emptyMessage}</T>
+              </p>
+            </div>
           )}
         </div>
       </div>

@@ -92,16 +92,17 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
 
   return (
     <AccordionItem value={module._id} className="border rounded-lg px-4">
-      <AccordionTrigger className="hover:no-underline py-4">
-        <div className="flex items-center gap-4 text-left">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium">
-            {index + 1}
+      <AccordionTrigger className="items-center hover:no-underline py-4">
+        <div className="flex flex-1 items-center justify-between gap-4 text-left">
+          <div className="flex min-w-0 items-center gap-4">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium">
+              {index + 1}
+            </div>
+            <h4 className="truncate font-medium text-sm">{t(module.title)}</h4>
           </div>
-          <div>
-            <h4 className="font-medium text-sm">{t(module.title)}</h4>
-            <p className="text-xs text-gray-600 mt-0.5">
-              {lessons.length} <T>lessons</T>{totalDuration > 0 ? ` • ${totalDuration} min` : ""}
-            </p>
+          <div className="shrink-0 text-right text-xs text-gray-600">
+            {lessons.length} {lessons.length === 1 ? <T>lesson</T> : <T>lessons</T>}
+            {totalDuration > 0 ? ` • ${totalDuration} min` : ""}
           </div>
         </div>
       </AccordionTrigger>

@@ -193,9 +193,15 @@ export default function AdminDashboardPage() {
                   <span className="font-bold font-mono">{analytics?.liveSessions?.upcoming || 0}</span>
                 </div>
                 <div className="flex justify-between items-center p-4 hover:bg-gray-50 transition-colors">
-                  <span className="text-sm font-medium text-gray-600">Live Sessions Now</span>
-                  <Badge variant={analytics?.liveSessions?.live ? "default" : "secondary"} className="rounded-lg">
-                    {analytics?.liveSessions?.live || 0}
+                  <span className="text-sm font-medium text-gray-600">Active Live Sessions</span>
+                  <Badge variant={analytics?.liveSessions?.active ? "default" : "secondary"} className="rounded-lg">
+                    {analytics?.liveSessions?.active || 0}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center p-4 hover:bg-gray-50 transition-colors">
+                  <span className="text-sm font-medium text-gray-600">Ended Sessions</span>
+                  <Badge variant={analytics?.liveSessions?.ended ? "outline" : "secondary"} className="rounded-lg">
+                    {analytics?.liveSessions?.ended || 0}
                   </Badge>
                 </div>
               </div>

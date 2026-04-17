@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth, useEnrollments } from "@/hooks";
 import { coursesApi } from "@/lib/api/courses";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
+import { isScheduledWindowOver } from "@/lib/live-session-utils";
 import type { Course, Enrollment } from "@/types";
 import { useT } from "@/components/t";
 import {
@@ -44,14 +45,24 @@ export default function HomePage() {
     refetchInterval: 30000,
   });
 
+  const { data: endedLiveSessionsResponse, isLoading: isLoadingEndedLiveSessions } = useQuery({
+    queryKey: ["home-ended-live-sessions"],
+    queryFn: () => liveSessionsApi.getAll(1, 10, "ended"),
+    refetchInterval: 30000,
+  });
+
   const courses = (coursesResponse?.data || []).filter(
     (course): course is Course => Boolean(course?._id && course.title)
   );
   const enrollments = enrollmentsResponse?.data || [];
   const liveSessions = liveSessionsResponse?.data || [];
+  const endedLiveSessions = endedLiveSessionsResponse?.data || [];
+  const staleEndedSessions = liveSessions.filter(
+    (s) => (s.status === "live" || s.status === "scheduled") && isScheduledWindowOver(s)
+  );
 
   const sortedLiveSessions = [...liveSessions]
-    .filter((s) => s.status === "live" || s.status === "scheduled")
+    .filter((s) => (s.status === "live" || s.status === "scheduled") && !isScheduledWindowOver(s))
     .sort((a, b) => {
       if (a.status === "live" && b.status !== "live") return -1;
       if (a.status !== "live" && b.status === "live") return 1;
@@ -59,7 +70,14 @@ export default function HomePage() {
     })
     .slice(0, 4);
 
-  const hasLiveSessions = sortedLiveSessions.length > 0;
+  const sortedEndedLiveSessions = [...endedLiveSessions, ...staleEndedSessions]
+    .filter((session, index, sessions) =>
+      sessions.findIndex((candidate) => candidate._id === session._id) === index
+    )
+    .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())
+    .slice(0, 4);
+
+  const hasLiveSessions = sortedLiveSessions.length > 0 || sortedEndedLiveSessions.length > 0;
 
   const enrollmentMap = new Map<string, Enrollment>();
   if (enrollments) {
@@ -90,10 +108,11 @@ export default function HomePage() {
         isLoading={isLoading}
       />
       <TestimoniesSection />
-      {(hasLiveSessions || isLoadingLiveSessions) && (
+      {(hasLiveSessions || isLoadingLiveSessions || isLoadingEndedLiveSessions) && (
         <LiveSessionsSection
           sessions={sortedLiveSessions}
-          isLoading={isLoadingLiveSessions}
+          endedSessions={sortedEndedLiveSessions}
+          isLoading={isLoadingLiveSessions || isLoadingEndedLiveSessions}
         />
       )}
       <StatementSection

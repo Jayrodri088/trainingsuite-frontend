@@ -71,22 +71,28 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
 
         {/* Carousel: break out of hero padding so it touches left/right edges of the dark section */}
         <div className="relative z-10 -mx-4 sm:-mx-6 lg:-mx-8 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] lg:w-[calc(100%+4rem)] overflow-hidden mt-auto pb-10 sm:pb-12 md:pb-14">
-          <div className="flex animate-hero-carousel gap-4 sm:gap-5 md:gap-6">
-            {[...HERO_IMAGES, ...HERO_IMAGES].map((src, i) => (
-              <div
-                key={i}
-                className="relative shrink-0 w-[220px] sm:w-[260px] md:w-[300px] aspect-4/3 rounded-xl overflow-hidden border-2 border-white/40 bg-white/5 shadow-lg"
-              >
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  priority={i < 4}
-                  className="object-cover"
-                  sizes="300px"
-                />
-              </div>
-            ))}
+          <div className="flex animate-hero-carousel gap-4 sm:gap-5 md:gap-6 [--hero-carousel-distance:944px] sm:[--hero-carousel-distance:1120px] md:[--hero-carousel-distance:1296px]">
+            {Array.from({ length: 3 }).flatMap((_, setIndex) =>
+              HERO_IMAGES.map((src, imageIndex) => {
+                const itemIndex = setIndex * HERO_IMAGES.length + imageIndex;
+
+                return (
+                  <div
+                    key={`${setIndex}-${src}`}
+                    className="relative shrink-0 w-[220px] sm:w-[260px] md:w-[300px] aspect-4/3 rounded-xl overflow-hidden border-2 border-white/40 bg-white/5 shadow-lg"
+                  >
+                    <Image
+                      src={src}
+                      alt=""
+                      fill
+                      priority={itemIndex < HERO_IMAGES.length}
+                      className="object-cover"
+                      sizes="300px"
+                    />
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       </div>

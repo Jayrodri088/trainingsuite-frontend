@@ -43,18 +43,27 @@ export function CourseListSection({
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center sm:justify-items-stretch">
-          {(
-            courses.map((course) => (
+        {courses.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center sm:justify-items-stretch">
+            {courses.map((course) => (
               <div key={course._id} className="w-full max-w-[280px] sm:max-w-none md:max-w-none">
                 <CourseCard
                   course={course}
                   enrollment={enrollmentMap.get(course._id)}
                 />
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-lg border border-gray-200 bg-gray-50 px-6 py-10 text-center">
+            <h3 className="font-sans text-lg font-semibold text-black">
+              <T>No courses available</T>
+            </h3>
+            <p className="mt-2 text-sm text-gray-600">
+              <T>Training programs will appear here once they are published.</T>
+            </p>
+          </div>
+        )}
 
         {/* <Link
           href="/courses"
