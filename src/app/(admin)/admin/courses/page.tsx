@@ -309,7 +309,7 @@ export default function CoursesPage() {
               </Select>
             </div>
             <div className="flex gap-2 w-full sm:w-auto justify-end">
-              <Button variant="outline" size="sm" className="rounded-xl border-gray-200 bg-white shadow-sm">
+              <Button variant="outline" size="sm" className="rounded-xl border-gray-200 bg-white shadow-sm min-w-[108px]">
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
@@ -319,7 +319,7 @@ export default function CoursesPage() {
         <CardContent className="p-6">
           {/* Bulk Actions */}
           {selectedCourses.length > 0 && (
-            <div className="flex flex-wrap items-center gap-3 mb-6 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+            <div className="flex flex-wrap items-center gap-2.5 mb-6 p-3 bg-primary/5 border border-primary/20 rounded-lg">
               <span className="text-sm font-medium px-2">
                 {selectedCourses.length} selected
               </span>

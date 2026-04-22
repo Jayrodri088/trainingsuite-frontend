@@ -61,6 +61,7 @@ function ResetPasswordForm() {
       const response = await authApi.resetPassword({
         token,
         password: data.password,
+        confirmPassword: data.confirmPassword,
       });
       if (response.success) {
         setIsSuccess(true);

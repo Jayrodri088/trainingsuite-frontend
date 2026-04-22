@@ -18,6 +18,7 @@ export interface RegisterData {
 export interface ResetPasswordData {
   token: string;
   password: string;
+  confirmPassword: string;
 }
 
 export interface UpdateProfileData {
@@ -59,7 +60,7 @@ export const authApi = {
   },
 
   forgotPassword: async (email: string) => {
-    const response = await apiClient.post<ApiResponse<null>>(
+    const response = await publicApiClient.post<ApiResponse<null>>(
       "/auth/forgot-password",
       { email }
     );
@@ -67,7 +68,7 @@ export const authApi = {
   },
 
   resetPassword: async (data: ResetPasswordData) => {
-    const response = await apiClient.post<ApiResponse<null>>(
+    const response = await publicApiClient.post<ApiResponse<null>>(
       "/auth/reset-password",
       data
     );

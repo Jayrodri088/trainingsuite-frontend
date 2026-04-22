@@ -91,7 +91,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
         </div>
       </form>
 
-      <div className="flex items-center gap-2 ml-auto">
+      <div className="flex items-center gap-2.5 ml-auto">
         {/* Language Selector */}
         <LanguageSelector />
 
@@ -157,7 +157,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="flex items-center gap-3 pl-2 pr-1 h-10 rounded-lg hover:bg-gray-200 hover:text-gray-900 text-gray-700 border-0 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-0"
+                className="flex items-center gap-2.5 pl-2 pr-2 h-10 rounded-lg hover:bg-gray-200 hover:text-gray-900 text-gray-700 border-0 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-0"
               >
                 <Avatar className="h-8 w-8 border border-gray-200 rounded-[9999px]">
                   <AvatarImage src={user.avatar} alt={user.name} />

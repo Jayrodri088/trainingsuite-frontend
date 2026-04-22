@@ -21,6 +21,12 @@ import { LearningVideoPlayer } from "@/components/learning/video-player";
 import { CurriculumSidebar } from "@/components/learning/curriculum-sidebar";
 import { LessonContent } from "@/components/learning/lesson-content";
 
+function getLessonId(lesson: Lesson | null | undefined): string {
+  if (!lesson) return "";
+  const rawId = (lesson as Lesson & { id?: unknown })._id ?? (lesson as Lesson & { id?: unknown }).id;
+  return typeof rawId === "string" ? rawId : String(rawId ?? "");
+}
+
 export default function CourseLearnPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
@@ -78,6 +84,7 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
   );
   const firstLesson = modules[0]?.lessons?.[0] as Lesson | undefined;
   const activeLesson = currentLesson || firstLesson || null;
+  const activeLessonId = getLessonId(activeLesson);
 
   useEffect(() => {
     if (!currentLesson) {
@@ -93,9 +100,21 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
     }
   }, [currentLesson, firstLesson, modules]);
 
+  function goToLesson(lesson: Lesson | null) {
+    if (!lesson) return;
+    setCurrentLesson(lesson);
+  }
+
   function handleVideoEnd() {
-    if (activeLesson && !completedLessonIds.has(activeLesson._id) && !markCompleteMutation.isPending) {
-      markCompleteMutation.mutate(activeLesson._id);
+    if (!activeLesson) return;
+
+    if (!completedLessonIds.has(activeLessonId) && !markCompleteMutation.isPending) {
+      markCompleteMutation.mutate(activeLessonId);
+    }
+
+    // Auto-advance to the next lesson when playback finishes.
+    if (nextLesson) {
+      goToLesson(nextLesson);
     }
   }
 
@@ -157,7 +176,7 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
   }
 
   const allLessons = modules.flatMap((m) => (m.lessons || []) as Lesson[]);
-  const currentIndex = allLessons.findIndex((l) => l._id === activeLesson?._id);
+  const currentIndex = allLessons.findIndex((l) => getLessonId(l) === activeLessonId);
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
 
@@ -193,9 +212,9 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
               <CurriculumSidebar
                 sheetLayout
                 modules={modules}
-                currentLessonId={activeLesson?._id || null}
+                currentLessonId={activeLessonId || null}
                 onSelectLesson={(lesson) => {
-                  setCurrentLesson(lesson);
+                  goToLesson(lesson);
                   setSidebarOpen(false);
                 }}
                 courseProgress={courseProgress}
@@ -209,10 +228,17 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
       <div className="flex-1 flex">
         <div className="flex-1 flex flex-col">
           <div className="bg-white border-b border-gray-200">
-            <LearningVideoPlayer lesson={activeLesson} onVideoEnd={handleVideoEnd} lessonId={activeLesson?._id} />
+            <div className="p-3 sm:p-4 lg:p-5">
+              <LearningVideoPlayer
+                key={activeLessonId}
+                lesson={activeLesson}
+                onVideoEnd={handleVideoEnd}
+                lessonId={activeLessonId}
+              />
+            </div>
             {isEnrolled && course.hasQuiz && (
-              <div className="flex items-center justify-end gap-2 px-3 sm:px-4 py-2.5 border-t border-gray-100">
-                <Button variant="outline" size="sm" className="rounded-[10px] border-gray-200 font-sans font-semibold text-[#0052CC] border-[#0052CC]/30 hover:bg-[#0052CC]/5" asChild>
+              <div className="flex items-center justify-end gap-2 px-3 sm:px-4 lg:px-5 py-2.5 border-t border-gray-100">
+                <Button variant="outline" size="sm" className="rounded-[10px] font-sans font-semibold text-[#0052CC] border-[#0052CC]/30 hover:bg-[#0052CC]/5" asChild>
                   <Link href={`${courseLearnBase}/quiz`}>
                     <ListChecks className="h-4 w-4 mr-2 shrink-0" />
                     <T>Course test</T>
@@ -222,18 +248,18 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
             )}
           </div>
 
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
-            <Button variant="ghost" size="sm" disabled={!prevLesson} className="rounded-[10px] font-sans" onClick={() => prevLesson && setCurrentLesson(prevLesson)}>
+          <div className="flex items-center justify-between gap-2 px-3 sm:px-4 lg:px-5 py-3 border-b border-gray-200 bg-white">
+            <Button variant="ghost" size="sm" disabled={!prevLesson} className="rounded-[10px] font-sans min-w-[92px]" onClick={() => goToLesson(prevLesson)}>
               <ChevronLeft className="h-4 w-4 mr-1" />
               <T>Previous</T>
             </Button>
-            {completedLessonIds.has(activeLesson?._id || "") && (
-              <div className="flex items-center text-sm text-green-600 font-sans">
+            {completedLessonIds.has(activeLessonId) && (
+              <div className="hidden sm:flex items-center text-sm text-green-600 font-sans">
                 <CheckCircle className="h-4 w-4 mr-2" />
                 <T>Completed</T>
               </div>
             )}
-            <Button variant="ghost" size="sm" disabled={!nextLesson} className="rounded-[10px] font-sans" onClick={() => nextLesson && setCurrentLesson(nextLesson)}>
+            <Button variant="ghost" size="sm" disabled={!nextLesson} className="rounded-[10px] font-sans min-w-[92px]" onClick={() => goToLesson(nextLesson)}>
               <T>Next</T>
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
@@ -276,8 +302,8 @@ export default function CourseLearnPage({ params }: { params: Promise<{ slug: st
         <aside className="w-80 border-l border-gray-200 bg-white hidden lg:block">
           <CurriculumSidebar
             modules={modules}
-            currentLessonId={activeLesson?._id || null}
-            onSelectLesson={setCurrentLesson}
+            currentLessonId={activeLessonId || null}
+            onSelectLesson={goToLesson}
             courseProgress={courseProgress}
             completedLessonIds={completedLessonIds}
           />

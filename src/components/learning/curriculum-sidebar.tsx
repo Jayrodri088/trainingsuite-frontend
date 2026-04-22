@@ -12,6 +12,11 @@ import type { Module, Lesson } from "@/types";
 import { cn } from "@/lib/utils";
 import { T, useT } from "@/components/t";
 
+function getLessonId(lesson: Lesson): string {
+  const rawId = (lesson as Lesson & { id?: unknown })._id ?? (lesson as Lesson & { id?: unknown }).id;
+  return typeof rawId === "string" ? rawId : String(rawId ?? "");
+}
+
 export function CurriculumSidebar({
   modules,
   currentLessonId,
@@ -54,7 +59,7 @@ export function CurriculumSidebar({
           <Accordion type="multiple" defaultValue={defaultOpenModules} className="space-y-2">
             {visibleModules.map((module, moduleIndex) => {
               const lessons = (module.lessons || []) as Lesson[];
-              const completedLessonsCount = lessons.filter((l) => completedLessonIds.has(l._id)).length;
+              const completedLessonsCount = lessons.filter((l) => completedLessonIds.has(getLessonId(l))).length;
 
               return (
                 <AccordionItem
@@ -79,10 +84,10 @@ export function CurriculumSidebar({
                     <div className="space-y-1">
                       {lessons.map((lesson) => (
                         <LessonItem
-                          key={lesson._id}
+                          key={getLessonId(lesson)}
                           lesson={lesson}
-                          isActive={currentLessonId === lesson._id}
-                          isCompleted={completedLessonIds.has(lesson._id)}
+                          isActive={currentLessonId === getLessonId(lesson)}
+                          isCompleted={completedLessonIds.has(getLessonId(lesson))}
                           isLocked={false}
                           onClick={() => onSelectLesson(lesson)}
                         />
