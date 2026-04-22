@@ -8,29 +8,29 @@ type IconPosition = "left" | "right";
 
 const INFO_ITEMS_KEYS = [
   {
-    titleKey: "Mission-Focused Training",
-    descKey: "Courses on organizing Rhapsody End-Time Teaching Crusades, door-to-door evangelism, church planting, prevailing prayer, and Christianizing your city using Rhapsody of Realities.",
+    titleKey: "Structured Curriculum",
+    descKey: "Theological and practical training materials curated for depth.",
     image: "/Images/image 1.png",
     frameCorner: "top-left" as FrameCorner,
     iconPosition: "left" as IconPosition,
   },
   {
-    titleKey: "Weekly Prevailing Prayers",
-    descKey: "Join the global workforce in targeted intercession sessions for your nation and region every week.",
+    titleKey: "HD Video Lessons",
+    descKey: "On-demand high-definition content from senior leadership.",
     image: "/Images/hd-film 1.png",
     frameCorner: "top-right" as FrameCorner,
     iconPosition: "right" as IconPosition,
   },
   {
-    titleKey: "Testimonies & Field Reports",
-    descKey: "Upload and share testimonies, reports, and footage of your field work and missionary assignments from your country.",
+    titleKey: "Live Mentorship",
+    descKey: "Real-time interactive sessions and spiritual guidance.",
     image: "/Images/image 3.png",
     frameCorner: "bottom-left" as FrameCorner,
     iconPosition: "left" as IconPosition,
   },
   {
-    titleKey: "Ask Pastor Chris",
-    descKey: "A dedicated dashboard where ministers can submit questions on life and ministry directly to Pastor Chris, their mentor and life coach.",
+    titleKey: "Official Certification",
+    descKey: "Recognized validation of completed ministry training.",
     image: "/Images/certificate 1.png",
     frameCorner: "bottom-right" as FrameCorner,
     iconPosition: "right" as IconPosition,

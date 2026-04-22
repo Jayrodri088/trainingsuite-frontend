@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks";
 import { T, useT } from "@/components/t";
 import { cn } from "@/lib/utils";
+import { InfoGrid } from "@/components/home";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -151,7 +152,7 @@ export default function AboutPage() {
               <T>Rhapsody Omega Force</T>
             </h1>
             <p ref={heroSubtitleRef} className="font-sans text-sm sm:text-base md:text-lg text-gray-600 mb-4 sm:mb-6 opacity-0 leading-relaxed">
-              <T>Rhapsody Omega Force is a group of specially trained individuals of the Rhapsody Global Network, consistently equipped to carry out specific missionary assignments with precision — using the Rhapsody of Realities — as we intensify our search for the last lost soul.</T>
+              <T>A specially trained workforce of the Rhapsody Global Network, trained and equipped to propagate the gospel in this terminal generation till the last lost soul is brought in.</T>
             </p>
             <div ref={heroButtonsRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 opacity-0 justify-center lg:justify-start">
               <Button asChild size="lg" className="rounded-lg h-11 px-6 sm:px-8 w-full sm:w-auto bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
@@ -208,6 +209,8 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      <InfoGrid />
 
       {/* Meet Our Leadership – Image beside text layout */}
       <section className="py-10 sm:py-14 md:py-20 bg-white">
