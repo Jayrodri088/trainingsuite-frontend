@@ -152,7 +152,7 @@ export default function AboutPage() {
               <T>Rhapsody Omega Force</T>
             </h1>
             <p ref={heroSubtitleRef} className="font-sans text-sm sm:text-base md:text-lg text-gray-600 mb-4 sm:mb-6 opacity-0 leading-relaxed">
-              <T>A specially trained workforce of the Rhapsody Global Network, trained and equipped to propagate the gospel in this terminal generation till the last lost soul is brought in.</T>
+              <T>Rhapsody Omega Force is a Kingdom movement — a force rising within the Rhapsody Global Network to finish the work of the gospel in this generation. The Rhapsody End-Time Teaching Crusades are where this vision comes alive, reaching nations with the undiluted message of Christ.</T>
             </p>
             <div ref={heroButtonsRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 opacity-0 justify-center lg:justify-start">
               <Button asChild size="lg" className="rounded-lg h-11 px-6 sm:px-8 w-full sm:w-auto bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
