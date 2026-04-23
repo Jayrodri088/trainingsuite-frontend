@@ -92,6 +92,13 @@ export const coursesApi = {
     return response.data;
   },
 
+  getCurriculumPublic: async (id: string) => {
+    const response = await publicApiClient.get<ApiResponse<CourseWithModules>>(
+      `/courses/${id}/curriculum`
+    );
+    return response.data;
+  },
+
   create: async (data: CreateCourseData) => {
     const response = await apiClient.post<ApiResponse<Course>>("/courses", data);
     return response.data;

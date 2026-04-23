@@ -120,6 +120,7 @@ export default function AdminCourseEditorPage({
   const [durationLoading, setDurationLoading] = useState(false);
   const [newObjective, setNewObjective] = useState("");
   const [courseTitle, setCourseTitle] = useState("");
+  const [courseDescription, setCourseDescription] = useState("");
 
   // Auto-extract video duration when URL changes
   const extractVideoDuration = useCallback(async (url: string) => {
@@ -347,7 +348,8 @@ export default function AdminCourseEditorPage({
 
   useEffect(() => {
     setCourseTitle(course?.title || "");
-  }, [course?.title]);
+    setCourseDescription(course?.description || "");
+  }, [course?.title, course?.description]);
 
   // Normalize thumbnail URL - convert old absolute URLs to relative
   const getThumbnailUrl = (url: string | undefined) => {
@@ -390,6 +392,23 @@ export default function AdminCourseEditorPage({
       return;
     }
     updateCourseMutation.mutate({ title: trimmed });
+  };
+
+  const handleCourseDescriptionSave = () => {
+    const trimmed = courseDescription.trim();
+    if (!trimmed) {
+      toast({ title: "Course description is required", variant: "destructive" });
+      setCourseDescription(course?.description || "");
+      return;
+    }
+    if (trimmed.length < 20) {
+      toast({ title: "Description must be at least 20 characters", variant: "destructive" });
+      return;
+    }
+    if (trimmed === (course?.description || "")) {
+      return;
+    }
+    updateCourseMutation.mutate({ description: trimmed });
   };
 
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -839,6 +858,30 @@ export default function AdminCourseEditorPage({
                   >
                     Save
                   </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="course-description">Course Description</Label>
+                <div className="space-y-2">
+                  <Textarea
+                    id="course-description"
+                    value={courseDescription}
+                    onChange={(e) => setCourseDescription(e.target.value)}
+                    onBlur={handleCourseDescriptionSave}
+                    placeholder="Enter course description"
+                    rows={5}
+                  />
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCourseDescriptionSave}
+                      disabled={updateCourseMutation.isPending}
+                    >
+                      Save description
+                    </Button>
+                  </div>
                 </div>
               </div>
 

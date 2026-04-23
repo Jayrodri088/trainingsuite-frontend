@@ -21,7 +21,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useAuth, useCategories, useEnrollments } from "@/hooks";
+import { useCategories, useEnrollments } from "@/hooks";
 import { adminApi } from "@/lib/api/admin";
 import { coursesApi } from "@/lib/api/courses";
 import type { Course, CourseFilters, Enrollment } from "@/types";
@@ -36,7 +36,6 @@ const COURSES_VIEW_MODE_STORAGE_KEY = "trainingsuite:courses-view-mode";
 function CoursesContent() {
   const searchParams = useSearchParams();
   const { t } = useT();
-  const { isAuthenticated } = useAuth();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
@@ -59,9 +58,9 @@ function CoursesContent() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [filters, setFilters] = useState<CourseFilters>({
     status: "published",
-    sort: "enrollmentCount",
+    sort: "createdAt",
     order: "desc",
-    limit: 50,
+    limit: 200,
   });
 
   const sortOptions = [
@@ -72,11 +71,9 @@ function CoursesContent() {
   ];
 
   const { data: coursesResponse, isLoading } = useQuery({
-    queryKey: ["public-courses", filters, searchQuery, isAuthenticated],
+    queryKey: ["public-courses", filters, searchQuery],
     queryFn: () =>
-      isAuthenticated
-        ? coursesApi.getAll({ ...filters, search: searchQuery || undefined })
-        : coursesApi.getAllPublic({ ...filters, search: searchQuery || undefined }),
+      coursesApi.getAllPublic({ ...filters, search: searchQuery || undefined }),
   });
 
   const { data: categoriesResponse } = useCategories();
