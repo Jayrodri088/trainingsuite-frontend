@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useCallback, useMemo } from "react";
+import { use, useState, useCallback, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -119,6 +119,7 @@ export default function AdminCourseEditorPage({
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [durationLoading, setDurationLoading] = useState(false);
   const [newObjective, setNewObjective] = useState("");
+  const [courseTitle, setCourseTitle] = useState("");
 
   // Auto-extract video duration when URL changes
   const extractVideoDuration = useCallback(async (url: string) => {
@@ -344,6 +345,10 @@ export default function AdminCourseEditorPage({
 
   const isLoading = courseLoading || curriculumLoading;
 
+  useEffect(() => {
+    setCourseTitle(course?.title || "");
+  }, [course?.title]);
+
   // Normalize thumbnail URL - convert old absolute URLs to relative
   const getThumbnailUrl = (url: string | undefined) => {
     if (!url) return null;
@@ -368,6 +373,23 @@ export default function AdminCourseEditorPage({
       objectives: [...(course.objectives || []), trimmed],
     });
     setNewObjective("");
+  };
+
+  const handleCourseTitleSave = () => {
+    const trimmed = courseTitle.trim();
+    if (!trimmed) {
+      toast({ title: "Course title is required", variant: "destructive" });
+      setCourseTitle(course?.title || "");
+      return;
+    }
+    if (trimmed.length < 3) {
+      toast({ title: "Title must be at least 3 characters", variant: "destructive" });
+      return;
+    }
+    if (trimmed === (course?.title || "")) {
+      return;
+    }
+    updateCourseMutation.mutate({ title: trimmed });
   };
 
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -534,7 +556,7 @@ export default function AdminCourseEditorPage({
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">{course.title}</h1>
+            <h1 className="text-2xl font-bold">{courseTitle || course.title}</h1>
             <div className="flex items-center gap-2 mt-1">
               <Badge
                 variant={course.status === "published" ? "default" : "secondary"}
@@ -793,6 +815,33 @@ export default function AdminCourseEditorPage({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="course-title">Course Title</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="course-title"
+                    value={courseTitle}
+                    onChange={(e) => setCourseTitle(e.target.value)}
+                    onBlur={handleCourseTitleSave}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleCourseTitleSave();
+                      }
+                    }}
+                    placeholder="Enter course title"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleCourseTitleSave}
+                    disabled={updateCourseMutation.isPending}
+                  >
+                    Save
+                  </Button>
+                </div>
+              </div>
+
               {/* Thumbnail Upload */}
               <div className="space-y-3">
                 <Label>Course Thumbnail</Label>
