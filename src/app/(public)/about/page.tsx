@@ -8,7 +8,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks";
-import { T, useT } from "@/components/t";
+import { T, usePageTranslation, useT } from "@/components/t";
 import { cn } from "@/lib/utils";
 import { InfoGrid } from "@/components/home";
 
@@ -34,9 +34,31 @@ const leadership = [
   },
 ];
 
+const ABOUT_PREFETCH_TEXTS: string[] = [
+  "Rhapsody Omega Force",
+  "Rhapsody Omega Force is a Kingdom movement — a force rising within the Rhapsody Global Network to finish the work of the gospel in this generation. The Rhapsody End-Time Teaching Crusades are where this vision comes alive, reaching nations with the undiluted message of Christ.",
+  "Explore Courses",
+  "View Curriculum",
+  "What Rhapsody Omega Force Is About",
+  "Rhapsody Omega Force is a specially trained workforce of the Rhapsody Global Network. These individuals are consistently trained to carry out specific missionary assignments with precision — using the Rhapsody of Realities — as we intensify our search for the last lost soul. At the core of the training is organizing Rhapsody End-Time Teaching Crusades in cities across the globe, alongside door-to-door evangelism, church planting, prevailing prayer, and strategic city transformation. The platform also offers weekly prayer sessions, field report uploads, ministry program participation, and the Ask Pastor Chris dashboard for direct mentorship.",
+  "Our Mission",
+  "The site offers a variety of mission-focused courses — including organizing Rhapsody End-Time Teaching Crusades in your city, door-to-door evangelism, church planting, winning through prevailing prayer, discipleship, and Christianizing your city using Rhapsody of Realities strategically.",
+  "Beyond training, the platform enables ministers to participate in ministry programs with Pastor Chris, upload testimonies, field reports and footage from their countries, and access the exclusive Ask Pastor Chris dashboard for life and ministry guidance.",
+  "Start Learning",
+  "Behind Rhapsody Omega Force is the excellent leadership of those committed to equipping ministers for global impact. Meet the people driving this vision.",
+  "Continue Your Learning Journey",
+  "Ready to Start Learning?",
+  "Continue your missionary training and stay equipped for precision gospel work with Rhapsody Omega Force.",
+  "Join the Rhapsody Omega Force workforce. Browse our courses and begin your missionary training today.",
+  "Browse Courses",
+  "Register Now",
+  ...leadership.flatMap((p) => [p.titleKey, p.bioKey]),
+];
+
 export default function AboutPage() {
   const { isAuthenticated } = useAuth();
   const { t } = useT();
+  usePageTranslation(ABOUT_PREFETCH_TEXTS);
   const heroSectionRef = useRef<HTMLElement>(null);
   const heroTitleRef = useRef<HTMLHeadingElement>(null);
   const heroSubtitleRef = useRef<HTMLParagraphElement>(null);
@@ -245,7 +267,7 @@ export default function AboutPage() {
                   <h3 className="font-sans text-xl sm:text-2xl md:text-3xl font-bold text-black">{person.name}</h3>
                   <p className="font-sans text-xs sm:text-sm md:text-base text-[#0052CC] font-medium">{t(person.titleKey)}</p>
                   <p className="font-sans text-gray-600 leading-relaxed text-sm md:text-base">
-                    <T>{person.bioKey}</T>
+                    {t(person.bioKey)}
                   </p>
                 </div>
               </div>

@@ -6,7 +6,7 @@ import { coursesApi } from "@/lib/api/courses";
 import { liveSessionsApi } from "@/lib/api/live-sessions";
 import { isScheduledWindowOver } from "@/lib/live-session-utils";
 import type { Course, Enrollment } from "@/types";
-import { useT } from "@/components/t";
+import { usePageTranslation, useT } from "@/components/t";
 import {
   HeroSection,
   AboutOmegaForceSection,
@@ -92,12 +92,27 @@ export default function HomePage() {
 
   const coursesToShow: Course[] = courses;
 
-  const statementItems = [
-    t("Organize Rhapsody End-Time Teaching Crusades in Your City"),
-    t("Weekly Prevailing Prayer Sessions for Your Nation"),
-    t("Participate in Ministry Programs with Pastor Chris"),
-    t("Upload Field Work Reports, Testimonies & Footage"),
+  const statementItemKeys = [
+    "Organize Rhapsody End-Time Teaching Crusades in Your City",
+    "Weekly Prevailing Prayer Sessions for Your Nation",
+    "Participate in Ministry Programs with Pastor Chris",
+    "Upload Field Work Reports, Testimonies & Footage",
   ];
+  const statementItems = statementItemKeys.map((item) => t(item));
+  const courseTexts = coursesToShow.flatMap((course) =>
+    [course.title, course.description].filter(Boolean) as string[]
+  );
+
+  usePageTranslation([
+    "Rhapsody Omega Force",
+    "A specially trained workforce of the Rhapsody Global Network, equipped to propagate the gospel in this terminal generation till the last lost soul is brought in. This is accomplished through the Rhapsody End-Time Teaching Crusades.",
+    "About Rhapsody Omega Force",
+    "Rhapsody Omega Force is a Kingdom movement — a force rising within the Rhapsody Global Network to finish the work of the gospel in this generation. The Rhapsody End-Time Teaching Crusades are where this vision comes alive, reaching nations with the undiluted message of Christ.",
+    "Ready to answer the call to service?",
+    "Join the Rhapsody Omega Force — the specially trained workforce of the Rhapsody Global Network — as we intensify the search for the last lost soul and advance the gospel with precision.",
+    ...statementItemKeys,
+    ...courseTexts,
+  ]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">

@@ -25,7 +25,7 @@ import { useCategories, useEnrollments } from "@/hooks";
 import { adminApi } from "@/lib/api/admin";
 import { coursesApi } from "@/lib/api/courses";
 import type { Course, CourseFilters, Enrollment } from "@/types";
-import { T, useT } from "@/components/t";
+import { T, usePageTranslation, useT } from "@/components/t";
 import { CourseCardPublic } from "@/components/courses/course-card-public";
 import { CoursesFilterSidebar, COURSE_LANGUAGES } from "@/components/courses/courses-filter-sidebar";
 import { CoursesLoading } from "@/components/courses/courses-loading";
@@ -100,6 +100,17 @@ function CoursesContent() {
   }, [enrollmentsResponse?.data]);
 
   const activeFiltersCount = [filters.category, filters.network, filters.language].filter(Boolean).length;
+  const dynamicCourseTexts = courses.flatMap((course) =>
+    [course.title, course.description].filter(Boolean) as string[]
+  );
+  const dynamicCategoryTexts = categories.map((category) => category.name).filter(Boolean);
+  const dynamicNetworkTexts = networks.filter((network): network is string => Boolean(network));
+
+  usePageTranslation([
+    ...dynamicCourseTexts,
+    ...dynamicCategoryTexts,
+    ...dynamicNetworkTexts,
+  ]);
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">

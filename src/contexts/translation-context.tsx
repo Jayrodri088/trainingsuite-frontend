@@ -136,6 +136,13 @@ export const SUPPORTED_LANGUAGES = [
 const STORAGE_KEY = 'preferred-language';
 const CACHE_KEY = 'translation-cache';
 
+function normalizeText(text: string): string {
+  return text
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 interface TranslationContextType {
   language: string;
   setLanguage: (lang: string) => void;
@@ -186,7 +193,7 @@ function saveCache(): void {
 }
 
 function getCacheKey(text: string, from: string, to: string): string {
-  return `${from}:${to}:${text}`;
+  return `${from}:${to}:${normalizeText(text)}`;
 }
 
 // Detect user's preferred language
@@ -240,8 +247,10 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
   const translateBatch = useCallback(async (texts: string[], retryCount = 0) => {
     if (language === 'en' || texts.length === 0) return;
 
+    const normalizedTexts = [...new Set(texts.map(normalizeText).filter(Boolean))];
+
     // Filter out already cached/pending texts
-    const toTranslate = texts.filter(text => {
+    const toTranslate = normalizedTexts.filter(text => {
       const cacheKey = getCacheKey(text, 'en', language);
       return !translationCache.has(cacheKey) && !pendingTranslations.current.has(text);
     });
@@ -260,43 +269,47 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
     }
 
     try {
-      // Process all chunks in parallel
-      const results = await Promise.allSettled(
-        chunks.map(async (chunk) => {
-          const response = await fetch(`${getApiBaseUrl()}/translate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              texts: chunk,
-              from: 'en',
-              to: language,
-            }),
-          });
-
-          const data = await response.json();
-
-          if (response.ok && data.success && data.data?.translations) {
-            Object.entries(data.data.translations).forEach(([original, translated]) => {
-              const cacheKey = getCacheKey(original, 'en', language);
-              translationCache.set(cacheKey, translated as string);
-            });
-            return { success: true };
-          } else if (response.status === 429) {
-            return { success: false, rateLimited: true, chunk };
-          } else {
-            console.error('Translation failed:', data.error || 'Unknown error');
-            return { success: false };
-          }
-        })
-      );
-
-      // Handle rate-limited chunks with retry
+      // Process chunks sequentially to reduce rate limiting / flaky partial failures when many
+      // long strings are translated together (parallel bursts were easy to overload).
       const rateLimitedChunks: string[] = [];
-      results.forEach((result) => {
-        if (result.status === 'fulfilled' && result.value.rateLimited && result.value.chunk) {
-          rateLimitedChunks.push(...result.value.chunk);
+      for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+        const chunk = chunks[chunkIndex];
+
+        const response = await fetch(`${getApiBaseUrl()}/translate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            texts: chunk,
+            from: 'en',
+            to: language,
+          }),
+        });
+
+        let data: {
+          success?: boolean;
+          error?: string;
+          message?: string;
+          data?: { translations?: Record<string, string> };
+        } = {};
+        try {
+          data = await response.json();
+        } catch {
+          /* non-JSON response */
         }
-      });
+
+        if (response.ok && data.success && data.data?.translations) {
+          const translations = data.data.translations;
+          Object.entries(translations).forEach(([original, translated]) => {
+            const normalizedOriginal = normalizeText(String(original));
+            const cacheKey = getCacheKey(normalizedOriginal, 'en', language);
+            translationCache.set(cacheKey, String(translated));
+          });
+        } else if (response.status === 429) {
+          rateLimitedChunks.push(...chunk);
+        } else {
+          console.error('Translation failed:', data.error || 'Unknown error');
+        }
+      }
 
       if (rateLimitedChunks.length > 0 && retryCount < 3) {
         console.warn('Translation rate limited, retrying in 2s...');
@@ -319,14 +332,15 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
 
   // Queue text for batch translation
   const queueForTranslation = useCallback((text: string) => {
-    if (!text || language === 'en') return;
+    const normalized = normalizeText(text);
+    if (!normalized || language === 'en') return;
     
-    const cacheKey = getCacheKey(text, 'en', language);
-    if (translationCache.has(cacheKey) || pendingTranslations.current.has(text)) return;
+    const cacheKey = getCacheKey(normalized, 'en', language);
+    if (translationCache.has(cacheKey) || pendingTranslations.current.has(normalized)) return;
 
     // Avoid duplicates in the queue
-    if (!batchQueue.current.includes(text)) {
-      batchQueue.current.push(text);
+    if (!batchQueue.current.includes(normalized)) {
+      batchQueue.current.push(normalized);
     }
     
     // Debounce batch requests - wait 300ms to collect more texts
@@ -344,14 +358,17 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
   // Note: We intentionally include translationVersion in deps to get fresh cache reads
   const t = useCallback((text: string): string => {
     if (!text || language === 'en') return text;
-    
-    const cacheKey = getCacheKey(text, 'en', language);
+
+    const normalized = normalizeText(text);
+    if (!normalized) return text;
+
+    const cacheKey = getCacheKey(normalized, 'en', language);
     const cached = translationCache.get(cacheKey);
     
     if (cached) return cached;
     
     // Queue for translation if not cached
-    queueForTranslation(text);
+    queueForTranslation(normalized);
     
     return text; // Return original while translating
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -400,10 +417,19 @@ export function useTranslation() {
 // Hook for translating page content on mount
 export function usePageTranslation(texts: string[]) {
   const { translateBatch, language } = useTranslation();
-  
+  // Callers often pass a fresh array literal each render; depend on serialized content instead
+  // of array identity so we don't constantly re-trigger batch translation work.
+  const textsKey = JSON.stringify(texts);
+
   useEffect(() => {
-    if (language !== 'en' && texts.length > 0) {
-      translateBatch(texts);
+    if (language === 'en') return;
+    let parsed: string[] = [];
+    try {
+      parsed = JSON.parse(textsKey) as string[];
+    } catch {
+      return;
     }
-  }, [language, texts, translateBatch]);
+    if (!Array.isArray(parsed) || parsed.length === 0) return;
+    translateBatch(parsed);
+  }, [language, textsKey, translateBatch]);
 }

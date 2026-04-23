@@ -45,7 +45,7 @@ import { enrollmentsApi } from "@/lib/api/enrollments";
 import { paymentsApi } from "@/lib/api/payments";
 import { cn, coursePlaceholderGradientClass, normalizeUploadUrl } from "@/lib/utils";
 import type { Course, Module, Lesson, Rating } from "@/types";
-import { T, useT } from "@/components/t";
+import { T, usePageTranslation, useT } from "@/components/t";
 
 const levelColors = {
   beginner: "bg-green-100 text-green-800",
@@ -523,6 +523,18 @@ export default function CourseDetailPage({
     0
   );
 
+  const curriculumTexts = visibleModules.flatMap((module) => {
+    const moduleLessons = ((module.lessons || []) as Lesson[]);
+    return [module.title, ...moduleLessons.map((lesson) => lesson.title)].filter(Boolean) as string[];
+  });
+  usePageTranslation([
+    course.title,
+    course.description || "",
+    ...(course.objectives || []),
+    ...(course.requirements || []),
+    ...curriculumTexts,
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Dark hero section – sharp structure: radius, spacing, clear hierarchy */}
@@ -951,6 +963,10 @@ function RelatedCourses({
     .filter((course: Course) => Boolean(course?._id && course.title))
     .filter((course: Course) => course._id !== currentCourseId)
     .slice(0, 4);
+  const relatedCourseTexts = relatedCourses.flatMap((course: Course) =>
+    [course.title, course.description].filter(Boolean) as string[]
+  );
+  usePageTranslation(relatedCourseTexts);
 
   if (!categoryId || (relatedCourses.length === 0 && !isLoading)) {
     return null;
