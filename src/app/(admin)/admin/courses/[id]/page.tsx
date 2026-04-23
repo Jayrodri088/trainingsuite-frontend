@@ -114,6 +114,7 @@ export default function AdminCourseEditorPage({
     videoUrl: "",
     videoDuration: 0,
     isFree: false,
+    isPublished: true,
   });
 
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
@@ -472,6 +473,7 @@ export default function AdminCourseEditorPage({
         videoUrl: lesson.videoUrl || "",
         videoDuration: lesson.videoDuration || lesson.duration || 0,
         isFree: lesson.isFree || false,
+        isPublished: lesson.isPublished ?? false,
       });
     } else {
       setEditingLesson(null);
@@ -483,6 +485,7 @@ export default function AdminCourseEditorPage({
         videoUrl: "",
         videoDuration: 0,
         isFree: false,
+        isPublished: true,
       });
     }
     setLessonDialogOpen(true);
@@ -513,6 +516,7 @@ export default function AdminCourseEditorPage({
       title: lessonForm.title,
       type: lessonForm.type,
       isFree: lessonForm.isFree,
+      isPublished: lessonForm.isPublished,
     };
 
     if (lessonForm.description?.trim()) {
@@ -755,6 +759,12 @@ export default function AdminCourseEditorPage({
                                           <div className="flex items-center gap-2 mt-0.5">
                                             <Badge variant="outline" className="text-xs">
                                               {lesson.type || "text"}
+                                            </Badge>
+                                            <Badge
+                                              variant={lesson.isPublished ? "default" : "secondary"}
+                                              className="text-xs"
+                                            >
+                                              {lesson.isPublished ? "Published" : "Draft"}
                                             </Badge>
                                             {lesson.duration && (
                                               <span className="text-xs text-gray-600">
@@ -1366,6 +1376,22 @@ export default function AdminCourseEditorPage({
                 </div>
                 <span className="text-sm text-gray-600">
                   (Allow non-enrolled users to access this lesson)
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="isPublished"
+                    checked={lessonForm.isPublished ?? false}
+                    onCheckedChange={(checked) =>
+                      setLessonForm({ ...lessonForm, isPublished: checked })
+                    }
+                  />
+                  <Label htmlFor="isPublished">Published</Label>
+                </div>
+                <span className="text-sm text-gray-600">
+                  (Only published lessons are visible in public course curriculum)
                 </span>
               </div>
 

@@ -38,7 +38,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { useCourseRatings, useAuth } from "@/hooks";
+import { useCourseCurriculum, useCourseRatings, useAuth } from "@/hooks";
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi } from "@/lib/api/courses";
 import { enrollmentsApi } from "@/lib/api/enrollments";
@@ -298,19 +298,18 @@ export default function CourseDetailPage({
     isLoading: courseLoading,
     isError: courseError,
   } = useQuery({
-    queryKey: ["public-course", resolvedParams.slug],
-    queryFn: () => coursesApi.getBySlugPublic(resolvedParams.slug),
+    queryKey: ["public-course", resolvedParams.slug, isAuthenticated],
+    queryFn: () =>
+      isAuthenticated
+        ? coursesApi.getBySlug(resolvedParams.slug)
+        : coursesApi.getBySlugPublic(resolvedParams.slug),
     enabled: !!resolvedParams.slug,
   });
   const {
     data: curriculumResponse,
     isLoading: curriculumLoading,
     isError: curriculumError,
-  } = useQuery({
-    queryKey: ["public-course-curriculum", resolvedParams.slug],
-    queryFn: () => coursesApi.getCurriculumPublic(resolvedParams.slug),
-    enabled: !!resolvedParams.slug,
-  });
+  } = useCourseCurriculum(resolvedParams.slug);
   const { data: ratingsResponse } = useCourseRatings(resolvedParams.slug);
 
   // Check enrollment status - need course ID, so wait for course to load
@@ -940,8 +939,11 @@ function RelatedCourses({
   const { t } = useT();
   const { isAuthenticated } = useAuth();
   const { data: relatedResponse, isLoading } = useQuery({
-    queryKey: ["related-courses", categoryId],
-    queryFn: () => coursesApi.getAllPublic({ category: categoryId, limit: 4, status: "published" as const }),
+    queryKey: ["related-courses", categoryId, isAuthenticated],
+    queryFn: () =>
+      isAuthenticated
+        ? coursesApi.getAll({ category: categoryId, limit: 4, status: "published" as const })
+        : coursesApi.getAllPublic({ category: categoryId, limit: 4, status: "published" as const }),
     enabled: !!categoryId,
   });
 

@@ -17,6 +17,7 @@ export interface CreateLessonData {
   videoUrl?: string;
   videoDuration?: number;
   isFree?: boolean;
+  isPublished?: boolean;
   order?: number;
 }
 
