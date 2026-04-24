@@ -479,21 +479,6 @@ export default function CourseDetailPage({
 
   const ratings = (ratingsResponse?.data || []) as Rating[];
 
-  if (visibleModules.length === 0) {
-    return (
-      <div className="container max-w-6xl py-12 sm:py-16 px-4 sm:px-6 text-center">
-        <h1 className="text-xl sm:text-2xl font-bold"><T>Course not currently available</T></h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-2">
-          <T>This course does not currently have any learner-visible content.</T>
-        </p>
-        <Button className="mt-4 sm:mt-6" onClick={() => router.push("/courses")}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          <T>Back to Courses</T>
-        </Button>
-      </div>
-    );
-  }
-
   // Find user's existing review
   const userReview = user
     ? ratings.find((r) => r.user?._id === user._id)
