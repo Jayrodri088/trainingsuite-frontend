@@ -435,11 +435,26 @@ export default function CourseDetailPage({
     }
   };
 
+  const course = courseResponse?.data;
+  const curriculumData = curriculumResponse?.data as { curriculum?: Module[] } | undefined;
+  const modules = (curriculumData?.curriculum || []) as Module[];
+  const visibleModules = modules.filter((module) => ((module.lessons || []) as Lesson[]).length > 0);
+  const curriculumTexts = visibleModules.flatMap((module) => {
+    const moduleLessons = ((module.lessons || []) as Lesson[]);
+    return [module.title, ...moduleLessons.map((lesson) => lesson.title)].filter(Boolean) as string[];
+  });
+  // Keep hook order stable across loading/error/success renders.
+  usePageTranslation([
+    course?.title || "",
+    course?.description || "",
+    ...(course?.objectives || []),
+    ...(course?.requirements || []),
+    ...curriculumTexts,
+  ]);
+
   if (courseLoading || curriculumLoading) {
     return <PageLoader />;
   }
-
-  const course = courseResponse?.data;
 
   if (courseError || curriculumError || !course?._id || !course.title) {
     return (
@@ -456,9 +471,6 @@ export default function CourseDetailPage({
     );
   }
 
-  const curriculumData = curriculumResponse?.data as { curriculum?: Module[] } | undefined;
-  const modules = (curriculumData?.curriculum || []) as Module[];
-  const visibleModules = modules.filter((module) => ((module.lessons || []) as Lesson[]).length > 0);
   const ratings = (ratingsResponse?.data || []) as Rating[];
 
   if (visibleModules.length === 0) {
@@ -522,18 +534,6 @@ export default function CourseDetailPage({
       ) || 0),
     0
   );
-
-  const curriculumTexts = visibleModules.flatMap((module) => {
-    const moduleLessons = ((module.lessons || []) as Lesson[]);
-    return [module.title, ...moduleLessons.map((lesson) => lesson.title)].filter(Boolean) as string[];
-  });
-  usePageTranslation([
-    course.title,
-    course.description || "",
-    ...(course.objectives || []),
-    ...(course.requirements || []),
-    ...curriculumTexts,
-  ]);
 
   return (
     <div className="min-h-screen bg-background">
