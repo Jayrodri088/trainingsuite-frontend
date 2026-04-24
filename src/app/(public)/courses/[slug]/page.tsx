@@ -38,7 +38,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { useCourseCurriculum, useCourseRatings, useAuth } from "@/hooks";
+import { useCourseRatings, useAuth } from "@/hooks";
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi } from "@/lib/api/courses";
 import { enrollmentsApi } from "@/lib/api/enrollments";
@@ -308,8 +308,14 @@ export default function CourseDetailPage({
   const {
     data: curriculumResponse,
     isLoading: curriculumLoading,
-    isError: curriculumError,
-  } = useCourseCurriculum(resolvedParams.slug);
+  } = useQuery({
+    queryKey: ["public-course-curriculum", resolvedParams.slug, isAuthenticated],
+    queryFn: () =>
+      isAuthenticated
+        ? coursesApi.getCurriculum(resolvedParams.slug)
+        : coursesApi.getCurriculumPublic(resolvedParams.slug),
+    enabled: !!resolvedParams.slug,
+  });
   const { data: ratingsResponse } = useCourseRatings(resolvedParams.slug);
 
   // Check enrollment status - need course ID, so wait for course to load
@@ -456,7 +462,7 @@ export default function CourseDetailPage({
     return <PageLoader />;
   }
 
-  if (courseError || curriculumError || !course?._id || !course.title) {
+  if (courseError || !course?._id || !course.title) {
     return (
       <div className="container max-w-6xl py-12 sm:py-16 px-4 sm:px-6 text-center">
         <h1 className="text-xl sm:text-2xl font-bold"><T>Course not found</T></h1>
