@@ -86,10 +86,6 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
   const lessons = (module.lessons || []) as Lesson[];
   const totalDuration = lessons.reduce((acc, lesson) => acc + (lesson.duration || 0), 0);
 
-  if (lessons.length === 0) {
-    return null;
-  }
-
   return (
     <AccordionItem value={module._id} className="border rounded-lg px-4">
       <AccordionTrigger className="items-center hover:no-underline py-4">
@@ -108,13 +104,17 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
       </AccordionTrigger>
       <AccordionContent className="pb-4">
         <div className="space-y-1 ml-12">
-          {lessons.map((lesson) => (
-            <LessonItem
-              key={lesson._id}
-              lesson={lesson}
-              isLocked={!isEnrolled && !lesson.isFree}
-            />
-          ))}
+          {lessons.length > 0 ? (
+            lessons.map((lesson) => (
+              <LessonItem
+                key={lesson._id}
+                lesson={lesson}
+                isLocked={!isEnrolled && !lesson.isFree}
+              />
+            ))
+          ) : (
+            <p className="py-2 text-sm text-gray-500"><T>Lessons coming soon.</T></p>
+          )}
         </div>
       </AccordionContent>
     </AccordionItem>
@@ -444,7 +444,7 @@ export default function CourseDetailPage({
   const course = courseResponse?.data;
   const curriculumData = curriculumResponse?.data as { curriculum?: Module[] } | undefined;
   const modules = (curriculumData?.curriculum || []) as Module[];
-  const visibleModules = modules.filter((module) => ((module.lessons || []) as Lesson[]).length > 0);
+  const visibleModules = modules;
   const curriculumTexts = visibleModules.flatMap((module) => {
     const moduleLessons = ((module.lessons || []) as Lesson[]);
     return [module.title, ...moduleLessons.map((lesson) => lesson.title)].filter(Boolean) as string[];
