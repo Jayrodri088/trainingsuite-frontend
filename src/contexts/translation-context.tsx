@@ -196,6 +196,30 @@ function getCacheKey(text: string, from: string, to: string): string {
   return `${from}:${to}:${normalizeText(text)}`;
 }
 
+function isIdentityTranslation(source: string, translated: string, from: string, to: string): boolean {
+  if (from === to) return false;
+
+  const normalizedSource = normalizeText(source);
+  const normalizedTranslated = normalizeText(translated);
+
+  return normalizedSource.length >= 6 && normalizedSource === normalizedTranslated;
+}
+
+function getCachedTranslation(text: string, from: string, to: string): string | undefined {
+  const cacheKey = getCacheKey(text, from, to);
+  const cached = translationCache.get(cacheKey);
+
+  if (!cached) return undefined;
+
+  if (isIdentityTranslation(text, cached, from, to)) {
+    translationCache.delete(cacheKey);
+    saveCache();
+    return undefined;
+  }
+
+  return cached;
+}
+
 // Detect user's preferred language
 function detectLanguage(): string {
   if (typeof window === 'undefined') return 'en';
@@ -251,8 +275,7 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
 
     // Filter out already cached/pending texts
     const toTranslate = normalizedTexts.filter(text => {
-      const cacheKey = getCacheKey(text, 'en', language);
-      return !translationCache.has(cacheKey) && !pendingTranslations.current.has(text);
+      return !getCachedTranslation(text, 'en', language) && !pendingTranslations.current.has(text);
     });
 
     if (toTranslate.length === 0) return;
@@ -335,8 +358,7 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
     const normalized = normalizeText(text);
     if (!normalized || language === 'en') return;
     
-    const cacheKey = getCacheKey(normalized, 'en', language);
-    if (translationCache.has(cacheKey) || pendingTranslations.current.has(normalized)) return;
+    if (getCachedTranslation(normalized, 'en', language) || pendingTranslations.current.has(normalized)) return;
 
     // Avoid duplicates in the queue
     if (!batchQueue.current.includes(normalized)) {
@@ -362,8 +384,7 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
     const normalized = normalizeText(text);
     if (!normalized) return text;
 
-    const cacheKey = getCacheKey(normalized, 'en', language);
-    const cached = translationCache.get(cacheKey);
+    const cached = getCachedTranslation(normalized, 'en', language);
     
     if (cached) return cached;
     
