@@ -38,7 +38,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { useCourseCurriculum, useCourseRatings, useAuth } from "@/hooks";
+import { useCourseRatings, useAuth } from "@/hooks";
 import { useToast } from "@/hooks/use-toast";
 import { coursesApi } from "@/lib/api/courses";
 import { enrollmentsApi } from "@/lib/api/enrollments";
@@ -86,10 +86,6 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
   const lessons = (module.lessons || []) as Lesson[];
   const totalDuration = lessons.reduce((acc, lesson) => acc + (lesson.duration || 0), 0);
 
-  if (lessons.length === 0) {
-    return null;
-  }
-
   return (
     <AccordionItem value={module._id} className="border rounded-lg px-4">
       <AccordionTrigger className="items-center hover:no-underline py-4">
@@ -108,13 +104,17 @@ function ModuleAccordion({ module, index, isEnrolled }: { module: Module; index:
       </AccordionTrigger>
       <AccordionContent className="pb-4">
         <div className="space-y-1 ml-12">
-          {lessons.map((lesson) => (
-            <LessonItem
-              key={lesson._id}
-              lesson={lesson}
-              isLocked={!isEnrolled && !lesson.isFree}
-            />
-          ))}
+          {lessons.length > 0 ? (
+            lessons.map((lesson) => (
+              <LessonItem
+                key={lesson._id}
+                lesson={lesson}
+                isLocked={!isEnrolled && !lesson.isFree}
+              />
+            ))
+          ) : (
+            <p className="py-2 text-sm text-gray-500"><T>Lessons coming soon.</T></p>
+          )}
         </div>
       </AccordionContent>
     </AccordionItem>
@@ -308,8 +308,14 @@ export default function CourseDetailPage({
   const {
     data: curriculumResponse,
     isLoading: curriculumLoading,
-    isError: curriculumError,
-  } = useCourseCurriculum(resolvedParams.slug);
+  } = useQuery({
+    queryKey: ["public-course-curriculum", resolvedParams.slug, isAuthenticated],
+    queryFn: () =>
+      isAuthenticated
+        ? coursesApi.getCurriculum(resolvedParams.slug)
+        : coursesApi.getCurriculumPublic(resolvedParams.slug),
+    enabled: !!resolvedParams.slug,
+  });
   const { data: ratingsResponse } = useCourseRatings(resolvedParams.slug);
 
   // Check enrollment status - need course ID, so wait for course to load
@@ -438,7 +444,7 @@ export default function CourseDetailPage({
   const course = courseResponse?.data;
   const curriculumData = curriculumResponse?.data as { curriculum?: Module[] } | undefined;
   const modules = (curriculumData?.curriculum || []) as Module[];
-  const visibleModules = modules.filter((module) => ((module.lessons || []) as Lesson[]).length > 0);
+  const visibleModules = modules;
   const curriculumTexts = visibleModules.flatMap((module) => {
     const moduleLessons = ((module.lessons || []) as Lesson[]);
     return [module.title, ...moduleLessons.map((lesson) => lesson.title)].filter(Boolean) as string[];
@@ -456,7 +462,7 @@ export default function CourseDetailPage({
     return <PageLoader />;
   }
 
-  if (courseError || curriculumError || !course?._id || !course.title) {
+  if (courseError || !course?._id || !course.title) {
     return (
       <div className="container max-w-6xl py-12 sm:py-16 px-4 sm:px-6 text-center">
         <h1 className="text-xl sm:text-2xl font-bold"><T>Course not found</T></h1>
@@ -472,21 +478,6 @@ export default function CourseDetailPage({
   }
 
   const ratings = (ratingsResponse?.data || []) as Rating[];
-
-  if (visibleModules.length === 0) {
-    return (
-      <div className="container max-w-6xl py-12 sm:py-16 px-4 sm:px-6 text-center">
-        <h1 className="text-xl sm:text-2xl font-bold"><T>Course not currently available</T></h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-2">
-          <T>This course does not currently have any learner-visible content.</T>
-        </p>
-        <Button className="mt-4 sm:mt-6" onClick={() => router.push("/courses")}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          <T>Back to Courses</T>
-        </Button>
-      </div>
-    );
-  }
 
   // Find user's existing review
   const userReview = user
