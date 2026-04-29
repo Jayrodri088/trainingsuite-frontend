@@ -36,8 +36,10 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
         </h1>
 
         {/* Subheading – white, smaller */}
-        <p className="relative z-10 text-white/95 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-8 font-normal">
-          <T>A specially trained workforce of the Rhapsody Global Network, equipped to propagate the gospel in this terminal generation till the last lost soul is brought in. This is accomplished through the Rhapsody End-Time Teaching Crusades.</T>
+        <p className="relative z-10 text-white/95 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-8 font-normal whitespace-pre-line">
+          <T>{`A specially trained workforce of the Rhapsody Global Network, equipped to propagate the gospel in this terminal generation till the last lost soul is brought in.
+
+This site will inspire, edify and equip you better as a Rhapsody Ambassador; you will improve personally, Excel as a Rhapsody Missionary and become a leading force in the organization of Rhapsody End-Time Teaching Crusades.`}</T>
         </p>
 
         {/* CTAs – royal blue + white bg / dark text / grey border for View Curriculum */}
