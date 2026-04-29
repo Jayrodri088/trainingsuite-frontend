@@ -517,6 +517,9 @@ export default function CourseDetailPage({
     0
   );
   const visibleLessons = visibleModules.flatMap((module) => (module.lessons || []) as Lesson[]);
+  const hasDownloadableResources = visibleLessons.some(
+    (lesson) => Array.isArray(lesson.materials) && lesson.materials.length > 0
+  );
   const visibleLessonIds = new Set(visibleLessons.map((lesson) => lesson._id));
   const completedVisibleLessons = (enrollmentResponse?.completedLessons || []).filter((lessonId) =>
     visibleLessonIds.has(lessonId)
@@ -679,10 +682,12 @@ export default function CourseDetailPage({
                         <BookOpen className="h-4 w-4 shrink-0 text-slate-300" />
                         <span>{totalLessons} <T>lessons</T></span>
                       </li>
-                      <li className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 shrink-0 text-slate-300" />
-                        <span><T>Downloadable resources</T></span>
-                      </li>
+                      {hasDownloadableResources && (
+                        <li className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 shrink-0 text-slate-300" />
+                          <span><T>Downloadable resources</T></span>
+                        </li>
+                      )}
                       <li className="flex items-center gap-2">
                         <Award className="h-4 w-4 shrink-0 text-slate-300" />
                         <span><T>Certificate of completion</T></span>
