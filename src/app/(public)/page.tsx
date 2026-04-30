@@ -9,7 +9,6 @@ import type { Course, Enrollment } from "@/types";
 import { usePageTranslation, useT } from "@/components/t";
 import {
   HeroSection,
-  AboutOmegaForceSection,
   InfoGrid,
   CourseListSection,
   TestimoniesSection,
@@ -104,11 +103,6 @@ export default function HomePage() {
   );
 
   usePageTranslation([
-    "Rhapsody Omega Force",
-    `A specially trained workforce of the Rhapsody Global Network, equipped to propagate the gospel in this terminal generation till the last lost soul is brought in.
-
-This site will inspire, edify and equip you better as a Rhapsody Ambassador; you will improve personally, Excel as a Rhapsody Missionary and become a leading force in the organization of Rhapsody End-Time Teaching Crusades.`,
-    "About Rhapsody Omega Force",
     "Ready to answer the call to service?",
     "Join the Rhapsody Omega Force — the specially trained workforce of the Rhapsody Global Network — as we intensify the search for the last lost soul and advance the gospel with precision.",
     ...statementItemKeys,
@@ -118,7 +112,6 @@ This site will inspire, edify and equip you better as a Rhapsody Ambassador; you
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
       <HeroSection isAuthenticated={!!isAuthenticated} />
-      <AboutOmegaForceSection />
       <InfoGrid />
       <CourseListSection
         courses={coursesToShow}
