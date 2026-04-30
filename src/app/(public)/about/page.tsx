@@ -167,11 +167,11 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
-      {/* Who We Are – Hero: stacked on mobile/tablet (text then globe), side-by-side on desktop (lg+) */}
-      <section ref={heroSectionRef} className="relative overflow-hidden min-h-0 lg:min-h-[70vh] flex flex-col lg:flex-row lg:items-center bg-linear-to-br from-white via-blue-50/30 to-white py-12 sm:py-16 md:py-20 lg:py-28">
-        {/* Content – centered on mobile/tablet, left-aligned on desktop */}
-        <div className="container relative z-10 order-1 w-full max-w-7xl shrink-0 px-4 sm:px-6 lg:px-8 flex flex-col items-center lg:items-stretch">
-          <div className="max-w-xl lg:max-w-2xl w-full text-center lg:text-left">
+      {/* Who We Are – stacked through laptop sizes; side-by-side from xl upward */}
+      <section ref={heroSectionRef} className="relative overflow-hidden min-h-0 xl:min-h-[70vh] flex flex-col xl:flex-row xl:items-center bg-linear-to-br from-white via-blue-50/30 to-white py-12 sm:py-16 md:py-20 xl:py-28">
+        {/* Content – centered on smaller screens, left-aligned on wider desktop */}
+        <div className="container relative z-10 order-1 w-full max-w-7xl shrink-0 px-4 sm:px-6 lg:px-8 flex flex-col items-center xl:items-stretch">
+          <div className="max-w-xl xl:max-w-2xl w-full text-center xl:text-left">
             <h1 ref={heroTitleRef} className="font-sans text-2xl sm:text-4xl md:text-5xl font-bold text-black mb-3 sm:mb-4 opacity-0">
               <T>Rhapsody Omega Force</T>
             </h1>
@@ -180,7 +180,7 @@ export default function AboutPage() {
 
 This site will inspire, edify and equip you better as a Rhapsody Ambassador; you will improve personally, Excel as a Rhapsody Missionary and become a leading force in the organization of Rhapsody End-Time Teaching Crusades.`}</T>
             </p>
-            <div ref={heroButtonsRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 opacity-0 justify-center lg:justify-start">
+            <div ref={heroButtonsRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 opacity-0 justify-center xl:justify-start">
               <Button asChild size="lg" className="rounded-lg h-11 px-6 sm:px-8 w-full sm:w-auto bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
                 <Link href="/courses"><T>Explore Courses</T></Link>
               </Button>
@@ -190,8 +190,8 @@ This site will inspire, edify and equip you better as a Rhapsody Ambassador; you
             </div>
           </div>
         </div>
-        {/* 3D Globe – below content on mobile/tablet (no overlap), right side on desktop (lg+) */}
-        <div className="relative order-2 lg:absolute lg:right-4 lg:top-1/2 lg:-translate-y-1/2 lg:order-0 mt-8 sm:mt-10 lg:mt-0 w-full max-w-[min(90vw,320px)] sm:max-w-[340px] mx-auto lg:mx-0 lg:w-[48%] lg:min-w-[320px] lg:max-w-[620px] aspect-square min-h-[220px] sm:min-h-[260px] lg:min-h-0 pointer-events-auto opacity-90 lg:opacity-95 flex items-center justify-center [&>div]:w-full [&>div]:h-full [&>div]:min-h-full z-0 lg:z-auto">
+        {/* 3D Globe – below content on mobile/tablet/laptop, right side on xl desktop */}
+        <div className="relative order-2 xl:absolute xl:right-4 xl:top-1/2 xl:-translate-y-1/2 xl:order-0 mt-8 sm:mt-10 xl:mt-0 w-full max-w-[min(88vw,340px)] sm:max-w-[360px] lg:max-w-[420px] mx-auto xl:mx-0 xl:w-[46%] xl:min-w-[360px] xl:max-w-[620px] aspect-square min-h-[220px] sm:min-h-[260px] xl:min-h-0 pointer-events-auto opacity-90 xl:opacity-95 flex items-center justify-center [&>div]:w-full [&>div]:h-full [&>div]:min-h-full z-0 xl:z-auto">
           <InteractiveGlobe />
         </div>
       </section>
