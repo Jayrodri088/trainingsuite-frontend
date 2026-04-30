@@ -36,7 +36,9 @@ const leadership = [
 
 const ABOUT_PREFETCH_TEXTS: string[] = [
   "Rhapsody Omega Force",
-  "Rhapsody Omega Force is a Kingdom movement — a force rising within the Rhapsody Global Network to finish the work of the gospel in this generation. The Rhapsody End-Time Teaching Crusades are where this vision comes alive, reaching nations with the undiluted message of Christ.",
+  `A specially trained workforce of the Rhapsody Global Network, equipped to propagate the gospel in this terminal generation till the last lost soul is brought in.
+
+This site will inspire, edify and equip you better as a Rhapsody Ambassador; you will improve personally, Excel as a Rhapsody Missionary and become a leading force in the organization of Rhapsody End-Time Teaching Crusades.`,
   "Explore Courses",
   "View Curriculum",
   "What Rhapsody Omega Force Is About",
@@ -173,8 +175,10 @@ export default function AboutPage() {
             <h1 ref={heroTitleRef} className="font-sans text-2xl sm:text-4xl md:text-5xl font-bold text-black mb-3 sm:mb-4 opacity-0">
               <T>Rhapsody Omega Force</T>
             </h1>
-            <p ref={heroSubtitleRef} className="font-sans text-sm sm:text-base md:text-lg text-gray-600 mb-4 sm:mb-6 opacity-0 leading-relaxed">
-              <T>Rhapsody Omega Force is a Kingdom movement — a force rising within the Rhapsody Global Network to finish the work of the gospel in this generation. The Rhapsody End-Time Teaching Crusades are where this vision comes alive, reaching nations with the undiluted message of Christ.</T>
+            <p ref={heroSubtitleRef} className="font-sans text-sm sm:text-base md:text-lg text-gray-600 mb-4 sm:mb-6 opacity-0 leading-relaxed whitespace-pre-line">
+              <T>{`A specially trained workforce of the Rhapsody Global Network, equipped to propagate the gospel in this terminal generation till the last lost soul is brought in.
+
+This site will inspire, edify and equip you better as a Rhapsody Ambassador; you will improve personally, Excel as a Rhapsody Missionary and become a leading force in the organization of Rhapsody End-Time Teaching Crusades.`}</T>
             </p>
             <div ref={heroButtonsRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 opacity-0 justify-center lg:justify-start">
               <Button asChild size="lg" className="rounded-lg h-11 px-6 sm:px-8 w-full sm:w-auto bg-[#0052CC] hover:bg-[#003d99] text-white font-bold">
