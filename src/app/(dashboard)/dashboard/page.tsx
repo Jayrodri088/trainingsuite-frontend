@@ -87,12 +87,6 @@ function CourseProgressCard({ enrollment }: { enrollment: Enrollment }) {
         ) : (
           <PlayCircle className="h-8 w-8 text-white/80 relative z-0 group-hover:scale-110 transition-transform" />
         )}
-        <Badge
-          className="absolute top-2 left-2 z-10 rounded-lg text-[10px] font-semibold border-0 bg-white/90 text-gray-800 backdrop-blur-sm"
-          variant="secondary"
-        >
-          {t(course.level || "beginner")}
-        </Badge>
       </div>
       <div className="flex-1 min-w-0">
         <span className="text-xs font-sans font-medium text-[#0052CC]"><T>Course</T></span>

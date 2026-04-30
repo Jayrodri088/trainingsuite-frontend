@@ -47,12 +47,6 @@ import { cn, coursePlaceholderGradientClass, normalizeUploadUrl } from "@/lib/ut
 import type { Course, Module, Lesson, Rating } from "@/types";
 import { T, usePageTranslation, useT } from "@/components/t";
 
-const levelColors = {
-  beginner: "bg-green-100 text-green-800",
-  intermediate: "bg-amber-100 text-amber-800",
-  advanced: "bg-red-100 text-red-800",
-};
-
 function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean }) {
   const { t } = useT();
   const getIcon = () => {
@@ -547,9 +541,6 @@ export default function CourseDetailPage({
               </Button>
 
               <div className="flex flex-wrap items-center gap-2">
-                <Badge className={`rounded-[9999px] ${levelColors[course.level as keyof typeof levelColors] || "bg-slate-600 text-white"}`}>
-                  {t(course.level || "beginner")}
-                </Badge>
                 {(course.price == null || course.price === 0 || course.isFree) ? (
                   <Badge className="rounded-[9999px] bg-emerald-600 text-white border-0">
                     <T>Free</T>

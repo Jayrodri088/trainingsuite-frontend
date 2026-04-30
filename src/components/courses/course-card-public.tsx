@@ -71,14 +71,12 @@ export function CourseCardPublic({
             )}
             <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
             <div className="absolute top-3 left-3 flex gap-2 flex-wrap sm:hidden">
-              <Badge variant="secondary" className="text-xs capitalize rounded-lg bg-gray-100 text-gray-800">{t(course.level || "beginner")}</Badge>
               {getEnrollmentBadge()}
             </div>
           </div>
           <CardContent className="p-4 flex-1 flex flex-col">
             <div className="flex-1">
               <div className="hidden sm:flex gap-2 flex-wrap mb-2">
-                <Badge variant="secondary" className="text-xs capitalize rounded-lg bg-gray-100 text-gray-800">{t(course.level || "beginner")}</Badge>
                 {course.language && (
                   <Badge variant="outline" className="text-xs rounded-lg border-gray-200">
                     <Globe className="h-3 w-3 mr-1" />{getLanguageNamePublic(course.language, languages)}
@@ -148,7 +146,6 @@ export function CourseCardPublic({
           )}
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
           <div className="absolute top-3 left-3 flex gap-2 flex-wrap">
-            <Badge variant="secondary" className="text-xs capitalize rounded-lg bg-white/90 text-gray-800 border-0">{t(course.level || "beginner")}</Badge>
             {course.language && (
               <Badge variant="outline" className="text-xs rounded-lg bg-white/90 border-gray-200">
                 <Globe className="h-3 w-3 mr-1" />{getLanguageNamePublic(course.language, languages)}

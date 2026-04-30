@@ -143,9 +143,6 @@ function CourseListItem({ enrollment }: { enrollment: Enrollment }) {
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className="rounded-lg text-[10px] font-semibold border-gray-200">
-                      {t(course.level || "beginner")}
-                    </Badge>
                     {isCompleted && (
                       <Badge className="rounded-lg bg-green-100 text-green-800 text-[10px] font-semibold border-0"><T>Completed</T></Badge>
                     )}
