@@ -141,8 +141,9 @@ export default function AdminCreateCoursePage() {
         setIsUploadingThumbnail(true);
         const uploadResponse = await uploadApi.uploadThumbnail(thumbnailFile);
         thumbnailUrl = uploadResponse.data?.fileUrl || "";
-      } catch {
-        toast({ title: "Failed to upload thumbnail", variant: "destructive" });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to upload thumbnail";
+        toast({ title: message, variant: "destructive" });
         setIsUploadingThumbnail(false);
         return;
       }

@@ -435,8 +435,9 @@ export default function AdminCourseEditorPage({
         await updateCourseMutation.mutateAsync({ thumbnail: response.data.fileUrl });
         toast({ title: "Thumbnail uploaded successfully" });
       }
-    } catch (_error) {
-      toast({ title: "Failed to upload thumbnail", variant: "destructive" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to upload thumbnail";
+      toast({ title: message, variant: "destructive" });
     } finally {
       setThumbnailUploading(false);
     }
