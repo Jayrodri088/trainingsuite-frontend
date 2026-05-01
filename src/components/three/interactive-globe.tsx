@@ -15,7 +15,7 @@ const MAX_CAMERA_Z = 7;
 // by the sphere's depth buffer, producing a true 3D "orbiting banner" effect.
 const ORBIT_TEXT_PHRASE = "WE ARE COVERING THE EARTH WITH OUR MESSENGER ANGEL";
 const ORBIT_RADIUS = 1.82;
-const ORBIT_FONT_SIZE = 0.15;
+const ORBIT_FONT_SIZE = 0.17;
 const ORBIT_SPEED = 0.22;
 const ORBIT_COLOR = "#0052CC";
 const ORBIT_LOGO_SIZE = 0.46;
@@ -141,9 +141,9 @@ function OrbitingTextRing() {
             color={ORBIT_COLOR}
             anchorX="center"
             anchorY="middle"
-            outlineWidth={0.006}
+            outlineWidth={0.014}
             outlineColor="#ffffff"
-            outlineOpacity={0.9}
+            outlineOpacity={1}
             material-toneMapped={false}
           >
             {char}
