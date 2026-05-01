@@ -170,7 +170,7 @@ export default function AboutPage() {
       {/* Who We Are – stacked through laptop sizes; side-by-side from xl upward */}
       <section ref={heroSectionRef} className="relative overflow-hidden min-h-0 xl:min-h-[70vh] flex flex-col xl:flex-row xl:items-center bg-linear-to-br from-white via-blue-50/30 to-white py-12 sm:py-16 md:py-20 xl:py-28">
         {/* Content – centered on smaller screens, left-aligned on wider desktop */}
-        <div className="container relative z-10 order-1 w-full max-w-7xl shrink-0 px-4 sm:px-6 lg:px-8 flex flex-col items-center xl:items-stretch">
+        <div className="container relative z-10 order-1 w-full max-w-6xl shrink-0 px-4 sm:px-6 lg:px-8 flex flex-col items-center xl:items-stretch">
           <div className="max-w-xl xl:max-w-2xl w-full text-center xl:text-left">
             <h1 ref={heroTitleRef} className="font-sans text-2xl sm:text-4xl md:text-5xl font-bold text-black mb-3 sm:mb-4 opacity-0">
               <T>Rhapsody Omega Force</T>
@@ -191,7 +191,7 @@ This site will inspire, edify and equip you better as a Rhapsody Ambassador; you
           </div>
         </div>
         {/* 3D Globe – below content on mobile/tablet/laptop, right side on xl desktop */}
-        <div className="relative order-2 xl:absolute xl:right-4 xl:top-1/2 xl:-translate-y-1/2 xl:order-0 mt-8 sm:mt-10 xl:mt-0 w-full max-w-[min(88vw,340px)] sm:max-w-[360px] lg:max-w-[420px] mx-auto xl:mx-0 xl:w-[46%] xl:min-w-[360px] xl:max-w-[620px] aspect-square min-h-[220px] sm:min-h-[260px] xl:min-h-0 pointer-events-auto opacity-90 xl:opacity-95 flex items-center justify-center [&>div]:w-full [&>div]:h-full [&>div]:min-h-full z-0 xl:z-auto">
+        <div className="relative order-2 xl:absolute xl:right-[max(2rem,calc((100vw-80rem)/2))] xl:top-1/2 xl:-translate-y-1/2 xl:order-0 mt-8 sm:mt-10 xl:mt-0 w-full max-w-[min(88vw,340px)] sm:max-w-[360px] lg:max-w-[420px] mx-auto xl:mx-0 xl:w-[34%] xl:min-w-[340px] xl:max-w-[440px] aspect-square min-h-[220px] sm:min-h-[260px] xl:min-h-0 pointer-events-auto opacity-90 xl:opacity-95 flex items-center justify-center [&>div]:w-full [&>div]:h-full [&>div]:min-h-full z-0 xl:z-auto">
           <InteractiveGlobe />
         </div>
       </section>
