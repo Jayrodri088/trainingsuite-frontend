@@ -21,7 +21,7 @@ const ORBIT_COLOR = "#0052CC";
 const ORBIT_LOGO_SIZE = 0.46;
 const ORBIT_CHAR_ARC = 0.122;
 const ORBIT_TEXT_LOGO_GAP = 0.22;
-const ORBIT_LOGO_URL = "/logo.webp";
+const ORBIT_LOGO_URL = "/logo-3d.png";
 
 export interface GlobeControlsRef {
   rotationX: number;

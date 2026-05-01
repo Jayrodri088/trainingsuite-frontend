@@ -66,8 +66,6 @@ export default function AboutPage() {
   const heroSubtitleRef = useRef<HTMLParagraphElement>(null);
   const heroButtonsRef = useRef<HTMLDivElement>(null);
   const missionSectionRef = useRef<HTMLElement>(null);
-  const missionHeadingRef = useRef<HTMLHeadingElement>(null);
-  const missionTextRef = useRef<HTMLParagraphElement>(null);
   const missionGridRef = useRef<HTMLDivElement>(null);
   const leadershipIntroRef = useRef<HTMLDivElement>(null);
   const leadershipCardsRef = useRef<HTMLDivElement>(null);
@@ -102,29 +100,13 @@ export default function AboutPage() {
         );
       }
 
-      // Mission section: scroll-triggered fade-up with stagger
-      gsap.set([missionHeadingRef.current, missionTextRef.current, missionGridRef.current], { opacity: 0, y: 40 });
-      gsap.to(missionHeadingRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.7,
-        ease: "power2.out",
-        scrollTrigger: { trigger: missionSectionRef.current, start: "top 75%", end: "top 50%", toggleActions: "play none none none" },
-      });
-      gsap.to(missionTextRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.7,
-        ease: "power2.out",
-        delay: 0.1,
-        scrollTrigger: { trigger: missionSectionRef.current, start: "top 75%", end: "top 50%", toggleActions: "play none none none" },
-      });
+      // Mission section: scroll-triggered fade-up
+      gsap.set(missionGridRef.current, { opacity: 0, y: 40 });
       gsap.to(missionGridRef.current, {
         opacity: 1,
         y: 0,
         duration: 0.8,
         ease: "power2.out",
-        delay: 0.2,
         scrollTrigger: { trigger: missionSectionRef.current, start: "top 70%", end: "top 45%", toggleActions: "play none none none" },
       });
 
@@ -196,16 +178,9 @@ This site will inspire, edify and equip you better as a Rhapsody Ambassador; you
         </div>
       </section>
 
-      {/* What Omega Force Is About – Platform mission + image beside text */}
+      {/* Mission section */}
       <section ref={missionSectionRef} className="py-10 sm:py-14 md:py-20 bg-[#f5f5f5] border-y border-gray-200">
         <div className="container max-w-7xl w-full px-4 sm:px-6 lg:px-8">
-          <h2 ref={missionHeadingRef} className="font-sans text-xl sm:text-2xl md:text-3xl font-bold text-black text-center mb-6 sm:mb-10 opacity-0">
-            <T>What Rhapsody Omega Force Is About</T>
-          </h2>
-          <p ref={missionTextRef} className="font-sans text-sm sm:text-base text-gray-700 text-center max-w-3xl mx-auto mb-8 sm:mb-12 leading-relaxed opacity-0">
-            <T>Rhapsody Omega Force is a specially trained workforce of the Rhapsody Global Network. These individuals are consistently trained to carry out specific missionary assignments with precision — using the Rhapsody of Realities — as we intensify our search for the last lost soul. At the core of the training is organizing Rhapsody End-Time Teaching Crusades in cities across the globe, alongside door-to-door evangelism, church planting, prevailing prayer, and strategic city transformation. The platform also offers weekly prayer sessions, field report uploads, ministry program participation, and the Ask Pastor Chris dashboard for direct mentorship.</T>
-          </p>
-
           {/* Image beside text – stacks on mobile */}
           <div ref={missionGridRef} className="grid grid-cols-1 md:grid-cols-[min(100%,20rem)_1fr] gap-6 sm:gap-8 md:gap-12 items-center rounded-xl overflow-hidden opacity-0 w-full">
             <div className="relative aspect-4/3 md:aspect-square w-full max-w-sm mx-auto md:mx-0 md:max-w-[20rem] rounded-xl overflow-hidden border border-gray-200 shadow-md bg-gray-100">
@@ -223,10 +198,7 @@ This site will inspire, edify and equip you better as a Rhapsody Ambassador; you
                 <T>Our Mission</T>
               </h3>
               <p className="font-sans text-sm sm:text-base text-gray-600 leading-relaxed">
-                <T>The site offers a variety of mission-focused courses — including organizing Rhapsody End-Time Teaching Crusades in your city, door-to-door evangelism, church planting, winning through prevailing prayer, discipleship, and Christianizing your city using Rhapsody of Realities strategically.</T>
-              </p>
-              <p className="font-sans text-sm sm:text-base text-gray-600 leading-relaxed">
-                <T>Beyond training, the platform enables ministers to participate in ministry programs with Pastor Chris, upload testimonies, field reports and footage from their countries, and access the exclusive Ask Pastor Chris dashboard for life and ministry guidance.</T>
+                <T>To Raise a workforce united in spirit, faith and purpose, Trained and equipped to locate and safe the Last Lost Soul, thereby wrapping up the church age in glory and victory.</T>
               </p>
               <Button asChild className="rounded-lg bg-[#0052CC] hover:bg-[#003d99] text-white font-semibold mt-2 w-full sm:w-auto">
                 <Link href="/courses"><T>Start Learning</T></Link>

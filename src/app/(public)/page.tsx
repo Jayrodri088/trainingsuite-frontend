@@ -95,7 +95,7 @@ export default function HomePage() {
     "Organize Rhapsody End-Time Teaching Crusades in Your City",
     "Weekly Prevailing Prayer Sessions for Your Nation",
     "Participate in Ministry Programs with Pastor Chris",
-    "Upload Field Work Reports, Testimonies & Footage",
+    "Upload Field Work Reports, Testimonies & Footages",
   ];
   const statementItems = statementItemKeys.map((item) => t(item));
   const courseTexts = coursesToShow.flatMap((course) =>
@@ -112,7 +112,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
       <HeroSection isAuthenticated={!!isAuthenticated} />
-      <InfoGrid />
+      <InfoGrid variant="homepage" />
       <CourseListSection
         courses={coursesToShow}
         enrollmentMap={enrollmentMap}
