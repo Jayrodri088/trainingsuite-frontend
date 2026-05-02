@@ -269,7 +269,6 @@ export default function AdminDashboardPage() {
                   <TableRow className="border-gray-200 hover:bg-transparent">
                     <TableHead className="pl-6">Course</TableHead>
                     <TableHead className="text-right">Enrollments</TableHead>
-                    <TableHead className="text-right">Level</TableHead>
                     <TableHead className="text-right">Rating</TableHead>
                     <TableHead className="w-[80px] pr-6"></TableHead>
                   </TableRow>
@@ -290,9 +289,6 @@ export default function AdminDashboardPage() {
                       </TableCell>
                       <TableCell className="text-right font-mono">
                         {(course.enrollmentCount || 0).toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="outline" className="rounded-lg font-sans font-medium text-gray-600 border-gray-200">{course.level || "All Levels"}</Badge>
                       </TableCell>
                       <TableCell className="text-right font-mono">
                         {course.rating?.toFixed(1) || "N/A"}

@@ -21,6 +21,7 @@ import {
   ArrowLeft,
   Loader2,
   Edit,
+  ScrollText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,6 +47,12 @@ import { paymentsApi } from "@/lib/api/payments";
 import { cn, coursePlaceholderGradientClass, normalizeUploadUrl } from "@/lib/utils";
 import type { Course, Module, Lesson, Rating } from "@/types";
 import { T, usePageTranslation, useT } from "@/components/t";
+
+function lessonLooksLikeVideo(lesson: Lesson): boolean {
+  if (lesson.type === "text") return false;
+  if (lesson.type === "video") return true;
+  return Boolean(lesson.videoUrl?.trim());
+}
 
 function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean }) {
   const { t } = useT();
@@ -450,6 +457,8 @@ export default function CourseDetailPage({
     ...(course?.objectives || []),
     ...(course?.requirements || []),
     ...curriculumTexts,
+    "Written lessons",
+    "Video lessons",
   ]);
 
   if (courseLoading || curriculumLoading) {
@@ -522,6 +531,9 @@ export default function CourseDetailPage({
       ) || 0),
     0
   );
+  const videoLessons = visibleLessons.filter(lessonLooksLikeVideo);
+  const hasVideoLessons = videoLessons.length > 0;
+  const totalVideoMinutes = videoLessons.reduce((acc, lesson) => acc + (lesson.duration || 0), 0);
 
   return (
     <div className="min-h-screen bg-background">
@@ -656,10 +668,23 @@ export default function CourseDetailPage({
                   <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
                     <h4 className="font-semibold text-sm text-white"><T>This course includes:</T></h4>
                     <ul className="space-y-2.5 text-sm text-slate-200">
-                      <li className="flex items-center gap-2">
-                        <Video className="h-4 w-4 shrink-0 text-slate-300" />
-                        <span>{totalDuration > 0 ? <>{totalDuration} <T>min of video</T></> : <T>Video content</T>}</span>
-                      </li>
+                      {hasVideoLessons ? (
+                        <li className="flex items-center gap-2">
+                          <Video className="h-4 w-4 shrink-0 text-slate-300" />
+                          <span>
+                            {totalVideoMinutes > 0 ? (
+                              <>{totalVideoMinutes} <T>min of video</T></>
+                            ) : (
+                              <T>Video lessons</T>
+                            )}
+                          </span>
+                        </li>
+                      ) : totalLessons > 0 ? (
+                        <li className="flex items-center gap-2">
+                          <ScrollText className="h-4 w-4 shrink-0 text-slate-300" />
+                          <span><T>Written lessons</T></span>
+                        </li>
+                      ) : null}
                       <li className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4 shrink-0 text-slate-300" />
                         <span>{totalLessons} <T>lessons</T></span>

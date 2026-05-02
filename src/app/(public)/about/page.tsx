@@ -54,6 +54,13 @@ This site will inspire, edify and equip you better as a Rhapsody Ambassador; you
   "Join the Rhapsody Omega Force workforce. Browse our courses and begin your missionary training today.",
   "Browse Courses",
   "Register Now",
+  // Same feature cards as home (InfoGrid variant="homepage")
+  "HD Video Lessons",
+  "On-demand high-definition content from senior leadership.",
+  "Live Mentorship",
+  "Join weekly prayer sessions",
+  "Official Certification",
+  "Recognized validation of completed ministry training.",
   ...leadership.flatMap((p) => [p.titleKey, p.bioKey]),
 ];
 
@@ -208,7 +215,7 @@ This site will inspire, edify and equip you better as a Rhapsody Ambassador; you
         </div>
       </section>
 
-      <InfoGrid />
+      <InfoGrid variant="homepage" />
 
       {/* Meet Our Leadership – Image beside text layout */}
       <section className="py-10 sm:py-14 md:py-20 bg-white">
@@ -268,7 +275,12 @@ This site will inspire, edify and equip you better as a Rhapsody Ambassador; you
               <Link href="/courses"><T>Browse Courses</T></Link>
             </Button>
             {!isAuthenticated && (
-              <Button asChild size="lg" variant="outline" className="rounded-lg h-11 px-6 sm:px-8 w-full sm:w-auto border-white text-white hover:bg-white/10 font-medium">
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="rounded-lg h-11 px-6 sm:px-8 w-full sm:w-auto border-2 border-white bg-transparent text-white hover:bg-white/10 hover:text-white font-medium shadow-none"
+              >
                 <Link href="/register"><T>Register Now</T></Link>
               </Button>
             )}

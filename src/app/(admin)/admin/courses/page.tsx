@@ -78,12 +78,6 @@ const statusColors: Record<string, string> = {
   archived: "bg-red-100 text-red-800",
 };
 
-const levelColors: Record<string, string> = {
-  beginner: "bg-blue-100 text-blue-800",
-  intermediate: "bg-purple-100 text-purple-800",
-  advanced: "bg-orange-100 text-orange-800",
-};
-
 export default function CoursesPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -387,7 +381,6 @@ export default function CoursesPage() {
                     </TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider text-gray-600">Course</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider text-gray-600">Status</TableHead>
-                    <TableHead className="font-bold uppercase text-xs tracking-wider text-gray-600">Level</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider text-right text-gray-600">Enrollments</TableHead>
                     <TableHead className="font-bold uppercase text-xs tracking-wider text-right text-gray-600">Rating</TableHead>
                     <TableHead className="w-[50px] pr-6"></TableHead>
@@ -396,7 +389,7 @@ export default function CoursesPage() {
                 <TableBody>
                   {filteredCourses.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-12">
+                      <TableCell colSpan={6} className="text-center py-12">
                         <div className="flex flex-col items-center">
                           <BookOpen className="h-12 w-12 text-gray-600 mb-4" />
                           <p className="text-gray-600 font-medium">No courses found matching your criteria</p>
@@ -439,14 +432,6 @@ export default function CoursesPage() {
                               }`}
                           >
                             {course.status || "draft"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="secondary"
-                            className="rounded-lg font-normal text-gray-600 bg-transparent border border-gray-200"
-                          >
-                            {course.level || "beginner"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">

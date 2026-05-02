@@ -38,8 +38,6 @@ import { adminApi } from "@/lib/api/admin";
 import { categoriesApi } from "@/lib/api/categories";
 import { uploadApi } from "@/lib/api/upload";
 import { invalidateCourseCollections } from "@/lib/query-keys";
-import type { CourseLevel } from "@/types";
-
 export default function AdminCreateCoursePage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -53,7 +51,6 @@ export default function AdminCreateCoursePage() {
     isFree: true,
     price: 0,
     currency: "USD",
-    level: "beginner",
     duration: 0,
     requirements: [],
     objectives: [],
@@ -158,7 +155,6 @@ export default function AdminCreateCoursePage() {
       isFree: formData.isFree ?? true,
       price: formData.isFree ? 0 : Number(formData.price || 0),
       currency: (formData.currency || "USD").toUpperCase(),
-      level: formData.level,
       requirements: formData.requirements,
       objectives: formData.objectives,
       tags: formData.tags,
@@ -290,22 +286,6 @@ export default function AdminCreateCoursePage() {
                             {cat.name}
                           </SelectItem>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="level">Level</Label>
-                    <Select
-                      value={formData.level}
-                      onValueChange={(value: CourseLevel) => setFormData({ ...formData, level: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="beginner">Beginner</SelectItem>
-                        <SelectItem value="intermediate">Intermediate</SelectItem>
-                        <SelectItem value="advanced">Advanced</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

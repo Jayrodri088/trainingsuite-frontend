@@ -76,7 +76,6 @@ import { getVideoDuration } from "@/lib/utils";
 import type {
   Module,
   Lesson,
-  CourseLevel,
   CourseStatus,
   Material,
   ApiError,
@@ -979,24 +978,6 @@ export default function AdminCourseEditorPage({
                           {cat.name}
                         </SelectItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Level</Label>
-                  <Select
-                    value={course.level}
-                    onValueChange={(value: CourseLevel) =>
-                      updateCourseMutation.mutate({ level: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="beginner">Beginner</SelectItem>
-                      <SelectItem value="intermediate">Intermediate</SelectItem>
-                      <SelectItem value="advanced">Advanced</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
