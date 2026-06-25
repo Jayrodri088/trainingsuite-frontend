@@ -66,7 +66,7 @@ const HOMEPAGE_INFO_ITEMS_KEYS = [
   {
     titleKey: "Join in the $1 Race to The Last Man Campaign",
     descKey: "Partner with a minimum of $1 as we reach the ends of the earth with the gospel.",
-    image: "/Images/dollar-campaign.png",
+    image: "/Images/race-last-man.png",
     frameCorner: "top-left" as FrameCorner,
     iconPosition: "left" as IconPosition,
     isPhoto: true,
