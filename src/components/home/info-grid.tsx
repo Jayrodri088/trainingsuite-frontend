@@ -120,6 +120,8 @@ export function InfoGrid({ variant = "default" }: InfoGridProps) {
     href: "href" in item ? item.href : undefined,
   }));
   const hasOddItemCount = infoItems.length % 2 !== 0;
+  // On the xl 3-column grid, a single leftover card wraps to a new row alone.
+  const hasXlOrphan = infoItems.length % 3 === 1;
 
   return (
     <section className="border-b border-gray-200 bg-white pt-6 sm:pt-8 pb-12 md:pb-16">
@@ -133,6 +135,9 @@ export function InfoGrid({ variant = "default" }: InfoGridProps) {
               isHomepageVariant ? "left" : item.iconPosition;
             const isLastOddCard =
               !isHomepageVariant && hasOddItemCount && idx === infoItems.length - 1;
+            const isLastCard = idx === infoItems.length - 1;
+            // A lone trailing card on the xl 3-col grid: place it in the middle column.
+            const isXlOrphan = hasXlOrphan && isLastCard;
             const CardTag = item.href ? "a" : "div";
             const linkProps = item.href
               ? {
@@ -148,7 +153,8 @@ export function InfoGrid({ variant = "default" }: InfoGridProps) {
               className={cn(
                 "group relative mx-auto flex min-h-0 w-full max-w-[320px] min-w-0 flex-col bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden pt-0 sm:mx-0 sm:max-w-none sm:min-h-[180px] sm:flex-row sm:items-center",
                 isLastOddCard &&
-                  "sm:col-span-2 sm:mx-auto sm:max-w-[680px] xl:col-span-1 xl:max-w-none"
+                  "sm:col-span-2 sm:mx-auto sm:max-w-[680px] xl:col-span-1 xl:max-w-none",
+                isXlOrphan && "xl:col-start-2"
               )}
             >
               {/* sm+: Frame in corner (hidden on mobile) */}
