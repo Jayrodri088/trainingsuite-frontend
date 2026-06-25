@@ -9,6 +9,7 @@ import type { Course, Enrollment } from "@/types";
 import { usePageTranslation, useT } from "@/components/t";
 import {
   HeroSection,
+  DollarCampaignBanner,
   InfoGrid,
   CourseListSection,
   TestimoniesSection,
@@ -112,6 +113,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
       <HeroSection isAuthenticated={!!isAuthenticated} />
+      <DollarCampaignBanner />
       <InfoGrid variant="homepage" />
       <CourseListSection
         courses={coursesToShow}
