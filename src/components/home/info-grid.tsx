@@ -63,6 +63,15 @@ const HOMEPAGE_INFO_ITEMS_KEYS = [
     iconPosition: "right" as IconPosition,
     isPhoto: false,
   },
+  {
+    titleKey: "Join in the $1 Race to The Last Man Campaign",
+    descKey: "Partner with a minimum of $1 as we reach the ends of the earth with the gospel.",
+    image: "/Images/dollar-campaign.png",
+    frameCorner: "top-left" as FrameCorner,
+    iconPosition: "left" as IconPosition,
+    isPhoto: true,
+    href: "https://rimpartnership.org",
+  },
 ] as const;
 
 /* Mobile: frame at top center. sm+: frame in corner */
@@ -108,6 +117,7 @@ export function InfoGrid({ variant = "default" }: InfoGridProps) {
     frameCorner: item.frameCorner,
     iconPosition: item.iconPosition,
     isPhoto: "isPhoto" in item ? item.isPhoto : false,
+    href: "href" in item ? item.href : undefined,
   }));
   const hasOddItemCount = infoItems.length % 2 !== 0;
 
@@ -123,9 +133,18 @@ export function InfoGrid({ variant = "default" }: InfoGridProps) {
               isHomepageVariant ? "left" : item.iconPosition;
             const isLastOddCard =
               !isHomepageVariant && hasOddItemCount && idx === infoItems.length - 1;
+            const CardTag = item.href ? "a" : "div";
+            const linkProps = item.href
+              ? {
+                  href: item.href,
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                }
+              : {};
             return (
-            <div
+            <CardTag
               key={idx}
+              {...linkProps}
               className={cn(
                 "group relative mx-auto flex min-h-0 w-full max-w-[320px] min-w-0 flex-col bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden pt-0 sm:mx-0 sm:max-w-none sm:min-h-[180px] sm:flex-row sm:items-center",
                 isLastOddCard &&
@@ -234,7 +253,7 @@ export function InfoGrid({ variant = "default" }: InfoGridProps) {
                   </div>
                 )}
               </div>
-            </div>
+            </CardTag>
             );
           })}
         </div>
