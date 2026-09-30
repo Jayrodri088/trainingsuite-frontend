@@ -16,6 +16,7 @@ export interface User {
   email: string;
   role: UserRole;
   network?: string;
+  gender?: "male" | "female";
   avatar?: string;
   bio?: string;
   title?: string;

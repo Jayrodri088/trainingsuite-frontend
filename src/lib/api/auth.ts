@@ -11,6 +11,7 @@ export interface RegisterData {
   email: string;
   phone: string;
   network: string;
+  gender?: "male" | "female";
   password: string;
   confirmPassword: string;
 }
@@ -26,6 +27,7 @@ export interface UpdateProfileData {
   bio?: string;
   phone?: string;
   avatar?: string;
+  gender?: "male" | "female";
 }
 
 export interface ChangePasswordData {
