@@ -8,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2, Check, X, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -69,7 +71,9 @@ export default function RegisterPage() {
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
+      gender: undefined,
       email: "",
       phone: "",
       network: "",
@@ -97,10 +101,11 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       const response = await authApi.register({
-        name: data.name,
+        name: `${data.firstName.trim()} ${data.lastName.trim()}`,
         email: data.email,
         phone: data.phone,
         network: data.network,
+        gender: data.gender,
         password: data.password,
         confirmPassword: data.confirmPassword,
       });
@@ -122,8 +127,10 @@ export default function RegisterPage() {
           const fieldErrors = errorData.errors;
 
           Object.entries(fieldErrors).forEach(([field, messages]) => {
-            if (field === "name" || field === "email" || field === "phone" || field === "network" || field === "password" || field === "confirmPassword") {
-              form.setError(field as keyof RegisterFormData, {
+            // Backend validates the combined `name`; surface it on first name.
+            const target = field === "name" ? "firstName" : field;
+            if (target === "firstName" || target === "gender" || target === "email" || target === "phone" || target === "network" || target === "password" || target === "confirmPassword") {
+              form.setError(target as keyof RegisterFormData, {
                 type: "server",
                 message: messages.join(". "),
               });
@@ -162,21 +169,69 @@ export default function RegisterPage() {
             </Alert>
           )}
 
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel><T>First Name</T></FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("John")}
+                      autoComplete="given-name"
+                      disabled={isLoading}
+                      className="rounded-lg h-11 border-gray-200"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel><T>Last Name</T></FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Doe")}
+                      autoComplete="family-name"
+                      disabled={isLoading}
+                      className="rounded-lg h-11 border-gray-200"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
-            name="name"
+            name="gender"
             render={({ field }) => (
               <FormItem>
-                <FormLabel><T>Full Name</T></FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("John Doe")}
-                    autoComplete="name"
-                    disabled={isLoading}
-                    className="rounded-lg h-11 border-gray-200"
-                    {...field}
-                  />
-                </FormControl>
+                <FormLabel><T>Gender</T></FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={isLoading}
+                >
+                  <FormControl>
+                    <SelectTrigger className="rounded-lg h-11 border-gray-200 w-full">
+                      <SelectValue placeholder={t("Select your gender")} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="male">{t("Male")}</SelectItem>
+                    <SelectItem value="female">{t("Female")}</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -210,14 +265,19 @@ export default function RegisterPage() {
               <FormItem>
                 <FormLabel><T>Phone Number</T></FormLabel>
                 <FormControl>
-                  <Input
-                    type="tel"
-                    placeholder={t("+1 555 123 4567")}
+                  <PhoneInput
+                    international
+                    countryCallingCodeEditable={false}
+                    defaultCountry="NG"
+                    inputComponent={Input}
+                    placeholder={t("Phone number")}
                     autoComplete="tel"
-                    inputMode="tel"
                     disabled={isLoading}
-                    className="rounded-lg h-11 border-gray-200"
-                    {...field}
+                    className="phone-field flex h-11 items-center gap-2 rounded-lg border border-gray-200 bg-transparent pl-3 shadow-xs focus-within:border-[#0052CC] focus-within:ring-2 focus-within:ring-[#0052CC]/20"
+                    value={field.value || undefined}
+                    onChange={(v) => field.onChange(v ?? "")}
+                    onBlur={field.onBlur}
+                    name={field.name}
                   />
                 </FormControl>
                 <FormMessage />

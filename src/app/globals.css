@@ -287,3 +287,15 @@
     background: var(--muted-foreground);
   }
 }
+
+/* Phone input (react-phone-number-input): inner field inherits the wrapper's border. */
+.phone-field .PhoneInputInput {
+  border: 0;
+  box-shadow: none;
+  height: 100%;
+  padding-left: 0;
+  outline: none;
+}
+.phone-field .PhoneInputCountrySelectArrow {
+  opacity: 0.6;
+}

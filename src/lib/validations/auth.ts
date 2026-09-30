@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 export const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -6,17 +7,25 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  name: z
+  // Stored as a single `name` ("First Last") on the backend.
+  firstName: z
     .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(100, "Name must be less than 100 characters"),
+    .trim()
+    .min(1, "First name is required")
+    .max(50, "First name must be less than 50 characters"),
+  lastName: z
+    .string()
+    .trim()
+    .min(1, "Last name is required")
+    .max(50, "Last name must be less than 50 characters"),
   email: z.string().email("Please enter a valid email address"),
+  // E.164 from the country-code picker, e.g. +2348012345678.
   phone: z
     .string()
-    .min(7, "Phone number is required")
-    .max(25, "Phone number must be less than 25 characters")
-    .regex(/^[+\d()\s-]+$/, "Please enter a valid phone number"),
+    .min(1, "Phone number is required")
+    .refine((v) => isValidPhoneNumber(v), "Please enter a valid phone number"),
   network: z.string().min(1, "Please select your network"),
+  gender: z.enum(["male", "female"], { message: "Please select your gender" }),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
