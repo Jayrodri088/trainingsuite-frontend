@@ -46,6 +46,12 @@ export interface Course {
   slug: string;
   thumbnail?: string;
   previewVideo?: string;
+  leadershipVideo?: string;
+  ministryApplication?: string;
+  skills?: string[];
+  badgeName?: string;
+  badgeImage?: string;
+  badgeDescription?: string;
   instructor: User | string;
   category: Category | string;
   price: number;

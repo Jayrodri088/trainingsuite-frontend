@@ -23,7 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth, useEnrollments, useCertificates, useNotifications, useCourseThumbnail } from "@/hooks";
 import { formatDistanceToNow } from "date-fns";
 import type { Enrollment, Course, Notification, Certificate } from "@/types";
-import { cn } from "@/lib/utils";
+import { cn, normalizeUploadUrl } from "@/lib/utils";
 import { T, useT } from "@/components/t";
 
 function StatCard({
@@ -284,7 +284,7 @@ export default function DashboardPage() {
       {certificates.length > 0 && (
         <div className="space-y-6 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-sans font-bold text-black"><T>Recent Certificates</T></h2>
+            <div><h2 className="text-xl font-sans font-bold text-black"><T>Achievements</T></h2><p className="text-sm text-gray-600"><T>Your earned course badges and certificates</T></p></div>
             <Button variant="outline" size="sm" asChild className="rounded-lg border-gray-200 hover:bg-gray-50 hover:text-[#0052CC] text-sm font-semibold">
               <Link href="/certificates">
                 <T>View All</T> <ArrowRight className="ml-1 h-3 w-3" />
@@ -299,18 +299,19 @@ export default function DashboardPage() {
                 <Card key={cert._id} className="rounded-xl border-amber-200 bg-amber-50/50 hover:border-amber-300 transition-colors group shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="h-12 w-12 rounded-xl border border-amber-200 bg-amber-100/80 text-amber-600 flex items-center justify-center shrink-0">
-                        <Award className="h-6 w-6" />
+                      <div className="h-14 w-14 rounded-full border border-amber-200 bg-amber-100/80 text-amber-600 flex items-center justify-center shrink-0 overflow-hidden">
+                        {course?.badgeImage ? <Image src={normalizeUploadUrl(course.badgeImage)!} alt="" width={56} height={56} className="h-full w-full object-cover" /> : <Award className="h-7 w-7" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-sans font-bold text-black text-sm line-clamp-1 group-hover:text-[#0052CC] transition-colors">
-                          {course?.title || t("Course Certificate")}
+                          {course?.badgeName || (course?.title ? `${course.title} Graduate` : t("Course Achievement"))}
                         </h4>
+                        <p className="mt-1 line-clamp-2 text-xs text-gray-600">{course?.badgeDescription || course?.title}</p>
                         <p className="text-xs font-sans text-gray-600 mt-1">
                           <T>Issued</T> {formatDistanceToNow(new Date(cert.issuedAt || cert.createdAt), { addSuffix: true })}
                         </p>
                         <Button variant="link" className="h-auto p-0 text-xs font-semibold text-[#0052CC] mt-3 group-hover:underline" asChild>
-                          <Link href={`/certificates/${cert._id}`}><T>View Certificate</T> <ArrowRight className="ml-1 h-3 w-3" /></Link>
+                          <Link href={`/certificates/${cert._id}`}><T>View achievement</T> <ArrowRight className="ml-1 h-3 w-3" /></Link>
                         </Button>
                       </div>
                     </div>

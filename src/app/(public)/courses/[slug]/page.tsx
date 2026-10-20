@@ -54,6 +54,23 @@ function lessonLooksLikeVideo(lesson: Lesson): boolean {
   return Boolean(lesson.videoUrl?.trim());
 }
 
+function CourseIntroVideo({ url, title }: { url: string; title: string }) {
+  const youtubeMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{6,})/i);
+  if (youtubeMatch) {
+    return (
+      <iframe
+        className="aspect-video w-full rounded-xl border-0"
+        src={`https://www.youtube-nocookie.com/embed/${youtubeMatch[1]}`}
+        title={title}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    );
+  }
+
+  return <video className="aspect-video w-full rounded-xl bg-black" src={url} controls preload="metadata" aria-label={title} />;
+}
+
 function LessonItem({ lesson, isLocked }: { lesson: Lesson; isLocked: boolean }) {
   const { t } = useT();
   const getIcon = () => {
@@ -697,7 +714,7 @@ export default function CourseDetailPage({
                       )}
                       <li className="flex items-center gap-2">
                         <Award className="h-4 w-4 shrink-0 text-slate-300" />
-                        <span><T>Certificate of completion</T></span>
+                        <span><T>Digital badge and certificate</T></span>
                       </li>
                       <li className="flex items-center gap-2">
                         <Clock className="h-4 w-4 shrink-0 text-slate-300" />
@@ -761,6 +778,22 @@ export default function CourseDetailPage({
                     <CardTitle className="text-base sm:text-lg"><T>Course Outcomes</T></CardTitle>
                   </CardHeader>
                   <CardContent className="px-4 sm:px-6">
+                    {(course.previewVideo || course.leadershipVideo) && (
+                      <div className="mb-8 grid gap-5 md:grid-cols-2">
+                        {course.previewVideo && (
+                          <div className="space-y-2">
+                            <h3 className="font-semibold"><T>Welcome to the course</T></h3>
+                            <CourseIntroVideo url={course.previewVideo} title={t(`${course.title} welcome video`)} />
+                          </div>
+                        )}
+                        {course.leadershipVideo && (
+                          <div className="space-y-2">
+                            <h3 className="font-semibold"><T>Leadership message</T></h3>
+                            <CourseIntroVideo url={course.leadershipVideo} title={t(`${course.title} leadership message`)} />
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {course.objectives && course.objectives.length > 0 ? (
                       <ul className="grid sm:grid-cols-2 gap-3">
                         {course.objectives.map((outcome: string, index: number) => (
@@ -772,6 +805,29 @@ export default function CourseDetailPage({
                       </ul>
                     ) : (
                       <p className="text-gray-600"><T>No course outcomes specified.</T></p>
+                    )}
+
+                    {course.skills && course.skills.length > 0 && (
+                      <div className="mt-8">
+                        <h3 className="mb-4 font-semibold"><T>Skills you will gain</T></h3>
+                        <div className="flex flex-wrap gap-2">
+                          {course.skills.map((skill) => <Badge key={skill} variant="secondary" className="rounded-full px-3 py-1">{t(skill)}</Badge>)}
+                        </div>
+                      </div>
+                    )}
+
+                    {course.ministryApplication && (
+                      <div className="mt-8 rounded-xl border border-blue-100 bg-blue-50/70 p-5">
+                        <h3 className="mb-2 font-semibold text-slate-900"><T>How this applies to your ministry</T></h3>
+                        <p className="text-sm leading-6 text-slate-700">{t(course.ministryApplication)}</p>
+                      </div>
+                    )}
+
+                    {(course.badgeName || course.badgeImage) && (
+                      <div className="mt-8 flex items-center gap-4 rounded-xl border border-amber-200 bg-amber-50/70 p-4">
+                        {course.badgeImage ? <Image src={normalizeUploadUrl(course.badgeImage)!} alt="" width={64} height={64} className="h-16 w-16 rounded-full object-cover" /> : <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-700"><Award className="h-8 w-8" /></div>}
+                        <div><p className="text-xs font-semibold uppercase tracking-wide text-amber-700"><T>Completion badge</T></p><h3 className="font-bold text-slate-900">{course.badgeName || `${course.title} Graduate`}</h3>{course.badgeDescription && <p className="mt-1 text-sm text-slate-600">{t(course.badgeDescription)}</p>}</div>
+                      </div>
                     )}
 
                     {course.requirements && course.requirements.length > 0 && (

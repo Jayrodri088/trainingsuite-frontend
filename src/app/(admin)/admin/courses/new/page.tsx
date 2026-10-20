@@ -56,6 +56,13 @@ export default function AdminCreateCoursePage() {
     objectives: [],
     tags: [],
     thumbnail: "",
+    previewVideo: "",
+    leadershipVideo: "",
+    ministryApplication: "",
+    skills: [],
+    badgeName: "",
+    badgeImage: "",
+    badgeDescription: "",
   });
 
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -159,6 +166,13 @@ export default function AdminCreateCoursePage() {
       objectives: formData.objectives,
       tags: formData.tags,
       thumbnail: thumbnailUrl || undefined,
+      previewVideo: formData.previewVideo?.trim() || undefined,
+      leadershipVideo: formData.leadershipVideo?.trim() || undefined,
+      ministryApplication: formData.ministryApplication?.trim() || undefined,
+      skills: formData.skills,
+      badgeName: formData.badgeName?.trim() || undefined,
+      badgeImage: formData.badgeImage?.trim() || undefined,
+      badgeDescription: formData.badgeDescription?.trim() || undefined,
     });
   };
 
@@ -370,6 +384,49 @@ export default function AdminCreateCoursePage() {
                     Duration is automatically calculated from the video lengths of all lessons in the course.
                   </p>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Welcome and Ministry Impact</CardTitle>
+                <CardDescription>Set expectations, introduce leadership, and explain how learners will use the training.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="previewVideo">Welcome video URL</Label>
+                    <Input id="previewVideo" type="url" value={formData.previewVideo || ""} onChange={(e) => setFormData({ ...formData, previewVideo: e.target.value })} placeholder="https://youtube.com/watch?v=..." />
+                    <p className="text-xs text-gray-600">Recommended length: 1–2 minutes.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="leadershipVideo">Leadership message URL</Label>
+                    <Input id="leadershipVideo" type="url" value={formData.leadershipVideo || ""} onChange={(e) => setFormData({ ...formData, leadershipVideo: e.target.value })} placeholder="https://youtube.com/watch?v=..." />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="skills">Skills learners will gain</Label>
+                  <Input id="skills" value={(formData.skills || []).join(", ")} onChange={(e) => setFormData({ ...formData, skills: e.target.value.split(",").map((item) => item.trim()).filter(Boolean) })} placeholder="Digital outreach, AI-assisted content, follow-up" />
+                  <p className="text-xs text-gray-600">Separate skills with commas.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ministryApplication">How this applies to ministry</Label>
+                  <Textarea id="ministryApplication" value={formData.ministryApplication || ""} onChange={(e) => setFormData({ ...formData, ministryApplication: e.target.value })} placeholder="Explain the practical ministry application of this course..." rows={4} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Completion Badge</CardTitle>
+                <CardDescription>This badge is earned automatically when the course is completed.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2"><Label htmlFor="badgeName">Badge name</Label><Input id="badgeName" value={formData.badgeName || ""} onChange={(e) => setFormData({ ...formData, badgeName: e.target.value })} placeholder="Digital Evangelist" /></div>
+                  <div className="space-y-2"><Label htmlFor="badgeImage">Badge image URL</Label><Input id="badgeImage" value={formData.badgeImage || ""} onChange={(e) => setFormData({ ...formData, badgeImage: e.target.value })} placeholder="https://.../badge.png" /></div>
+                </div>
+                <div className="space-y-2"><Label htmlFor="badgeDescription">Badge description</Label><Textarea id="badgeDescription" value={formData.badgeDescription || ""} onChange={(e) => setFormData({ ...formData, badgeDescription: e.target.value })} placeholder="Awarded for completing this course and demonstrating..." rows={3} /></div>
               </CardContent>
             </Card>
 

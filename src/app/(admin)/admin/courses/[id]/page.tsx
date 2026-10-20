@@ -1062,6 +1062,28 @@ export default function AdminCourseEditorPage({
               </div>
 
               <div className="space-y-4 rounded-lg border p-4">
+                <div>
+                  <Label>Welcome and ministry impact</Label>
+                  <p className="mt-1 text-xs text-gray-600">Introduce the journey, feature a leadership message, and make the practical value clear.</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2"><Label htmlFor="course-preview-video">Welcome video URL</Label><Input id="course-preview-video" type="url" defaultValue={course.previewVideo || ""} onBlur={(e) => updateCourseMutation.mutate({ previewVideo: e.target.value.trim() })} /></div>
+                  <div className="space-y-2"><Label htmlFor="course-leadership-video">Leadership message URL</Label><Input id="course-leadership-video" type="url" defaultValue={course.leadershipVideo || ""} onBlur={(e) => updateCourseMutation.mutate({ leadershipVideo: e.target.value.trim() })} /></div>
+                </div>
+                <div className="space-y-2"><Label htmlFor="course-skills">Skills learners will gain</Label><Input id="course-skills" defaultValue={(course.skills || []).join(", ")} onBlur={(e) => updateCourseMutation.mutate({ skills: e.target.value.split(",").map((item) => item.trim()).filter(Boolean) })} placeholder="Digital outreach, AI-assisted content, follow-up" /></div>
+                <div className="space-y-2"><Label htmlFor="course-ministry-application">How this applies to ministry</Label><Textarea id="course-ministry-application" defaultValue={course.ministryApplication || ""} onBlur={(e) => updateCourseMutation.mutate({ ministryApplication: e.target.value.trim() })} rows={4} /></div>
+              </div>
+
+              <div className="space-y-4 rounded-lg border p-4">
+                <div><Label>Completion badge</Label><p className="mt-1 text-xs text-gray-600">Automatically shown as earned when the participant completes this course.</p></div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2"><Label htmlFor="course-badge-name">Badge name</Label><Input id="course-badge-name" defaultValue={course.badgeName || ""} onBlur={(e) => updateCourseMutation.mutate({ badgeName: e.target.value.trim() })} /></div>
+                  <div className="space-y-2"><Label htmlFor="course-badge-image">Badge image URL</Label><Input id="course-badge-image" defaultValue={course.badgeImage || ""} onBlur={(e) => updateCourseMutation.mutate({ badgeImage: e.target.value.trim() })} /></div>
+                </div>
+                <div className="space-y-2"><Label htmlFor="course-badge-description">Badge description</Label><Textarea id="course-badge-description" defaultValue={course.badgeDescription || ""} onBlur={(e) => updateCourseMutation.mutate({ badgeDescription: e.target.value.trim() })} rows={3} /></div>
+              </div>
+
+              <div className="space-y-4 rounded-lg border p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="course-is-free">Free Course</Label>

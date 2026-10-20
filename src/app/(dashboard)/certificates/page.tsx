@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Award,
   Download,
@@ -41,6 +42,7 @@ import { certificatesApi } from "@/lib/api/certificates";
 import { format } from "date-fns";
 import type { Certificate, Course } from "@/types";
 import { T, useT } from "@/components/t";
+import { normalizeUploadUrl } from "@/lib/utils";
 
 function CertificateCard({ certificate }: { certificate: Certificate }) {
   const { toast } = useToast();
@@ -104,8 +106,8 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
           <Badge className="absolute top-3 left-3 rounded-lg bg-amber-600 hover:bg-amber-600 border-0 text-[10px] font-semibold"><T>Verified</T></Badge>
           <div className="flex items-center justify-center py-4">
             <div className="relative">
-              <div className="h-20 w-20 rounded-xl border-2 border-amber-200 bg-amber-100/80 flex items-center justify-center">
-                <Award className="h-10 w-10 text-amber-600" />
+              <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-amber-200 bg-amber-100/80 flex items-center justify-center">
+                {course?.badgeImage ? <Image src={normalizeUploadUrl(course.badgeImage)!} alt="" width={80} height={80} className="h-full w-full object-cover" /> : <Award className="h-10 w-10 text-amber-600" />}
               </div>
               <div className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-green-600 flex items-center justify-center border-2 border-white">
                 <Check className="h-4 w-4 text-white" />
@@ -115,8 +117,9 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
         </div>
         <CardContent className="p-5">
           <h3 className="font-sans font-bold text-black text-center text-sm line-clamp-2 min-h-[40px] mb-4">
-            {t(course?.title || "Course Certificate")}
+            {t(course?.badgeName || (course?.title ? `${course.title} Graduate` : "Course Achievement"))}
           </h3>
+          {course?.badgeDescription && <p className="mb-4 line-clamp-2 text-center text-xs text-gray-600">{t(course.badgeDescription)}</p>}
 
           <div className="space-y-3 mb-6">
             <div className="flex items-center justify-between text-xs border-b border-gray-200 pb-2">
@@ -261,9 +264,9 @@ export default function CertificatesPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-sans font-bold text-black tracking-tight"><T>My Certificates</T></h1>
+        <h1 className="text-2xl sm:text-3xl font-sans font-bold text-black tracking-tight"><T>My Achievements</T></h1>
         <p className="font-sans text-gray-600 mt-1">
-          <T>View and download your earned certificates</T>
+          <T>View your earned course badges and download verified certificates</T>
         </p>
       </div>
 
@@ -276,7 +279,7 @@ export default function CertificatesPage() {
             </div>
             <div>
               <p className="text-3xl font-sans font-bold text-black">{certificates.length}</p>
-              <p className="text-sm font-sans text-gray-600 mt-1"><T>Total Certificates</T></p>
+              <p className="text-sm font-sans text-gray-600 mt-1"><T>Badges Earned</T></p>
             </div>
           </CardContent>
         </Card>

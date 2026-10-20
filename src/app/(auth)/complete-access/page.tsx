@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ShieldCheck, Loader2, AlertCircle } from "lucide-react";
+import { ShieldCheck, Loader2, AlertCircle, GraduationCap, HeartHandshake, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -82,9 +82,24 @@ function CompleteAccessInner() {
         </h1>
         <p className="text-gray-600 text-sm">
           <T>
-            To access the training portal, you will need to complete a one-time $1 identity verification. This helps us confirm that each account belongs to a real person and keeps the platform secure for all ministers.
+            Complete your one-time $1 access payment to activate the full Omega Force learning experience.
           </T>
         </p>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-3 text-center">
+          <GraduationCap className="mx-auto mb-2 h-5 w-5 text-[#0052CC]" />
+          <p className="text-xs font-semibold text-slate-800"><T>Practical training</T></p>
+        </div>
+        <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-3 text-center">
+          <HeartHandshake className="mx-auto mb-2 h-5 w-5 text-[#0052CC]" />
+          <p className="text-xs font-semibold text-slate-800"><T>Mentorship and spiritual growth</T></p>
+        </div>
+        <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-3 text-center">
+          <Award className="mx-auto mb-2 h-5 w-5 text-[#0052CC]" />
+          <p className="text-xs font-semibold text-slate-800"><T>Badges and certificates</T></p>
+        </div>
       </div>
 
       {cancelled && (
@@ -120,7 +135,7 @@ function CompleteAccessInner() {
           )}
         </Button>
         <p className="text-center text-xs text-gray-500">
-          <T>Secure payment via Stripe. You will be redirected to complete your identity verification payment.</T>
+          <T>Secure checkout. Card, Apple Pay, and Google Pay appear where supported on your device.</T>
         </p>
       </div>
 
@@ -134,12 +149,12 @@ function CompleteAccessInner() {
               <div className="space-y-3 text-left text-sm leading-6 text-gray-600">
                 <p>
                   <T>
-                    This one-time $1 payment is used to verify your identity and confirm that your account belongs to a real person.
+                    This one-time $1 payment activates training, mentorship, spiritual-development resources, progress tracking, badges, and certification.
                   </T>
                 </p>
                 <p>
                   <T>
-                    It helps protect the training portal from fake accounts, spam, and misuse, so the platform remains safe and trustworthy for everyone.
+                    It also helps verify each account and protect the training community from fake accounts, spam, and misuse.
                   </T>
                 </p>
                 <p>

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Loader2, Check, X, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Loader2, Check, X, AlertCircle, Award, Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PhoneInput from "react-phone-number-input";
@@ -55,6 +55,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [customNetwork, setCustomNetwork] = useState("");
   const { data: configData } = useQuery({
     queryKey: ["site-config"],
     queryFn: adminApi.getConfig,
@@ -82,13 +83,8 @@ export default function RegisterPage() {
     },
   });
 
-  useEffect(() => {
-    if (!form.getValues("network") && networks[0]) {
-      form.setValue("network", networks[0], { shouldDirty: false, shouldValidate: false });
-    }
-  }, [form, networks]);
-
   const password = form.watch("password");
+  const selectedNetwork = form.watch("network");
 
   async function onSubmit(data: RegisterFormData) {
     setServerError(null);
@@ -98,13 +94,19 @@ export default function RegisterPage() {
       return;
     }
 
+    const resolvedNetwork = data.network === "__other__" ? customNetwork.trim() : data.network;
+    if (!resolvedNetwork) {
+      form.setError("network", { message: t("Please specify your network or designation") });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await authApi.register({
         name: `${data.firstName.trim()} ${data.lastName.trim()}`,
         email: data.email,
         phone: data.phone,
-        network: data.network,
+        network: resolvedNetwork,
         gender: data.gender,
         password: data.password,
         confirmPassword: data.confirmPassword,
@@ -117,7 +119,7 @@ export default function RegisterPage() {
               "Welcome! Your account has been created. You can browse courses now, and complete the one-time verification when you are ready to access training."
             )
         );
-        router.push("/courses");
+        router.push("/complete-access?new=1");
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError && error.response?.data) {
@@ -307,16 +309,35 @@ export default function RegisterPage() {
                         {network}
                       </SelectItem>
                     ))}
+                    <SelectItem value="__other__"><T>Other / Not listed</T></SelectItem>
                   </SelectContent>
                 </Select>
+                {field.value.toLowerCase() === "global" && (
+                  <p className="text-xs leading-5 text-gray-500">
+                    <T>Global is for participants serving across multiple regions or without a specific regional network.</T>
+                  </p>
+                )}
                 <FormMessage />
               </FormItem>
             )}
           />
+          {selectedNetwork === "__other__" && (
+            <div className="space-y-2">
+              <FormLabel htmlFor="custom-network"><T>Your network or designation</T></FormLabel>
+              <Input
+                id="custom-network"
+                value={customNetwork}
+                onChange={(event) => setCustomNetwork(event.target.value)}
+                placeholder={t("Enter your network, ministry, or designation")}
+                className="rounded-lg h-11 border-gray-200"
+                disabled={isLoading}
+              />
+            </div>
+          )}
           {networks.length === 0 && (
-            <Alert variant="destructive">
+            <Alert>
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{t("No networks have been configured yet. Please contact an administrator.")}</AlertDescription>
+              <AlertDescription>{t("No listed networks are available. Choose Other and enter your network or designation.")}</AlertDescription>
             </Alert>
           )}
 
@@ -438,9 +459,18 @@ export default function RegisterPage() {
             </label>
           </div>
 
+          <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-4">
+            <p className="mb-3 text-sm font-semibold text-slate-900"><T>Your one-time $1 access includes</T></p>
+            <div className="grid gap-2 text-xs leading-5 text-slate-600 sm:grid-cols-3">
+              <span className="flex items-start gap-2"><Users className="mt-0.5 h-4 w-4 shrink-0 text-[#0052CC]" /><T>Training and mentorship</T></span>
+              <span className="flex items-start gap-2"><Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#0052CC]" /><T>Spiritual development</T></span>
+              <span className="flex items-start gap-2"><Award className="mt-0.5 h-4 w-4 shrink-0 text-[#0052CC]" /><T>Badges and certification</T></span>
+            </div>
+          </div>
+
           <Button type="submit" className="w-full h-11 rounded-lg bg-[#0052CC] hover:bg-[#0052CC]/90 text-white font-bold" disabled={isLoading || !acceptTerms}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            <T>Create account</T>
+            <T>Create account and continue</T>
           </Button>
         </form>
       </Form>

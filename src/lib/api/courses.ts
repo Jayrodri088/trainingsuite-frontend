@@ -26,6 +26,13 @@ export interface CreateCourseData {
   objectives?: string[];
   tags?: string[];
   thumbnail?: string;
+  previewVideo?: string;
+  leadershipVideo?: string;
+  ministryApplication?: string;
+  skills?: string[];
+  badgeName?: string;
+  badgeImage?: string;
+  badgeDescription?: string;
 }
 
 export interface UpdateCourseData
@@ -34,7 +41,6 @@ export interface UpdateCourseData
   level?: CourseLevel;
   isPublished?: boolean;
   thumbnail?: string;
-  previewVideo?: string;
   /** Omit or set `null` to clear (server stores unset). */
   network?: string | null;
 }
